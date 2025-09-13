@@ -13,10 +13,34 @@
     <maven.compiler.target>17</maven.compiler.target>
     <maven.compiler.source>17</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <slf4j-api.version>2.0.16</slf4j-api.version>
+    <logback-classic.version>1.5.15</logback-classic.version>
+    <junit.version>5.13.4</junit.version>
+
     <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
   </properties>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j-api.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback-classic.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 

@@ -1,4 +1,4 @@
-package ru.itmo;
+package ru.itmo.spaceships;
 
 public class App {
     /**

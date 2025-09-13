@@ -3,9 +3,12 @@ package ru.itmo.spaceships.model;
 import java.time.Instant;
 import java.util.List;
 
+import lombok.Getter;
+
 /**
  * Космический корабль
  */
+@Getter
 public class SpaceShip {
     /**
      * Серийный номер, уникальный для каждого корабля

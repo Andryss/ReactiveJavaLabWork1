@@ -13,7 +13,7 @@ public class EngineGenerator implements Generator<Engine> {
     /**
      * Все возможные производители двигателей
      */
-    private static final String[] MANUFACTURERS = new String[]{
+    private static final String[] MANUFACTURERS = {
             "GAZ", "UAZ", "Kuznetsov", "ELSIB", "Saturn", "Kamaz", "RUMO"
     };
     /**

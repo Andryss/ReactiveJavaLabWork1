@@ -3,12 +3,14 @@ package ru.itmo.spaceships.model;
 import java.time.Instant;
 import java.util.List;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * Космический корабль
  */
-@Getter
+@Data
+@AllArgsConstructor
 public class SpaceShip {
     /**
      * Серийный номер, уникальный для каждого корабля

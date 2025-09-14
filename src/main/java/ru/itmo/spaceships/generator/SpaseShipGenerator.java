@@ -79,6 +79,7 @@ public class SpaseShipGenerator implements Generator<SpaceShip> {
 
         int maxSpeed = random.nextInt(MIN_MAX_SPEED, MAX_MAX_SPEED);
 
-        return new SpaceShip(serial, manufacturer, manufactureDate, name, spaceShipType, dimensions, engine, crewMembers, maxSpeed);
+        return new SpaceShip(serial, manufacturer, manufactureDate, name, spaceShipType, dimensions, engine,
+                crewMembers, maxSpeed);
     }
 }

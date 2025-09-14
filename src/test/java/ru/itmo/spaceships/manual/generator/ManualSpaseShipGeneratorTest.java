@@ -1,22 +1,22 @@
-package ru.itmo.spaceships.manual;
+package ru.itmo.spaceships.manual.generator;
 
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import ru.itmo.spaceships.generator.CrewMemberGenerator;
-import ru.itmo.spaceships.model.CrewMember;
+import ru.itmo.spaceships.generator.SpaseShipGenerator;
+import ru.itmo.spaceships.model.SpaceShip;
 
 @Slf4j
 @Disabled("Только для ручного тестирования")
-class ManualCrewMemberGeneratorTest {
+class ManualSpaseShipGeneratorTest {
 
     @Test
     void generateManyTest() {
-        CrewMemberGenerator generator = new CrewMemberGenerator();
+        SpaseShipGenerator generator = new SpaseShipGenerator();
 
-        List<CrewMember> generated = generator.generateMany(10);
+        List<SpaceShip> generated = generator.generateMany(1);
 
         log.info("Generated: {}", generated);
     }

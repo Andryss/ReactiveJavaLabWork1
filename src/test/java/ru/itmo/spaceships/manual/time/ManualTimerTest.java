@@ -1,4 +1,4 @@
-package ru.itmo.spaceships.manual;
+package ru.itmo.spaceships.manual.time;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;

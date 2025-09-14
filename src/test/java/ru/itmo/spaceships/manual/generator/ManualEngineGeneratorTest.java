@@ -1,4 +1,4 @@
-package ru.itmo.spaceships.manual;
+package ru.itmo.spaceships.manual.generator;
 
 import java.util.List;
 

@@ -2,9 +2,14 @@ package ru.itmo.spaceships.model;
 
 import java.time.LocalDate;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
  * Член экипажа
  */
+@Data
+@AllArgsConstructor
 public class CrewMember {
     /**
      * ФИО

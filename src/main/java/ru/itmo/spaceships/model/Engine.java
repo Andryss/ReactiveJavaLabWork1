@@ -1,8 +1,13 @@
 package ru.itmo.spaceships.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
  * Двигатель
  */
+@Data
+@AllArgsConstructor
 public class Engine {
     /**
      * Модель

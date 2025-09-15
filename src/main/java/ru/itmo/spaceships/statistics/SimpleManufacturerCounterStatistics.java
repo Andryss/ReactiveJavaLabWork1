@@ -7,7 +7,8 @@ import java.util.Map;
 import ru.itmo.spaceships.model.SpaceShip;
 
 /**
- * Класс для сбора статистики о количестве произведенных кораблей различными производителями
+ * Класс для сбора статистики о количестве произведенных кораблей различными производителями.
+ * При помощи стандартного цикла
  */
 public class SimpleManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
 

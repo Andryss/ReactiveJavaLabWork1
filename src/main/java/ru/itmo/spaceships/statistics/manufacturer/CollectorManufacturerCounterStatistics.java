@@ -28,7 +28,9 @@ public class CollectorManufacturerCounterStatistics implements StatisticsCalcula
                 .collect(new ManufacturerCounterCollector());
     }
 
-    private static class ManufacturerCounterCollector implements Collector<SpaceShip, Map<String, AtomicLong>, Map<String, Long>> {
+    private static class ManufacturerCounterCollector
+            implements Collector<SpaceShip, Map<String, AtomicLong>, Map<String, Long>> {
+
         @Override
         public Supplier<Map<String, AtomicLong>> supplier() {
             return ConcurrentHashMap::new;

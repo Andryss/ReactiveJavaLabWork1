@@ -1,10 +1,11 @@
-package ru.itmo.spaceships.manual.statistics;
+package ru.itmo.spaceships.manual.statistics.manufacturer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.itmo.spaceships.generator.SpaseShipGenerator;
-import ru.itmo.spaceships.statistics.StreamManufacturerCounterStatistics;
+import ru.itmo.spaceships.manual.statistics.BaseTimedStatisticsTest;
+import ru.itmo.spaceships.statistics.manufacturer.StreamManufacturerCounterStatistics;
 
 @Slf4j
 @Disabled("Только для ручного тестирования")

@@ -1,4 +1,4 @@
-package ru.itmo.spaceships.statistics;
+package ru.itmo.spaceships.statistics.manufacturer;
 
 import java.util.List;
 import java.util.Map;
@@ -6,6 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
  * Класс для сбора статистики о количестве произведенных кораблей различными производителями.

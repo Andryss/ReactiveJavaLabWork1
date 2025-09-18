@@ -1,16 +1,17 @@
-package ru.itmo.spaceships.statistics;
+package ru.itmo.spaceships.statistics.manufacturer;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
  * Класс для сбора статистики о количестве произведенных кораблей различными производителями.
  * При помощи стандартного цикла
  */
-public class SimpleManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+public class CycleManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
 
     @Override
     public Map<String, Long> calculate(List<SpaceShip> objects) {

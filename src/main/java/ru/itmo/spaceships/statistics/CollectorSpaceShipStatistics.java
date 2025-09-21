@@ -82,7 +82,7 @@ public class CollectorSpaceShipStatistics implements StatisticsCalculator<SpaceS
 
 		@Override
 		public Set<Characteristics> characteristics() {
-			return Set.of(Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH, Characteristics.CONCURRENT);
+			return Set.of(Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
 		}
 
 		private <K> void mergeMaps(Map<K, Long> map1, Map<K, Long> map2) {

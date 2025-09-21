@@ -28,7 +28,8 @@ public class CollectorBirthdayMonthCounterStatistics implements StatisticsCalcul
                 .collect(new BirthdayMonthCounterCollector());
     }
 
-    private static class BirthdayMonthCounterCollector implements Collector<SpaceShip, Map<Month, Long>, Map<Month, Long>> {
+    private static class BirthdayMonthCounterCollector
+            implements Collector<SpaceShip, Map<Month, Long>, Map<Month, Long>> {
 
         @Override
         public Supplier<Map<Month, Long>> supplier() {

@@ -14,13 +14,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-public class CollectorSpaceShipStatistics implements StatisticsCalculator<SpaceShip, String> {
+public class CollectorSpaceShipStatistics implements StatisticsCalculator<SpaceShip, StatisticsAccumulator> {
 
 	@Override
-	public String calculate(List<SpaceShip> objects) {
-		StatisticsAccumulator accumulator = objects.stream()
+	public StatisticsAccumulator calculate(List<SpaceShip> objects) {
+		return objects.stream()
 				.collect(new SpaceShipStatisticsCollector());
-		return accumulator.getStatistics();
 	}
 
 	private static class SpaceShipStatisticsCollector implements Collector<SpaceShip, StatisticsAccumulator, StatisticsAccumulator> {

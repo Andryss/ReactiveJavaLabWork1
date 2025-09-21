@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-public class StreamSpaceShipStatistics implements StatisticsCalculator<SpaceShip, String> {
+public class StreamSpaceShipStatistics implements StatisticsCalculator<SpaceShip, StatisticsAccumulator> {
 
 	@Override
-	public String calculate(List<SpaceShip> objects) {
+	public StatisticsAccumulator calculate(List<SpaceShip> objects) {
 		StatisticsAccumulator accumulator = new StatisticsAccumulator();
 
 		accumulator.getCountByManufacturer().accumulator = objects.stream()
@@ -34,6 +34,6 @@ public class StreamSpaceShipStatistics implements StatisticsCalculator<SpaceShip
 						Collectors.summarizingLong(ship -> ship.getCrew().size())
 				));
 
-		return accumulator.getStatistics();
+		return accumulator;
 	}
 }

@@ -8,10 +8,10 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.List;
 
-public class CycleSpaceShipStatistics implements StatisticsCalculator<SpaceShip, String> {
+public class CycleSpaceShipStatistics implements StatisticsCalculator<SpaceShip, StatisticsAccumulator> {
 
 	@Override
-	public String calculate(List<SpaceShip> objects) {
+	public StatisticsAccumulator calculate(List<SpaceShip> objects) {
 		StatisticsAccumulator accumulator = new StatisticsAccumulator();
 		for (SpaceShip object : objects) {
 			accumulator.getCountByManufacturer().accumulator.merge(object.getManufacturer(), 1L, Long::sum);
@@ -39,6 +39,6 @@ public class CycleSpaceShipStatistics implements StatisticsCalculator<SpaceShip,
 				return v;
 			});
 		}
-		return accumulator.getStatistics();
+		return accumulator;
 	}
 }

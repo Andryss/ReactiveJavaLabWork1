@@ -15,13 +15,13 @@ public class StatisticsAccumulator {
 	private AggregateAccumulator aggregateLength = new AggregateAccumulator();
 	private GroupedAggregateAccumulator aggregateCrewByShipType = new GroupedAggregateAccumulator();
 
-	public String getStatistics() {
-		return "\ncountByManufacturer: " + countByManufacturer.getResult() + "\n" +
-				"aggregateMaxSpeed: " + aggregateMaxSpeed.getResult() + "\n" +
-				"aggregateCrewMembers: " + aggregateCrewMembers.getResult() + "\n" +
-				"aggregateLength: " + aggregateLength.getResult() + "\n" +
-				"countByFuelType: " + countByFuelType.getResult() + "\n" +
-				"aggregateCrewByShipType: " + aggregateCrewByShipType.getResult() + "\n" +
-				"countByDate: " + countByDate.getResult() + "\n";
+	public String toString() {
+		return "\ncountByManufacturer: " + countByManufacturer + "\n" +
+				"aggregateMaxSpeed: " + aggregateMaxSpeed + "\n" +
+				"aggregateCrewMembers: " + aggregateCrewMembers + "\n" +
+				"aggregateLength: " + aggregateLength + "\n" +
+				"countByFuelType: " + countByFuelType + "\n" +
+				"aggregateCrewByShipType: " + aggregateCrewByShipType + "\n" +
+				"countByDate: " + countByDate + "\n";
 	}
 }

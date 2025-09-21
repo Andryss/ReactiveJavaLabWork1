@@ -4,7 +4,7 @@ public class BaseAccumulator implements Accumulator {
 	Long accumulator = 0L;
 
 	@Override
-	public String getResult() {
+	public String toString() {
 		return accumulator.toString();
 	}
 }

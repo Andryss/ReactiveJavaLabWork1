@@ -7,7 +7,7 @@ public class GroupedAccumulator implements Accumulator {
 	public Map<String, Long> accumulator = new HashMap<>();
 
 	@Override
-	public String getResult() {
+	public String toString() {
 		return accumulator.toString();
 	}
 }

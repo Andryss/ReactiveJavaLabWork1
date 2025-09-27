@@ -18,6 +18,7 @@
     <slf4j-api.version>2.0.16</slf4j-api.version>
     <logback-classic.version>1.5.15</logback-classic.version>
     <junit.version>5.13.4</junit.version>
+    <jmh.version>1.37</jmh.version>
 
     <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
   </properties>
@@ -48,6 +49,18 @@
       <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>${jmh.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>${jmh.version}</version>
     </dependency>
 
   </dependencies>

@@ -9,9 +9,23 @@ import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
 import ru.itmo.spaceships.model.SpaceShip;
-import ru.itmo.spaceships.statistics.manufacturer.CycleManufacturerCounterStatistics;
+import ru.itmo.spaceships.statistics.manufacturer.StreamManufacturerCounterStatistics;
 
-public class ManualCycleManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
+public class ManualStreamManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
+
+    @Benchmark
+    public void milliBatchRun(
+            StatisticsConfig statisticsConfig,
+            SpaseShipsConfig spaseShipsConfig,
+            Blackhole blackhole
+    ) {
+        StreamManufacturerCounterStatistics statistics = statisticsConfig.getStreamManufacturerCounterStatistics();
+        List<SpaceShip> batch = spaseShipsConfig.getMilliBatch();
+
+        Map<String, Long> result = statistics.calculate(batch);
+
+        blackhole.consume(result);
+    }
 
     @Benchmark
     public void smallBatchRun(
@@ -19,7 +33,7 @@ public class ManualCycleManufacturerCounterStatisticsTest extends BaseBenchmarkT
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        CycleManufacturerCounterStatistics statistics = statisticsConfig.getCycleManufacturerCounterStatistics();
+        StreamManufacturerCounterStatistics statistics = statisticsConfig.getStreamManufacturerCounterStatistics();
         List<SpaceShip> batch = spaseShipsConfig.getSmallBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
@@ -33,7 +47,7 @@ public class ManualCycleManufacturerCounterStatisticsTest extends BaseBenchmarkT
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        CycleManufacturerCounterStatistics statistics = statisticsConfig.getCycleManufacturerCounterStatistics();
+        StreamManufacturerCounterStatistics statistics = statisticsConfig.getStreamManufacturerCounterStatistics();
         List<SpaceShip> batch = spaseShipsConfig.getMediumBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
@@ -47,7 +61,7 @@ public class ManualCycleManufacturerCounterStatisticsTest extends BaseBenchmarkT
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        CycleManufacturerCounterStatistics statistics = statisticsConfig.getCycleManufacturerCounterStatistics();
+        StreamManufacturerCounterStatistics statistics = statisticsConfig.getStreamManufacturerCounterStatistics();
         List<SpaceShip> batch = spaseShipsConfig.getLargeBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
@@ -57,6 +71,6 @@ public class ManualCycleManufacturerCounterStatisticsTest extends BaseBenchmarkT
 
     @Override
     protected String getReportPath() {
-        return "reports/benchmarks/ManufacturerCounterStatistics/cycle/result.txt";
+        return "reports/benchmarks/ManufacturerCounterStatistics/stream/result.txt";
     }
 }

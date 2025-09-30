@@ -49,6 +49,9 @@ public class SpaceShip {
      */
     private int maxSpeed;
 
+    /**
+     * Получить производителя с заданной задержкой (имитация работы)
+     */
     public String getManufacturer(long delay) {
         try {
             Thread.sleep(delay);

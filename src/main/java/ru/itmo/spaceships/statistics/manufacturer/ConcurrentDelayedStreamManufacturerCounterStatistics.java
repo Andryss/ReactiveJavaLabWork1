@@ -14,7 +14,8 @@ import static ru.itmo.spaceships.statistics.manufacturer.DelayedStreamManufactur
  * Класс для сбора статистики о количестве произведенных кораблей различными производителями.
  * При помощи Stream API (параллельно + с задержкой)
  */
-public class ConcurrentDelayedStreamManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+public class ConcurrentDelayedStreamManufacturerCounterStatistics
+        implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
 
     @Override
     public Map<String, Long> calculate(List<SpaceShip> objects) {

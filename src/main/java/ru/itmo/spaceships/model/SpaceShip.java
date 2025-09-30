@@ -48,4 +48,13 @@ public class SpaceShip {
      * Максимальная развиваемая скорость
      */
     private int maxSpeed;
+
+    public String getManufacturer(long delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return getManufacturer();
+    }
 }

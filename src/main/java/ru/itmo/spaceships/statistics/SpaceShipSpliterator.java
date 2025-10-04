@@ -6,6 +6,9 @@ import java.util.function.Consumer;
 
 import ru.itmo.spaceships.model.SpaceShip;
 
+/**
+ * Реализация Spliterator для обработки списка кораблей
+ */
 public class SpaceShipSpliterator implements Spliterator<SpaceShip> {
 
     public static final int MIN_BATCH_SIZE = 50;

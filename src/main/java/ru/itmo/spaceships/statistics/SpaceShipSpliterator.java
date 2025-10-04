@@ -16,15 +16,17 @@ public class SpaceShipSpliterator implements Spliterator<SpaceShip> {
     private final List<SpaceShip> list;
     private int currentIndex;
     private final int endIndex;
+    private final int batchSize;
 
     public SpaceShipSpliterator(List<SpaceShip> list) {
-        this(list, 0, list.size());
+        this(list, 0, list.size(),list.size()/Runtime.getRuntime().availableProcessors());
     }
 
-    private SpaceShipSpliterator(List<SpaceShip> list, int start, int end) {
+    private SpaceShipSpliterator(List<SpaceShip> list, int start, int end, int batchSize) {
         this.list = list;
         this.currentIndex = start;
         this.endIndex = end;
+        this.batchSize = batchSize;
     }
 
     @Override
@@ -39,11 +41,11 @@ public class SpaceShipSpliterator implements Spliterator<SpaceShip> {
     @Override
     public Spliterator<SpaceShip> trySplit() {
         int remaining = endIndex - currentIndex;
-        if (remaining <= MIN_BATCH_SIZE) {
+        if (remaining <= batchSize) {
             return null;
         }
         int midIndex = currentIndex + remaining / 2;
-        SpaceShipSpliterator newSplit = new SpaceShipSpliterator(list, currentIndex, midIndex);
+        SpaceShipSpliterator newSplit = new SpaceShipSpliterator(list, currentIndex, midIndex, batchSize);
         currentIndex = midIndex;
         return newSplit;
     }

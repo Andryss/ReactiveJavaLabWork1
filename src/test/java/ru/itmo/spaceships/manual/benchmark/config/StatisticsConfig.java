@@ -7,6 +7,8 @@ import ru.itmo.spaceships.statistics.manufacturer.ConcurrentDelayedStreamManufac
 import ru.itmo.spaceships.statistics.manufacturer.ConcurrentStreamManufacturerCounterStatistics;
 import ru.itmo.spaceships.statistics.manufacturer.CycleManufacturerCounterStatistics;
 import ru.itmo.spaceships.statistics.manufacturer.DelayedStreamManufacturerCounterStatistics;
+import ru.itmo.spaceships.statistics.manufacturer.SpliteratorDelayedStreamManufacturerCounterStatistics;
+import ru.itmo.spaceships.statistics.manufacturer.SpliteratorStreamManufacturerCounterStatistics;
 import ru.itmo.spaceships.statistics.manufacturer.StreamManufacturerCounterStatistics;
 
 /**
@@ -18,12 +20,19 @@ import ru.itmo.spaceships.statistics.manufacturer.StreamManufacturerCounterStati
 public class StatisticsConfig {
     private final CycleManufacturerCounterStatistics cycleManufacturerCounterStatistics =
             new CycleManufacturerCounterStatistics();
+
     private final StreamManufacturerCounterStatistics streamManufacturerCounterStatistics =
             new StreamManufacturerCounterStatistics();
     private final DelayedStreamManufacturerCounterStatistics delayedStreamManufacturerCounterStatistics =
             new DelayedStreamManufacturerCounterStatistics();
+
     private final ConcurrentStreamManufacturerCounterStatistics concurrentStreamManufacturerCounterStatistics =
             new ConcurrentStreamManufacturerCounterStatistics();
     private final ConcurrentDelayedStreamManufacturerCounterStatistics concurrentDelayedStreamManufacturerCounterStatistics =
             new ConcurrentDelayedStreamManufacturerCounterStatistics();
+
+    private final SpliteratorStreamManufacturerCounterStatistics spliteratorStreamManufacturerCounterStatistics =
+            new SpliteratorStreamManufacturerCounterStatistics();
+    private final SpliteratorDelayedStreamManufacturerCounterStatistics spliteratorDelayedStreamManufacturerCounterStatistics =
+            new SpliteratorDelayedStreamManufacturerCounterStatistics();
 }

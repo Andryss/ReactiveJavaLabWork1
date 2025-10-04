@@ -11,7 +11,7 @@ import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
 import ru.itmo.spaceships.model.SpaceShip;
 import ru.itmo.spaceships.statistics.manufacturer.ConcurrentStreamManufacturerCounterStatistics;
 
-public class ManualConcurrentConcurrentDelayedStreamManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
+public class ManualConcurrentStreamManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
 
     @Benchmark
     public void milliBatchRun(

@@ -50,6 +50,10 @@ public class SpaseShipGenerator implements Generator<SpaceShip> {
         this(new Random(), new DimensionsGenerator(), new EngineGenerator(), new CrewMemberGenerator());
     }
 
+    public SpaseShipGenerator(Random random) {
+        this(random, new DimensionsGenerator(random), new EngineGenerator(random), new CrewMemberGenerator(random));
+    }
+
     public SpaseShipGenerator(Random random, Generator<Dimensions> dimensionsGenerator,
                               Generator<Engine> engineGenerator, Generator<CrewMember> crewMemberGenerator) {
         this.random = random;

@@ -24,7 +24,8 @@ public class ConcurrentStreamSpaceShipStatistics extends StreamSpaceShipStatisti
                 .collect(Collectors.groupingByConcurrent(s -> s.getManufacturer(delay), Collectors.counting())));
 
         accumulator.setCountByFuelType(objects.stream().parallel()
-                .collect(Collectors.groupingByConcurrent(v -> v.getEngine().getFuelType().name(), Collectors.counting())));
+                .collect(Collectors.groupingByConcurrent(v ->
+                        v.getEngine().getFuelType().name(), Collectors.counting())));
 
         accumulator.setCountByDate(objects.stream().parallel()
                 .map(ship -> DATE_FORMATTER.format(ship.getManufactureDate()))

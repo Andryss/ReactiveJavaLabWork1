@@ -7,11 +7,11 @@ public abstract class StreamSpaceShipStatistics implements StatisticsCalculator<
     protected final long delay;
 
 
-	public StreamSpaceShipStatistics(long delay) {
-		this.delay = delay;
-	}
+    public StreamSpaceShipStatistics(long delay) {
+        this.delay = delay;
+    }
 
-	public StreamSpaceShipStatistics() {
+    public StreamSpaceShipStatistics() {
         this.delay = 0;
     }
 }

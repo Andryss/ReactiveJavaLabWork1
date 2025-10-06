@@ -36,7 +36,7 @@ public class SpaseShipsConfig {
         mediumBatch = generator.generateMany(50_000);
         largeBatch = generator.generateMany(250_000);
 
-        withoutDelayBatch = generator.generateMany(100_000);
+        withoutDelayBatch = generator.generateMany(3000);
         withDelayBatch = generator.generateMany(1); // NOTE: при размере больше 1 parallel всегда выигрывает
     }
 }

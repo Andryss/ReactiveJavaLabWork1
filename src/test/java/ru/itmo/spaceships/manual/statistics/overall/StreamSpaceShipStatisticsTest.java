@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.itmo.spaceships.generator.SpaseShipGenerator;
 import ru.itmo.spaceships.manual.statistics.BaseTimedStatisticsTest;
-import ru.itmo.spaceships.statistics.overall.StreamSpaceShipStatistics;
+import ru.itmo.spaceships.statistics.overall.SequenceStreamSpaceShipStatistics;
 
 @Slf4j
 @Disabled("Только для ручного тестирования")
@@ -18,7 +18,7 @@ public class StreamSpaceShipStatisticsTest extends BaseTimedStatisticsTest {
         calculate(
                 new SpaseShipGenerator(),
                 5_000,
-                new StreamSpaceShipStatistics(),
+                new SequenceStreamSpaceShipStatistics(),
                 REPORTS_BASE_PATH + ".small"
         );
     }
@@ -28,7 +28,7 @@ public class StreamSpaceShipStatisticsTest extends BaseTimedStatisticsTest {
         calculate(
                 new SpaseShipGenerator(),
                 50_000,
-                new StreamSpaceShipStatistics(),
+                new SequenceStreamSpaceShipStatistics(),
                 REPORTS_BASE_PATH + ".medium"
         );
     }
@@ -38,7 +38,7 @@ public class StreamSpaceShipStatisticsTest extends BaseTimedStatisticsTest {
         calculate(
                 new SpaseShipGenerator(),
                 250_000,
-                new StreamSpaceShipStatistics(),
+                new SequenceStreamSpaceShipStatistics(),
                 REPORTS_BASE_PATH + ".large"
         );
     }

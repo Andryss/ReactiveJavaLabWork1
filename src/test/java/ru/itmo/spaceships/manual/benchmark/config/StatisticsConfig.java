@@ -33,9 +33,14 @@ public class StatisticsConfig {
 	private final SpliteratorDelayedStreamManufacturerCounterStatistics spliteratorDelayedStreamManufacturerCounterStatistics =
 			new SpliteratorDelayedStreamManufacturerCounterStatistics();
 
-	private final ConcurrentStreamSpaceShipStatistics concurrentStreamSpaceShipStatistics = new ConcurrentStreamSpaceShipStatistics();
-	private final SpliteratorConcurrentStreamSpaceShipStatistics spliteratorStreamSpaceShipStatistics = new SpliteratorConcurrentStreamSpaceShipStatistics();
-	private final ConcurrentStreamSpaceShipStatistics concurrentDelayedStreamSpaceShipStatistics = new ConcurrentStreamSpaceShipStatistics(5L);
-	private final SequenceStreamSpaceShipStatistics sequenceStreamSpaceShipStatistics = new SequenceStreamSpaceShipStatistics();
-	private final SequenceStreamSpaceShipStatistics sequenceDelayedStreamSpaceShipStatistics = new SequenceStreamSpaceShipStatistics(5L);
+	private final ConcurrentStreamSpaceShipStatistics concurrentStreamSpaceShipStatistics =
+			new ConcurrentStreamSpaceShipStatistics();
+	private final SpliteratorConcurrentStreamSpaceShipStatistics spliteratorStreamSpaceShipStatistics =
+			new SpliteratorConcurrentStreamSpaceShipStatistics();
+	private final ConcurrentStreamSpaceShipStatistics concurrentDelayedStreamSpaceShipStatistics =
+			new ConcurrentStreamSpaceShipStatistics(5L);
+	private final SequenceStreamSpaceShipStatistics sequenceStreamSpaceShipStatistics =
+			new SequenceStreamSpaceShipStatistics();
+	private final SequenceStreamSpaceShipStatistics sequenceDelayedStreamSpaceShipStatistics =
+			new SequenceStreamSpaceShipStatistics(5L);
 }

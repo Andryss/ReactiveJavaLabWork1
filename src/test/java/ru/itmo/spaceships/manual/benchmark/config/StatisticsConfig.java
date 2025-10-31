@@ -43,4 +43,7 @@ public class StatisticsConfig {
 			new SequenceStreamSpaceShipStatistics();
 	private final SequenceStreamSpaceShipStatistics sequenceDelayedStreamSpaceShipStatistics =
 			new SequenceStreamSpaceShipStatistics(5L);
+
+	private final RxManufacturerCounterStatistics rxManufacturerCounterStatistics =
+			new RxManufacturerCounterStatistics();
 }

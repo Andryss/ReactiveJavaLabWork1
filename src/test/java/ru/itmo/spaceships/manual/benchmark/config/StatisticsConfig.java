@@ -26,7 +26,7 @@ public class StatisticsConfig {
 	private final ConcurrentStreamManufacturerCounterStatistics concurrentStreamManufacturerCounterStatistics =
 			new ConcurrentStreamManufacturerCounterStatistics();
 	private final ConcurrentStreamManufacturerCounterStatistics concurrentDelayedStreamManufacturerCounterStatistics =
-			new ConcurrentStreamManufacturerCounterStatistics(3L);
+			new ConcurrentStreamManufacturerCounterStatistics(1L);
 
 	private final SpliteratorStreamManufacturerCounterStatistics spliteratorStreamManufacturerCounterStatistics =
 			new SpliteratorStreamManufacturerCounterStatistics();
@@ -47,5 +47,7 @@ public class StatisticsConfig {
 	private final RxManufacturerCounterStatistics rxManufacturerCounterStatistics =
 			new RxManufacturerCounterStatistics();
 	private final RxManufacturerCounterStatistics rxDelayedManufacturerCounterStatistics =
-			new RxManufacturerCounterStatistics(3L);
+			new RxManufacturerCounterStatistics(1L);
+	private final RxBackpressureManufacturerCounterStatistics rxBackpressureManufacturerCounterStatistics =
+			new RxBackpressureManufacturerCounterStatistics(1_000);
 }

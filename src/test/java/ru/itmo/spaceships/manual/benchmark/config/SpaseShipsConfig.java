@@ -28,6 +28,10 @@ public class SpaseShipsConfig {
     // Размер пачки, при котором сбор статистики С ЗАДЕРЖКОЙ последовательным и параллельным способами занимают одинаковое время
     private List<SpaceShip> withDelayBatch;
 
+    // Размеры пачки для сравнения реактивных и параллельных потоков
+    private List<SpaceShip> rxCompareSmall;
+    private List<SpaceShip> rxCompareMedium;
+
     @Setup(Level.Trial)
     public void setUp(RandomConfig randomConfig) {
         SpaseShipGenerator generator = new SpaseShipGenerator(randomConfig.getSeededRandom());
@@ -38,5 +42,8 @@ public class SpaseShipsConfig {
 
         withoutDelayBatch = generator.generateMany(3000);
         withDelayBatch = generator.generateMany(1); // NOTE: при размере больше 1 parallel всегда выигрывает
+
+        rxCompareSmall = generator.generateMany(500);
+        rxCompareMedium = generator.generateMany(2_000);
     }
 }

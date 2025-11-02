@@ -7,19 +7,28 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.apache.commons.math3.util.Pair;
 import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.statistics.DelayedStatistics;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
  * Класс для сбора статистики о количестве произведенных кораблей различными производителями.
  * При помощи RxJava
  */
-public class RxManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+public class RxManufacturerCounterStatistics extends DelayedStatistics
+        implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+
+    public RxManufacturerCounterStatistics(long delay) {
+        super(delay);
+    }
+
+    public RxManufacturerCounterStatistics() {
+    }
 
     @Override
     public Map<String, Long> calculate(List<SpaceShip> objects) {
         return Observable.fromIterable(objects)
                 .subscribeOn(Schedulers.computation())
-                .groupBy(SpaceShip::getManufacturer)
+                .groupBy(ship -> ship.getManufacturer(getDelay()))
                 .flatMapSingle(grouped -> grouped
                         .count()
                         .map(count -> Pair.create(grouped.getKey(), count))

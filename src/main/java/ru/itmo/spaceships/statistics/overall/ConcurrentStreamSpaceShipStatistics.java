@@ -1,6 +1,8 @@
 package ru.itmo.spaceships.statistics.overall;
 
 import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.statistics.DelayedStatistics;
+import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 import java.util.List;
 import java.util.function.Function;
@@ -8,7 +10,8 @@ import java.util.stream.Collectors;
 
 import static ru.itmo.spaceships.statistics.overall.OverallStatistics.DATE_FORMATTER;
 
-public class ConcurrentStreamSpaceShipStatistics extends StreamSpaceShipStatistics {
+public class ConcurrentStreamSpaceShipStatistics extends DelayedStatistics
+        implements StatisticsCalculator<SpaceShip, OverallStatistics> {
     public ConcurrentStreamSpaceShipStatistics(long delay) {
         super(delay);
     }
@@ -21,7 +24,7 @@ public class ConcurrentStreamSpaceShipStatistics extends StreamSpaceShipStatisti
         OverallStatistics accumulator = new OverallStatistics();
 
         accumulator.setCountByManufacturer(objects.stream().parallel()
-                .collect(Collectors.groupingByConcurrent(s -> s.getManufacturer(delay), Collectors.counting())));
+                .collect(Collectors.groupingByConcurrent(s -> s.getManufacturer(getDelay()), Collectors.counting())));
 
         accumulator.setCountByFuelType(objects.stream().parallel()
                 .collect(Collectors.groupingByConcurrent(v ->

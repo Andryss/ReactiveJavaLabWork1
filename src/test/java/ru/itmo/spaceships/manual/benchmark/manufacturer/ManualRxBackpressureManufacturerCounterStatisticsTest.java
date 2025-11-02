@@ -9,19 +9,19 @@ import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
 import ru.itmo.spaceships.model.SpaceShip;
-import ru.itmo.spaceships.statistics.manufacturer.SpliteratorStreamManufacturerCounterStatistics;
+import ru.itmo.spaceships.statistics.manufacturer.RxBackpressureManufacturerCounterStatistics;
 
-public class ManualSpliteratorStreamManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
+public class ManualRxBackpressureManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
 
     @Benchmark
-    public void parallelWithoutDelayBatchRun(
+    public void smallBatchRun(
             StatisticsConfig statisticsConfig,
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        SpliteratorStreamManufacturerCounterStatistics statistics =
-                statisticsConfig.getSpliteratorStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithoutDelayBatch();
+        RxBackpressureManufacturerCounterStatistics statistics =
+                statisticsConfig.getRxBackpressureManufacturerCounterStatistics();
+        List<SpaceShip> batch = spaseShipsConfig.getSmallBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -29,14 +29,14 @@ public class ManualSpliteratorStreamManufacturerCounterStatisticsTest extends Ba
     }
 
     @Benchmark
-    public void parallelWithDelayBatchRun(
+    public void largeBatchRun(
             StatisticsConfig statisticsConfig,
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        SpliteratorStreamManufacturerCounterStatistics statistics =
-                statisticsConfig.getSpliteratorDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
+        RxBackpressureManufacturerCounterStatistics statistics =
+                statisticsConfig.getRxBackpressureManufacturerCounterStatistics();
+        List<SpaceShip> batch = spaseShipsConfig.getLargeBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -45,6 +45,6 @@ public class ManualSpliteratorStreamManufacturerCounterStatisticsTest extends Ba
 
     @Override
     protected String getReportPath() {
-        return "reports/benchmarks/ManufacturerCounterStatistics/stream/result-spliterator.txt";
+        return "reports/benchmarks/ManufacturerCounterStatistics/rx/result-backpressure.txt";
     }
 }

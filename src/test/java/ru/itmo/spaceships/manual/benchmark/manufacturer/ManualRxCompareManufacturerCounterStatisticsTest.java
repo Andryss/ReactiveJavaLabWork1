@@ -10,18 +10,18 @@ import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
 import ru.itmo.spaceships.model.SpaceShip;
 import ru.itmo.spaceships.statistics.manufacturer.ConcurrentStreamManufacturerCounterStatistics;
-import ru.itmo.spaceships.statistics.manufacturer.StreamManufacturerCounterStatistics;
+import ru.itmo.spaceships.statistics.manufacturer.RxManufacturerCounterStatistics;
 
-public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
+public class ManualRxCompareManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
 
     @Benchmark
-    public void sequenceWithoutDelayBatchRun(
+    public void smallRxBatchRun(
             StatisticsConfig statisticsConfig,
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        StreamManufacturerCounterStatistics statistics = statisticsConfig.getStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithoutDelayBatch();
+        RxManufacturerCounterStatistics statistics = statisticsConfig.getRxDelayedManufacturerCounterStatistics();
+        List<SpaceShip> batch = spaseShipsConfig.getRxCompareSmall();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -29,14 +29,13 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
     }
 
     @Benchmark
-    public void parallelWithoutDelayBatchRun(
+    public void mediumRxBatchRun(
             StatisticsConfig statisticsConfig,
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        ConcurrentStreamManufacturerCounterStatistics statistics =
-                statisticsConfig.getConcurrentStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithoutDelayBatch();
+        RxManufacturerCounterStatistics statistics = statisticsConfig.getRxDelayedManufacturerCounterStatistics();
+        List<SpaceShip> batch = spaseShipsConfig.getRxCompareMedium();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -44,29 +43,29 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
     }
 
     @Benchmark
-    public void sequenceWithDelayBatchRun(
-            StatisticsConfig statisticsConfig,
-            SpaseShipsConfig spaseShipsConfig,
-            Blackhole blackhole
-    ) {
-        StreamManufacturerCounterStatistics statistics =
-                statisticsConfig.getDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
-
-        Map<String, Long> result = statistics.calculate(batch);
-
-        blackhole.consume(result);
-    }
-
-    @Benchmark
-    public void parallelWithDelayBatchRun(
+    public void smallStreamBatchRun(
             StatisticsConfig statisticsConfig,
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
         ConcurrentStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getConcurrentDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
+        List<SpaceShip> batch = spaseShipsConfig.getRxCompareSmall();
+
+        Map<String, Long> result = statistics.calculate(batch);
+
+        blackhole.consume(result);
+    }
+
+    @Benchmark
+    public void mediumStreamBatchRun(
+            StatisticsConfig statisticsConfig,
+            SpaseShipsConfig spaseShipsConfig,
+            Blackhole blackhole
+    ) {
+        ConcurrentStreamManufacturerCounterStatistics statistics =
+                statisticsConfig.getConcurrentDelayedStreamManufacturerCounterStatistics();
+        List<SpaceShip> batch = spaseShipsConfig.getRxCompareMedium();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -75,6 +74,6 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
 
     @Override
     protected String getReportPath() {
-        return "reports/benchmarks/ManufacturerCounterStatistics/stream/result-same-time.txt";
+        return "reports/benchmarks/ManufacturerCounterStatistics/rx/result-compare-stream.txt";
     }
 }

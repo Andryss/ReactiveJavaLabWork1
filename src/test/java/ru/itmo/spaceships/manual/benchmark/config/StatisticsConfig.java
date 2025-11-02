@@ -20,18 +20,18 @@ public class StatisticsConfig {
 
 	private final StreamManufacturerCounterStatistics streamManufacturerCounterStatistics =
 			new StreamManufacturerCounterStatistics();
-	private final DelayedStreamManufacturerCounterStatistics delayedStreamManufacturerCounterStatistics =
-			new DelayedStreamManufacturerCounterStatistics();
+	private final StreamManufacturerCounterStatistics delayedStreamManufacturerCounterStatistics =
+			new StreamManufacturerCounterStatistics(3L);
 
 	private final ConcurrentStreamManufacturerCounterStatistics concurrentStreamManufacturerCounterStatistics =
 			new ConcurrentStreamManufacturerCounterStatistics();
-	private final ConcurrentDelayedStreamManufacturerCounterStatistics concurrentDelayedStreamManufacturerCounterStatistics =
-			new ConcurrentDelayedStreamManufacturerCounterStatistics();
+	private final ConcurrentStreamManufacturerCounterStatistics concurrentDelayedStreamManufacturerCounterStatistics =
+			new ConcurrentStreamManufacturerCounterStatistics(1L);
 
 	private final SpliteratorStreamManufacturerCounterStatistics spliteratorStreamManufacturerCounterStatistics =
 			new SpliteratorStreamManufacturerCounterStatistics();
-	private final SpliteratorDelayedStreamManufacturerCounterStatistics spliteratorDelayedStreamManufacturerCounterStatistics =
-			new SpliteratorDelayedStreamManufacturerCounterStatistics();
+	private final SpliteratorStreamManufacturerCounterStatistics spliteratorDelayedStreamManufacturerCounterStatistics =
+			new SpliteratorStreamManufacturerCounterStatistics(3L);
 
 	private final ConcurrentStreamSpaceShipStatistics concurrentStreamSpaceShipStatistics =
 			new ConcurrentStreamSpaceShipStatistics();
@@ -43,4 +43,11 @@ public class StatisticsConfig {
 			new SequenceStreamSpaceShipStatistics();
 	private final SequenceStreamSpaceShipStatistics sequenceDelayedStreamSpaceShipStatistics =
 			new SequenceStreamSpaceShipStatistics(5L);
+
+	private final RxManufacturerCounterStatistics rxManufacturerCounterStatistics =
+			new RxManufacturerCounterStatistics();
+	private final RxManufacturerCounterStatistics rxDelayedManufacturerCounterStatistics =
+			new RxManufacturerCounterStatistics(1L);
+	private final RxBackpressureManufacturerCounterStatistics rxBackpressureManufacturerCounterStatistics =
+			new RxBackpressureManufacturerCounterStatistics(1_000);
 }

@@ -9,9 +9,7 @@ import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
 import ru.itmo.spaceships.model.SpaceShip;
-import ru.itmo.spaceships.statistics.manufacturer.ConcurrentDelayedStreamManufacturerCounterStatistics;
 import ru.itmo.spaceships.statistics.manufacturer.ConcurrentStreamManufacturerCounterStatistics;
-import ru.itmo.spaceships.statistics.manufacturer.DelayedStreamManufacturerCounterStatistics;
 import ru.itmo.spaceships.statistics.manufacturer.StreamManufacturerCounterStatistics;
 
 public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
@@ -51,7 +49,7 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        DelayedStreamManufacturerCounterStatistics statistics =
+        StreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getDelayedStreamManufacturerCounterStatistics();
         List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
 
@@ -66,7 +64,7 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        ConcurrentDelayedStreamManufacturerCounterStatistics statistics =
+        ConcurrentStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getConcurrentDelayedStreamManufacturerCounterStatistics();
         List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
 

@@ -6,18 +6,27 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.statistics.DelayedStatistics;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
  * Класс для сбора статистики о количестве произведенных кораблей различными производителями.
  * При помощи Stream API
  */
-public class StreamManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+public class StreamManufacturerCounterStatistics extends DelayedStatistics
+        implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+
+    public StreamManufacturerCounterStatistics(long delay) {
+        super(delay);
+    }
+
+    public StreamManufacturerCounterStatistics() {
+    }
 
     @Override
     public Map<String, Long> calculate(List<SpaceShip> objects) {
         return objects.stream()
-                .map(SpaceShip::getManufacturer)
+                .map(ship -> ship.getManufacturer(getDelay()))
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 }

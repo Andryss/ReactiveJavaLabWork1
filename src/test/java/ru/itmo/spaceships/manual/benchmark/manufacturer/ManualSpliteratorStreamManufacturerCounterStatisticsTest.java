@@ -9,7 +9,6 @@ import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
 import ru.itmo.spaceships.model.SpaceShip;
-import ru.itmo.spaceships.statistics.manufacturer.SpliteratorDelayedStreamManufacturerCounterStatistics;
 import ru.itmo.spaceships.statistics.manufacturer.SpliteratorStreamManufacturerCounterStatistics;
 
 public class ManualSpliteratorStreamManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
@@ -35,7 +34,7 @@ public class ManualSpliteratorStreamManufacturerCounterStatisticsTest extends Ba
             SpaseShipsConfig spaseShipsConfig,
             Blackhole blackhole
     ) {
-        SpliteratorDelayedStreamManufacturerCounterStatistics statistics =
+        SpliteratorStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getSpliteratorDelayedStreamManufacturerCounterStatistics();
         List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
 

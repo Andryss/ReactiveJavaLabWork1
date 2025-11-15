@@ -28,8 +28,10 @@ public class RxManufacturerCounterStatistics extends DelayedStatistics
     public Map<String, Long> calculate(List<SpaceShip> objects) {
         return Observable.fromIterable(objects)
                 .subscribeOn(Schedulers.computation())
-                .flatMap(ship -> Observable.fromCallable(() -> ship.getManufacturer(getDelay()))
-                        .subscribeOn(Schedulers.io()))
+                .flatMap(ship -> Observable.just(ship)
+                        .subscribeOn(Schedulers.io())
+                        .map(SpaceShip::getManufacturer)
+                )
                 .groupBy(String::toString)
                 .flatMapSingle(grouped -> grouped
                         .count()

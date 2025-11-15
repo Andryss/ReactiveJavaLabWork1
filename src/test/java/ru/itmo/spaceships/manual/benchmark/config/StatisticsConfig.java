@@ -49,5 +49,5 @@ public class StatisticsConfig {
 	private final RxManufacturerCounterStatistics rxDelayedManufacturerCounterStatistics =
 			new RxManufacturerCounterStatistics(1L);
 	private final RxBackpressureManufacturerCounterStatistics rxBackpressureManufacturerCounterStatistics =
-			new RxBackpressureManufacturerCounterStatistics(1_000);
+			new RxBackpressureManufacturerCounterStatistics(1_000, false);
 }

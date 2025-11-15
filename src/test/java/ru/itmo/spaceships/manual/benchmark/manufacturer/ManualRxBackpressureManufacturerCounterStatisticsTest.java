@@ -45,6 +45,6 @@ public class ManualRxBackpressureManufacturerCounterStatisticsTest extends BaseB
 
     @Override
     protected String getReportPath() {
-        return "reports/benchmarks/ManufacturerCounterStatistics/rx/result-backpressure.txt";
+        return "reports/benchmarks/ManufacturerCounterStatistics/rx/result-backpressure-2.txt";
     }
 }

@@ -4,9 +4,7 @@ import lombok.Getter;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import ru.itmo.spaceships.statistics.manufacturer.*;
-import ru.itmo.spaceships.statistics.overall.ConcurrentStreamSpaceShipStatistics;
-import ru.itmo.spaceships.statistics.overall.SequenceStreamSpaceShipStatistics;
-import ru.itmo.spaceships.statistics.overall.SpliteratorConcurrentStreamSpaceShipStatistics;
+import ru.itmo.spaceships.statistics.overall.*;
 
 /**
  * Состояние со всеми статистиками.
@@ -50,4 +48,9 @@ public class StatisticsConfig {
 			new RxManufacturerCounterStatistics(1L);
 	private final RxBackpressureManufacturerCounterStatistics rxBackpressureManufacturerCounterStatistics =
 			new RxBackpressureManufacturerCounterStatistics(1_000);
+
+	private final RXSpaceShipStatistics rxSpaceShipStatistics = new RXSpaceShipStatistics();
+	private final RXSpaceShipStatistics rxSpaceShipStatisticsDelayed = new RXSpaceShipStatistics(5L);
+	private final RXBackpressureShipStatistics rxBackpressureShipStatistics = new RXBackpressureShipStatistics(1000, false);
+
 }

@@ -16,15 +16,20 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
 public class ConcurrentStreamManufacturerCounterStatistics extends DelayedStatistics
         implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
 
-    public ConcurrentStreamManufacturerCounterStatistics(long delay) {
-        super(delay);
-    }
+    private final int parallelism;
 
     public ConcurrentStreamManufacturerCounterStatistics() {
+        this(0, Runtime.getRuntime().availableProcessors());
+    }
+
+    public ConcurrentStreamManufacturerCounterStatistics(long delay, int parallelism) {
+        super(delay);
+        this.parallelism = parallelism;
     }
 
     @Override
     public Map<String, Long> calculate(List<SpaceShip> objects) {
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(parallelism));
         return objects.stream()
                 .parallel()
                 .map(ship -> ship.getManufacturer(getDelay()))

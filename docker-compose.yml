@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  antalk-db:
+    restart: unless-stopped
+    container_name: spaceships-db
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=spaceships
+    volumes:
+      - .postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U postgres -d spaceships
+      interval: 5s
+      timeout: 5s
+      retries: 5

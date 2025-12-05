@@ -1,3 +1,5 @@
+.postgres/
+logs/
 reports/
 target/
 !.mvn/wrapper/maven-wrapper.jar

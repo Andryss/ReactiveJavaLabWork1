@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.0</version>
+    <version>3.5.4</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -23,17 +23,18 @@
     <maven.compiler.source>17</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <lombok.version>1.18.30</lombok.version>
-    <slf4j-api.version>2.0.16</slf4j-api.version>
-    <logback.version>1.5.19</logback.version>
-    <junit.version>5.13.4</junit.version>
     <jmh.version>1.37</jmh.version>
     <rxjava.version>3.1.10</rxjava.version>
+
+    <zonky.embedded-database.version>2.6.0</zonky.embedded-database.version>
+    <zonky.embedded-postgres.version>2.1.0</zonky.embedded-postgres.version>
 
     <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
   </properties>
 
   <dependencies>
+
+    <!-- SPRING STARTERS DEPENDENCIES -->
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -42,33 +43,28 @@
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
+      <artifactId>spring-boot-starter-data-r2dbc</artifactId>
     </dependency>
+
+    <!-- PROCESSOR DEPENDENCIES -->
 
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- COMMON DEPENDENCIES -->
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>r2dbc-postgresql</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j-api.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>${logback.version}</version>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -87,6 +83,28 @@
       <groupId>io.reactivex.rxjava3</groupId>
       <artifactId>rxjava</artifactId>
       <version>${rxjava.version}</version>
+    </dependency>
+
+    <!-- TEST DEPENDENCIES -->
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.zonky.test</groupId>
+      <artifactId>embedded-database-spring-test</artifactId>
+      <version>${zonky.embedded-database.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.zonky.test</groupId>
+      <artifactId>embedded-postgres</artifactId>
+      <version>${zonky.embedded-postgres.version}</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

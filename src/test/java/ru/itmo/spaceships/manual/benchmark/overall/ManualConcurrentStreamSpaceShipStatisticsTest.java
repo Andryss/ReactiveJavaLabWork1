@@ -1,5 +1,6 @@
 package ru.itmo.spaceships.manual.benchmark.overall;
 
+import org.junit.jupiter.api.Disabled;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
@@ -11,6 +12,7 @@ import ru.itmo.spaceships.statistics.overall.OverallStatistics;
 
 import java.util.List;
 
+@Disabled("Только для ручного запуска")
 public class ManualConcurrentStreamSpaceShipStatisticsTest extends BaseBenchmarkTest {
     @Benchmark
     public void milliBatchRun(

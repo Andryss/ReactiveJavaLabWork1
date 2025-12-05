@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reactive Client Demo</title>
+</head>
+<body>
+
+<h2>Call Reactive Endpoint</h2>
+
+<button onclick="callEndpoint()">Call /ping</button>
+
+<p><strong>Response:</strong> <span id="result">none</span></p>
+
+<script>
+    function callEndpoint() {
+        fetch("http://localhost:8080/ping")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("result").textContent = data;
+            })
+            .catch(error => {
+                document.getElementById("result").textContent = "Error: " + error;
+            });
+    }
+</script>
+
+</body>
+</html>

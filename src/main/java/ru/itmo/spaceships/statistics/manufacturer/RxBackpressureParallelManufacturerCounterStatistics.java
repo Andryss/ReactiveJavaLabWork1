@@ -19,18 +19,19 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class RxBackpressureParallelManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+public class RxBackpressureParallelManufacturerCounterStatistics
+        implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
 
     private final int bufferSize;
 
     @Override
     public Map<String, Long> calculate(List<SpaceShip> objects) {
         return Flowable.<SpaceShip>create(emitter -> {
-                    for (SpaceShip object : objects) {
-                        emitter.onNext(object);
-                    }
-                    emitter.onComplete();
-                }, BackpressureStrategy.BUFFER)
+            for (SpaceShip object : objects) {
+                emitter.onNext(object);
+            }
+            emitter.onComplete();
+        }, BackpressureStrategy.BUFFER)
                 .window(bufferSize)
                 .flatMapSingle(flow -> flow
                         .subscribeOn(Schedulers.computation())

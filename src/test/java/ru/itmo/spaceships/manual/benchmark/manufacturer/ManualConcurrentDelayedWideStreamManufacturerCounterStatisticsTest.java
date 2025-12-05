@@ -3,6 +3,7 @@ package ru.itmo.spaceships.manual.benchmark.manufacturer;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Disabled;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
@@ -11,6 +12,7 @@ import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
 import ru.itmo.spaceships.model.SpaceShip;
 import ru.itmo.spaceships.statistics.manufacturer.ConcurrentStreamManufacturerCounterStatistics;
 
+@Disabled("Только для ручного запуска")
 public class ManualConcurrentDelayedWideStreamManufacturerCounterStatisticsTest extends BaseBenchmarkTest {
 
     @Benchmark

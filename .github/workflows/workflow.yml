@@ -1,4 +1,4 @@
-name: Java build
+name: Java tests check
 
 on:
   push:
@@ -27,5 +27,5 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Compile project
-        run: mvn clean compile
+      - name: Run tests and checks
+        run: mvn clean verify

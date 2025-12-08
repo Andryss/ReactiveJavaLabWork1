@@ -6,17 +6,17 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
  * Класс для сбора статистики о количестве членов экипажа, рожденных в разные месяцы.
  * При помощи Stream API
  */
-public class StreamBirthdayMonthCounterStatistics implements StatisticsCalculator<SpaceShip, Map<Month, Long>> {
+public class StreamBirthdayMonthCounterStatistics implements StatisticsCalculator<SpaceShipEntity, Map<Month, Long>> {
 
     @Override
-    public Map<Month, Long> calculate(List<SpaceShip> objects) {
+    public Map<Month, Long> calculate(List<SpaceShipEntity> objects) {
         return objects.stream()
                 .parallel()
                 .flatMap(ship -> ship.getCrew().stream())

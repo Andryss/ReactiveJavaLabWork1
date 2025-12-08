@@ -7,13 +7,13 @@ import java.util.Random;
 import ru.itmo.spaceships.model.CrewMember;
 import ru.itmo.spaceships.model.Dimensions;
 import ru.itmo.spaceships.model.Engine;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.model.SpaceShipType;
 
 /**
- * Генератор космических кораблей ({@link SpaceShip})
+ * Генератор космических кораблей ({@link SpaceShipEntity})
  */
-public class SpaseShipGenerator implements Generator<SpaceShip> {
+public class SpaseShipGenerator implements Generator<SpaceShipEntity> {
 
     /**
      * Все возможные производители кораблей
@@ -63,7 +63,7 @@ public class SpaseShipGenerator implements Generator<SpaceShip> {
     }
 
     @Override
-    public SpaceShip generateOne() {
+    public SpaceShipEntity generateOne() {
         long serial = random.nextLong();
 
         String manufacturer = MANUFACTURERS[random.nextInt(MANUFACTURERS.length)];
@@ -83,7 +83,7 @@ public class SpaseShipGenerator implements Generator<SpaceShip> {
 
         int maxSpeed = random.nextInt(MIN_MAX_SPEED, MAX_MAX_SPEED);
 
-        return new SpaceShip(serial, manufacturer, manufactureDate, name, spaceShipType, dimensions, engine,
+        return new SpaceShipEntity(serial, manufacturer, manufactureDate, name, spaceShipType, dimensions, engine,
                 crewMembers, maxSpeed);
     }
 }

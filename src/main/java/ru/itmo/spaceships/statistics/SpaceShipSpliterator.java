@@ -4,25 +4,25 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 
 /**
  * Реализация Spliterator для обработки списка кораблей
  */
-public class SpaceShipSpliterator implements Spliterator<SpaceShip> {
+public class SpaceShipSpliterator implements Spliterator<SpaceShipEntity> {
 
     public static final int MIN_BATCH_SIZE = 50;
 
-    private final List<SpaceShip> list;
+    private final List<SpaceShipEntity> list;
     private int currentIndex;
     private final int endIndex;
     private final int batchSize;
 
-    public SpaceShipSpliterator(List<SpaceShip> list) {
+    public SpaceShipSpliterator(List<SpaceShipEntity> list) {
         this(list, 0, list.size(),list.size()/Runtime.getRuntime().availableProcessors());
     }
 
-    private SpaceShipSpliterator(List<SpaceShip> list, int start, int end, int batchSize) {
+    private SpaceShipSpliterator(List<SpaceShipEntity> list, int start, int end, int batchSize) {
         this.list = list;
         this.currentIndex = start;
         this.endIndex = end;
@@ -30,7 +30,7 @@ public class SpaceShipSpliterator implements Spliterator<SpaceShip> {
     }
 
     @Override
-    public boolean tryAdvance(Consumer<? super SpaceShip> action) {
+    public boolean tryAdvance(Consumer<? super SpaceShipEntity> action) {
         if (currentIndex < endIndex) {
             action.accept(list.get(currentIndex++));
             return true;
@@ -39,7 +39,7 @@ public class SpaceShipSpliterator implements Spliterator<SpaceShip> {
     }
 
     @Override
-    public Spliterator<SpaceShip> trySplit() {
+    public Spliterator<SpaceShipEntity> trySplit() {
         int remaining = endIndex - currentIndex;
         if (remaining <= batchSize) {
             return null;

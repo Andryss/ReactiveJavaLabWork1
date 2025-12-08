@@ -12,24 +12,24 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import ru.itmo.spaceships.model.CrewMember;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
  * Класс для сбора статистики о количестве членов экипажа, рожденных в разные месяцы.
  * При помощи собственного Collector
  */
-public class CollectorBirthdayMonthCounterStatistics implements StatisticsCalculator<SpaceShip, Map<Month, Long>> {
+public class CollectorBirthdayMonthCounterStatistics implements StatisticsCalculator<SpaceShipEntity, Map<Month, Long>> {
 
     @Override
-    public Map<Month, Long> calculate(List<SpaceShip> objects) {
+    public Map<Month, Long> calculate(List<SpaceShipEntity> objects) {
         return objects.stream()
                 .parallel()
                 .collect(new BirthdayMonthCounterCollector());
     }
 
     private static class BirthdayMonthCounterCollector
-            implements Collector<SpaceShip, Map<Month, Long>, Map<Month, Long>> {
+            implements Collector<SpaceShipEntity, Map<Month, Long>, Map<Month, Long>> {
 
         @Override
         public Supplier<Map<Month, Long>> supplier() {
@@ -37,7 +37,7 @@ public class CollectorBirthdayMonthCounterStatistics implements StatisticsCalcul
         }
 
         @Override
-        public BiConsumer<Map<Month, Long>, SpaceShip> accumulator() {
+        public BiConsumer<Map<Month, Long>, SpaceShipEntity> accumulator() {
             return (result, spaseShip) -> {
                 for (CrewMember member : spaseShip.getCrew()) {
                     result.merge(member.getBirthDate().getMonth(), 1L, Long::sum);

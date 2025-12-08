@@ -8,7 +8,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import ru.itmo.spaceships.generator.SpaseShipGenerator;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 
 /**
  * Состояние со всеми группами объектов.
@@ -18,19 +18,19 @@ import ru.itmo.spaceships.model.SpaceShip;
 @State(Scope.Benchmark)
 public class SpaseShipsConfig {
 
-    private List<SpaceShip> milliBatch;
-    private List<SpaceShip> smallBatch;
-    private List<SpaceShip> mediumBatch;
-    private List<SpaceShip> largeBatch;
+    private List<SpaceShipEntity> milliBatch;
+    private List<SpaceShipEntity> smallBatch;
+    private List<SpaceShipEntity> mediumBatch;
+    private List<SpaceShipEntity> largeBatch;
 
     // Размер пачки, при котором сбор статистики БЕЗ ЗАДЕРЖКИ последовательным и параллельным способами занимают одинаковое время
-    private List<SpaceShip> withoutDelayBatch;
+    private List<SpaceShipEntity> withoutDelayBatch;
     // Размер пачки, при котором сбор статистики С ЗАДЕРЖКОЙ последовательным и параллельным способами занимают одинаковое время
-    private List<SpaceShip> withDelayBatch;
+    private List<SpaceShipEntity> withDelayBatch;
 
     // Размеры пачки для сравнения реактивных и параллельных потоков
-    private List<SpaceShip> rxCompareSmall;
-    private List<SpaceShip> rxCompareMedium;
+    private List<SpaceShipEntity> rxCompareSmall;
+    private List<SpaceShipEntity> rxCompareMedium;
 
     @Setup(Level.Trial)
     public void setUp(RandomConfig randomConfig) {

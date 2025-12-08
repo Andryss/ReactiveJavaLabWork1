@@ -10,7 +10,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Pair;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
@@ -20,14 +20,14 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
 @Slf4j
 @RequiredArgsConstructor
 public class RxBackpressureParallelManufacturerCounterStatistics
-        implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+        implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
 
     private final int bufferSize;
 
     @Override
-    public Map<String, Long> calculate(List<SpaceShip> objects) {
-        return Flowable.<SpaceShip>create(emitter -> {
-            for (SpaceShip object : objects) {
+    public Map<String, Long> calculate(List<SpaceShipEntity> objects) {
+        return Flowable.<SpaceShipEntity>create(emitter -> {
+            for (SpaceShipEntity object : objects) {
                 emitter.onNext(object);
             }
             emitter.onComplete();
@@ -35,7 +35,7 @@ public class RxBackpressureParallelManufacturerCounterStatistics
                 .window(bufferSize)
                 .flatMapSingle(flow -> flow
                         .subscribeOn(Schedulers.computation())
-                        .groupBy(SpaceShip::getManufacturer)
+                        .groupBy(SpaceShipEntity::getManufacturer)
                         .flatMapSingle(grouped -> grouped
                                 .count()
                                 .map(count -> Pair.create(grouped.getKey(), count))

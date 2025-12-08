@@ -19,7 +19,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Subscription;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
@@ -28,19 +28,19 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class RxBackpressureManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+public class RxBackpressureManufacturerCounterStatistics implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
 
     private final int bufferSize;
     private final boolean countDrops;
 
     @Override
-    public Map<String, Long> calculate(List<SpaceShip> objects) {
+    public Map<String, Long> calculate(List<SpaceShipEntity> objects) {
         ManufacturerCounterSubscriber subscriber = new ManufacturerCounterSubscriber(bufferSize);
 
         AtomicInteger droppedCount = new AtomicInteger(0);
 
-        Flowable.<SpaceShip>create(emitter -> {
-            for (SpaceShip object : objects) {
+        Flowable.<SpaceShipEntity>create(emitter -> {
+            for (SpaceShipEntity object : objects) {
                 emitter.onNext(object);
             }
             emitter.onComplete();
@@ -75,7 +75,7 @@ public class RxBackpressureManufacturerCounterStatistics implements StatisticsCa
 
     @Slf4j
     @RequiredArgsConstructor
-    private static class ManufacturerCounterSubscriber implements FlowableSubscriber<SpaceShip> {
+    private static class ManufacturerCounterSubscriber implements FlowableSubscriber<SpaceShipEntity> {
 
         private final int batchSize;
         private Subscription subscription;
@@ -94,7 +94,7 @@ public class RxBackpressureManufacturerCounterStatistics implements StatisticsCa
         }
 
         @Override
-        public void onNext(SpaceShip spaceShip) {
+        public void onNext(SpaceShipEntity spaceShip) {
             String manufacturer = spaceShip.getManufacturer();
             statistics.merge(manufacturer, 1L, Long::sum);
 

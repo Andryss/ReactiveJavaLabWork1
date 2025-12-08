@@ -5,16 +5,22 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * Космический корабль
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class SpaceShip {
+@Table("spaceship")
+public class SpaceShipEntity {
     /**
      * Серийный номер, уникальный для каждого корабля
      */
+    @Id
     private long serial;
     /**
      * Название компании изготовителя

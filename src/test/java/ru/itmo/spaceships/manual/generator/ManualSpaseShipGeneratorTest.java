@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.itmo.spaceships.generator.SpaseShipGenerator;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 
 @Slf4j
 @Disabled("Только для ручного тестирования")
@@ -16,7 +16,7 @@ class ManualSpaseShipGeneratorTest {
     void generateManyTest() {
         SpaseShipGenerator generator = new SpaseShipGenerator();
 
-        List<SpaceShip> generated = generator.generateMany(1);
+        List<SpaceShipEntity> generated = generator.generateMany(1);
 
         log.info("Generated: {}", generated);
     }

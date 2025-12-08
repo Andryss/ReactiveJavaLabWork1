@@ -9,7 +9,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.manufacturer.ConcurrentStreamManufacturerCounterStatistics;
 import ru.itmo.spaceships.statistics.manufacturer.RxManufacturerCounterStatistics;
 
@@ -23,7 +23,7 @@ public class ManualRxCompareManufacturerCounterStatisticsTest extends BaseBenchm
             Blackhole blackhole
     ) {
         RxManufacturerCounterStatistics statistics = statisticsConfig.getRxDelayedManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getRxCompareSmall();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getRxCompareSmall();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -37,7 +37,7 @@ public class ManualRxCompareManufacturerCounterStatisticsTest extends BaseBenchm
             Blackhole blackhole
     ) {
         RxManufacturerCounterStatistics statistics = statisticsConfig.getRxDelayedManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getRxCompareMedium();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getRxCompareMedium();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -52,7 +52,7 @@ public class ManualRxCompareManufacturerCounterStatisticsTest extends BaseBenchm
     ) {
         ConcurrentStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getConcurrentDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getRxCompareSmall();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getRxCompareSmall();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -67,7 +67,7 @@ public class ManualRxCompareManufacturerCounterStatisticsTest extends BaseBenchm
     ) {
         ConcurrentStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getConcurrentDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getRxCompareMedium();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getRxCompareMedium();
 
         Map<String, Long> result = statistics.calculate(batch);
 

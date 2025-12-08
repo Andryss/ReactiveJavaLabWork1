@@ -6,7 +6,7 @@ import java.util.Map;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.apache.commons.math3.util.Pair;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.DelayedStatistics;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
@@ -15,7 +15,7 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
  * При помощи RxJava
  */
 public class RxManufacturerCounterStatistics extends DelayedStatistics
-        implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+        implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
 
     public RxManufacturerCounterStatistics(long delay) {
         super(delay);
@@ -25,12 +25,12 @@ public class RxManufacturerCounterStatistics extends DelayedStatistics
     }
 
     @Override
-    public Map<String, Long> calculate(List<SpaceShip> objects) {
+    public Map<String, Long> calculate(List<SpaceShipEntity> objects) {
         return Observable.fromIterable(objects)
                 .subscribeOn(Schedulers.computation())
                 .flatMap(ship -> Observable.just(ship)
                         .subscribeOn(Schedulers.io())
-                        .map(SpaceShip::getManufacturer)
+                        .map(SpaceShipEntity::getManufacturer)
                 )
                 .groupBy(String::toString)
                 .flatMapSingle(grouped -> grouped

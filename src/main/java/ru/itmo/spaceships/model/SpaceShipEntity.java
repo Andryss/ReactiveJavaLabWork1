@@ -5,13 +5,21 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * Космический корабль
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class SpaceShip {
+@Table("spaceship")
+public class SpaceShipEntity {
+    @Id
+    private long id;
     /**
      * Серийный номер, уникальный для каждого корабля
      */
@@ -31,18 +39,22 @@ public class SpaceShip {
     /**
      * Тип корабля
      */
+    @Column("type")
     private SpaceShipType type;
     /**
      * ВГХ
      */
+    @Column("dimensions")
     private Dimensions dimensions;
     /**
      * Двигатель
      */
+    @Column("engine")
     private Engine engine;
     /**
      * Экипаж
      */
+    @Column("crew")
     private List<CrewMember> crew;
     /**
      * Максимальная развиваемая скорость

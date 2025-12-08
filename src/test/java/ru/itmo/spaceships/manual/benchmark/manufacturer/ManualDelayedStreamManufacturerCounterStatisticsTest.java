@@ -9,7 +9,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.manufacturer.StreamManufacturerCounterStatistics;
 
 @Disabled("Только для ручного запуска")
@@ -23,7 +23,7 @@ public class ManualDelayedStreamManufacturerCounterStatisticsTest extends BaseBe
     ) {
         StreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getMilliBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getMilliBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 

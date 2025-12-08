@@ -6,7 +6,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.overall.ConcurrentStreamSpaceShipStatistics;
 import ru.itmo.spaceships.statistics.overall.OverallStatistics;
 
@@ -21,7 +21,7 @@ public class ManualConcurrentStreamSpaceShipStatisticsTest extends BaseBenchmark
             Blackhole blackhole
     ) {
         ConcurrentStreamSpaceShipStatistics statistics = statisticsConfig.getConcurrentStreamSpaceShipStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getMilliBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getMilliBatch();
 
         OverallStatistics result = statistics.calculate(batch);
 
@@ -35,7 +35,7 @@ public class ManualConcurrentStreamSpaceShipStatisticsTest extends BaseBenchmark
             Blackhole blackhole
     ) {
         ConcurrentStreamSpaceShipStatistics statistics = statisticsConfig.getConcurrentDelayedStreamSpaceShipStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getMilliBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getMilliBatch();
 
         OverallStatistics result = statistics.calculate(batch);
 
@@ -49,7 +49,7 @@ public class ManualConcurrentStreamSpaceShipStatisticsTest extends BaseBenchmark
             Blackhole blackhole
     ) {
         ConcurrentStreamSpaceShipStatistics statistics = statisticsConfig.getConcurrentStreamSpaceShipStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getSmallBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getSmallBatch();
 
         OverallStatistics result = statistics.calculate(batch);
 
@@ -63,7 +63,7 @@ public class ManualConcurrentStreamSpaceShipStatisticsTest extends BaseBenchmark
             Blackhole blackhole
     ) {
         ConcurrentStreamSpaceShipStatistics statistics = statisticsConfig.getConcurrentDelayedStreamSpaceShipStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getSmallBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getSmallBatch();
 
         OverallStatistics result = statistics.calculate(batch);
 

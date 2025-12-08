@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 @Configuration
-public class R2dbcConfig {
+public class R2dbcTestConfig {
 
     @Bean
     public EmbeddedPostgres embeddedPostgres() throws Exception {

@@ -1,6 +1,6 @@
 package ru.itmo.spaceships.statistics.overall;
 
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.DelayedStatistics;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import static ru.itmo.spaceships.statistics.overall.OverallStatistics.DATE_FORMATTER;
 
 public class ConcurrentStreamSpaceShipStatistics extends DelayedStatistics
-        implements StatisticsCalculator<SpaceShip, OverallStatistics> {
+        implements StatisticsCalculator<SpaceShipEntity, OverallStatistics> {
     public ConcurrentStreamSpaceShipStatistics(long delay) {
         super(delay);
     }
@@ -20,7 +20,7 @@ public class ConcurrentStreamSpaceShipStatistics extends DelayedStatistics
         super();
     }
     @Override
-    public OverallStatistics calculate(List<SpaceShip> objects) {
+    public OverallStatistics calculate(List<SpaceShipEntity> objects) {
         OverallStatistics accumulator = new OverallStatistics();
 
         accumulator.setCountByManufacturer(objects.stream().parallel()
@@ -36,7 +36,7 @@ public class ConcurrentStreamSpaceShipStatistics extends DelayedStatistics
                 .collect(Collectors.groupingByConcurrent(Function.identity(), Collectors.counting())));
 
         accumulator.getAggregateMaxSpeed().combine(
-                objects.stream().parallel().mapToLong(SpaceShip::getMaxSpeed).summaryStatistics()
+                objects.stream().parallel().mapToLong(SpaceShipEntity::getMaxSpeed).summaryStatistics()
         );
 
         accumulator.getAggregateCrewMembers().combine(

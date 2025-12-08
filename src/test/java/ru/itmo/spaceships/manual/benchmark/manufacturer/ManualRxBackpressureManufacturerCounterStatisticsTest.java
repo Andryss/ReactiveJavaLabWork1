@@ -9,7 +9,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.manufacturer.RxBackpressureManufacturerCounterStatistics;
 
 @Disabled("Только для ручного запуска")
@@ -23,7 +23,7 @@ public class ManualRxBackpressureManufacturerCounterStatisticsTest extends BaseB
     ) {
         RxBackpressureManufacturerCounterStatistics statistics =
                 statisticsConfig.getRxBackpressureManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getSmallBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getSmallBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -38,7 +38,7 @@ public class ManualRxBackpressureManufacturerCounterStatisticsTest extends BaseB
     ) {
         RxBackpressureManufacturerCounterStatistics statistics =
                 statisticsConfig.getRxBackpressureManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getLargeBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getLargeBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 

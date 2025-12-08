@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.DelayedStatistics;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
@@ -14,7 +14,7 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
  * При помощи Stream API
  */
 public class StreamManufacturerCounterStatistics extends DelayedStatistics
-        implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+        implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
 
     public StreamManufacturerCounterStatistics(long delay) {
         super(delay);
@@ -24,7 +24,7 @@ public class StreamManufacturerCounterStatistics extends DelayedStatistics
     }
 
     @Override
-    public Map<String, Long> calculate(List<SpaceShip> objects) {
+    public Map<String, Long> calculate(List<SpaceShipEntity> objects) {
         return objects.stream()
                 .map(ship -> ship.getManufacturerDelayed(getDelay()))
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));

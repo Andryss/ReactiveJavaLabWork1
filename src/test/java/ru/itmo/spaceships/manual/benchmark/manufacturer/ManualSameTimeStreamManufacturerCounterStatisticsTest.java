@@ -9,7 +9,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.manufacturer.ConcurrentStreamManufacturerCounterStatistics;
 import ru.itmo.spaceships.statistics.manufacturer.StreamManufacturerCounterStatistics;
 
@@ -23,7 +23,7 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
             Blackhole blackhole
     ) {
         StreamManufacturerCounterStatistics statistics = statisticsConfig.getStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithoutDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithoutDelayBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -38,7 +38,7 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
     ) {
         ConcurrentStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getConcurrentStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithoutDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithoutDelayBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -53,7 +53,7 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
     ) {
         StreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithDelayBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -68,7 +68,7 @@ public class ManualSameTimeStreamManufacturerCounterStatisticsTest extends BaseB
     ) {
         ConcurrentStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getConcurrentDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithDelayBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 

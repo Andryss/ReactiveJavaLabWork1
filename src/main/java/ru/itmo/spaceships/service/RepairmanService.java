@@ -1,9 +1,10 @@
 package ru.itmo.spaceships.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import ru.itmo.spaceships.generated.model.RepairmanDto;
 import ru.itmo.spaceships.generated.model.RepairmanRequest;
 import ru.itmo.spaceships.model.RepairmanEntity;
 import ru.itmo.spaceships.repository.RepairmanRepository;
@@ -21,9 +22,9 @@ public class RepairmanService {
      * Create a new repairman.
      *
      * @param request request to create repairman
-     * @return created repairman DTO
+     * @return created repairman entity
      */
-    public Mono<RepairmanDto> createRepairman(RepairmanRequest request) {
+    public Mono<RepairmanEntity> createRepairman(RepairmanRequest request) {
         if (request.getName() == null || request.getPosition() == null) {
             return Mono.error(new IllegalArgumentException("Name and position are required for creating a repairman"));
         }
@@ -31,8 +32,7 @@ public class RepairmanService {
         entity.setName(request.getName());
         entity.setPosition(request.getPosition());
 
-        return repairmanRepository.save(entity)
-                .map(this::convertToDto);
+        return repairmanRepository.save(entity);
     }
 
     /**
@@ -40,9 +40,9 @@ public class RepairmanService {
      *
      * @param id repairman id
      * @param request request to update repairman
-     * @return updated repairman DTO
+     * @return updated repairman entity
      */
-    public Mono<RepairmanDto> updateRepairman(Long id, RepairmanRequest request) {
+    public Mono<RepairmanEntity> updateRepairman(Long id, RepairmanRequest request) {
         return repairmanRepository.findById(id)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Repairman not found with id: " + id)))
                 .flatMap(entity -> {
@@ -53,8 +53,7 @@ public class RepairmanService {
                         entity.setPosition(request.getPosition());
                     }
                     return repairmanRepository.save(entity);
-                })
-                .map(this::convertToDto);
+                });
     }
 
     /**
@@ -69,12 +68,30 @@ public class RepairmanService {
                 .flatMap(repairmanRepository::delete);
     }
 
-    private RepairmanDto convertToDto(RepairmanEntity entity) {
-        RepairmanDto dto = new RepairmanDto();
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setPosition(entity.getPosition());
-        return dto;
+    /**
+     * Get all repairmen with paging.
+     *
+     * @param page page number (0-based)
+     * @param size page size
+     * @return flux of repairman entities sorted by ID
+     */
+    public Flux<RepairmanEntity> getRepairmen(Integer page, Integer size) {
+        long offset = (long) page * size;
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        return repairmanRepository.findAll(sort)
+                .skip(offset)
+                .take(size);
+    }
+
+    /**
+     * Get repairman by ID.
+     *
+     * @param id repairman id
+     * @return repairman entity
+     */
+    public Mono<RepairmanEntity> getRepairmanById(Long id) {
+        return repairmanRepository.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Repairman not found with id: " + id)));
     }
 }
 

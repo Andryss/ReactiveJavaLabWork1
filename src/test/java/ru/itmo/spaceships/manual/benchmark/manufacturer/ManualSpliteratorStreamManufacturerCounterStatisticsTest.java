@@ -9,7 +9,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.manufacturer.SpliteratorStreamManufacturerCounterStatistics;
 
 @Disabled("Только для ручного запуска")
@@ -23,7 +23,7 @@ public class ManualSpliteratorStreamManufacturerCounterStatisticsTest extends Ba
     ) {
         SpliteratorStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getSpliteratorStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithoutDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithoutDelayBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 
@@ -38,7 +38,7 @@ public class ManualSpliteratorStreamManufacturerCounterStatisticsTest extends Ba
     ) {
         SpliteratorStreamManufacturerCounterStatistics statistics =
                 statisticsConfig.getSpliteratorDelayedStreamManufacturerCounterStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithDelayBatch();
 
         Map<String, Long> result = statistics.calculate(batch);
 

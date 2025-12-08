@@ -6,7 +6,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import ru.itmo.spaceships.manual.benchmark.BaseBenchmarkTest;
 import ru.itmo.spaceships.manual.benchmark.config.SpaseShipsConfig;
 import ru.itmo.spaceships.manual.benchmark.config.StatisticsConfig;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.overall.ConcurrentStreamSpaceShipStatistics;
 import ru.itmo.spaceships.statistics.overall.OverallStatistics;
 import ru.itmo.spaceships.statistics.overall.SequenceStreamSpaceShipStatistics;
@@ -23,7 +23,7 @@ public class ManualSameTimeStreamSpaceShipStatisticsTest extends BaseBenchmarkTe
             Blackhole blackhole
     ) {
         SequenceStreamSpaceShipStatistics statistics = statisticsConfig.getSequenceStreamSpaceShipStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithoutDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithoutDelayBatch();
 
         OverallStatistics result = statistics.calculate(batch);
 
@@ -38,7 +38,7 @@ public class ManualSameTimeStreamSpaceShipStatisticsTest extends BaseBenchmarkTe
     ) {
         ConcurrentStreamSpaceShipStatistics statistics =
                 statisticsConfig.getConcurrentStreamSpaceShipStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithoutDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithoutDelayBatch();
 
         OverallStatistics result = statistics.calculate(batch);
 
@@ -53,7 +53,7 @@ public class ManualSameTimeStreamSpaceShipStatisticsTest extends BaseBenchmarkTe
     ) {
         SequenceStreamSpaceShipStatistics statistics =
                 statisticsConfig.getSequenceDelayedStreamSpaceShipStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithDelayBatch();
 
         OverallStatistics result = statistics.calculate(batch);
 
@@ -68,7 +68,7 @@ public class ManualSameTimeStreamSpaceShipStatisticsTest extends BaseBenchmarkTe
     ) {
         ConcurrentStreamSpaceShipStatistics statistics =
                 statisticsConfig.getConcurrentDelayedStreamSpaceShipStatistics();
-        List<SpaceShip> batch = spaseShipsConfig.getWithDelayBatch();
+        List<SpaceShipEntity> batch = spaseShipsConfig.getWithDelayBatch();
 
         OverallStatistics result = statistics.calculate(batch);
 

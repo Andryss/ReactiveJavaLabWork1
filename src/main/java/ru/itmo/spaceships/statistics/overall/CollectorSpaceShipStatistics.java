@@ -10,21 +10,21 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 import static ru.itmo.spaceships.statistics.overall.OverallStatistics.DATE_FORMATTER;
 
-public class CollectorSpaceShipStatistics implements StatisticsCalculator<SpaceShip, OverallStatistics> {
+public class CollectorSpaceShipStatistics implements StatisticsCalculator<SpaceShipEntity, OverallStatistics> {
 
     @Override
-    public OverallStatistics calculate(List<SpaceShip> objects) {
+    public OverallStatistics calculate(List<SpaceShipEntity> objects) {
         return objects.stream()
                 .collect(new SpaceShipStatisticsCollector());
     }
 
     private static class SpaceShipStatisticsCollector
-            implements Collector<SpaceShip, OverallStatistics, OverallStatistics> {
+            implements Collector<SpaceShipEntity, OverallStatistics, OverallStatistics> {
 
         @Override
         public Supplier<OverallStatistics> supplier() {
@@ -32,7 +32,7 @@ public class CollectorSpaceShipStatistics implements StatisticsCalculator<SpaceS
         }
 
         @Override
-        public BiConsumer<OverallStatistics, SpaceShip> accumulator() {
+        public BiConsumer<OverallStatistics, SpaceShipEntity> accumulator() {
             return (acc, ship) -> {
                 acc.getCountByManufacturer().merge(ship.getManufacturer(), 1L, Long::sum);
 

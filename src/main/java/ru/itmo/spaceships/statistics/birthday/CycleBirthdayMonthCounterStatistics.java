@@ -6,19 +6,19 @@ import java.util.List;
 import java.util.Map;
 
 import ru.itmo.spaceships.model.CrewMember;
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
  * Класс для сбора статистики о количестве членов экипажа, рожденных в разные месяцы.
  * При помощи стандартного цикла
  */
-public class CycleBirthdayMonthCounterStatistics implements StatisticsCalculator<SpaceShip, Map<Month, Long>> {
+public class CycleBirthdayMonthCounterStatistics implements StatisticsCalculator<SpaceShipEntity, Map<Month, Long>> {
 
     @Override
-    public Map<Month, Long> calculate(List<SpaceShip> objects) {
+    public Map<Month, Long> calculate(List<SpaceShipEntity> objects) {
         Map<Month, Long> result = new HashMap<>();
-        for (SpaceShip ship : objects) {
+        for (SpaceShipEntity ship : objects) {
             List<CrewMember> crew = ship.getCrew();
             for (CrewMember crewMember : crew) {
                 Month month = crewMember.getBirthDate().getMonth();

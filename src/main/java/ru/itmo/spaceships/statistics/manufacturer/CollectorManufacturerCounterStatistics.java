@@ -12,24 +12,25 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-import ru.itmo.spaceships.model.SpaceShip;
+import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.statistics.StatisticsCalculator;
 
 /**
  * Класс для сбора статистики о количестве произведенных кораблей различными производителями.
  * При помощи собственного Collector
  */
-public class CollectorManufacturerCounterStatistics implements StatisticsCalculator<SpaceShip, Map<String, Long>> {
+public class CollectorManufacturerCounterStatistics
+        implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
 
     @Override
-    public Map<String, Long> calculate(List<SpaceShip> objects) {
+    public Map<String, Long> calculate(List<SpaceShipEntity> objects) {
         return objects.stream()
                 .parallel()
                 .collect(new ManufacturerCounterCollector());
     }
 
     private static class ManufacturerCounterCollector
-            implements Collector<SpaceShip, Map<String, AtomicLong>, Map<String, Long>> {
+            implements Collector<SpaceShipEntity, Map<String, AtomicLong>, Map<String, Long>> {
 
         @Override
         public Supplier<Map<String, AtomicLong>> supplier() {
@@ -37,7 +38,7 @@ public class CollectorManufacturerCounterStatistics implements StatisticsCalcula
         }
 
         @Override
-        public BiConsumer<Map<String, AtomicLong>, SpaceShip> accumulator() {
+        public BiConsumer<Map<String, AtomicLong>, SpaceShipEntity> accumulator() {
             return (result, spaceShip) ->
                     result.computeIfAbsent(spaceShip.getManufacturer(), key -> new AtomicLong(0))
                             .incrementAndGet();

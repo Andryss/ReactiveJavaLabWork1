@@ -10,9 +10,30 @@ servers:
 tags:
   - name: repairmen
     description: API for working with repairmen
+  - name: spaceships
+    description: API for working with spaceships
+  - name: maintenance-requests
+    description: API for working with maintenance requests
 
 paths:
   /repairmen:
+    get:
+      summary: Get all repairmen
+      operationId: getRepairmen
+      tags:
+        - repairmen
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RepairmanDto"
     post:
       summary: Create a new repairman
       operationId: createRepairman
@@ -31,17 +52,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/RepairmanDto"
   /repairmen/{id}:
+    get:
+      summary: Get repairman by ID
+      operationId: getRepairmanById
+      tags:
+        - repairmen
+      parameters:
+        - $ref: "#/components/parameters/repairmanId"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RepairmanDto"
     put:
       summary: Update a repairman
       operationId: updateRepairman
       tags:
         - repairmen
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/repairmanId"
+        - $ref: "#/components/parameters/repairmanId"
       requestBody:
         content:
           application/json:
@@ -60,16 +91,213 @@ paths:
       tags:
         - repairmen
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/repairmanId"
+        - $ref: "#/components/parameters/repairmanId"
+      responses:
+        200:
+          description: OK
+  /spaceships:
+    get:
+      summary: Get all spaceships
+      operationId: getSpaceships
+      tags:
+        - spaceships
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpaceShipDto"
+    post:
+      summary: Create a new spaceship
+      operationId: createSpaceship
+      tags:
+        - spaceships
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpaceShipRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceShipDto"
+  /spaceships/{serial}:
+    get:
+      summary: Get spaceship by serial number
+      operationId: getSpaceshipBySerial
+      tags:
+        - spaceships
+      parameters:
+        - $ref: "#/components/parameters/spaceshipSerial"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceShipDto"
+    put:
+      summary: Update a spaceship
+      operationId: updateSpaceship
+      tags:
+        - spaceships
+      parameters:
+        - $ref: "#/components/parameters/spaceshipSerial"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpaceShipRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceShipDto"
+    delete:
+      summary: Delete a spaceship
+      operationId: deleteSpaceship
+      tags:
+        - spaceships
+      parameters:
+        - $ref: "#/components/parameters/spaceshipSerial"
+      responses:
+        200:
+          description: OK
+  /maintenance-requests:
+    get:
+      summary: Get all maintenance requests
+      operationId: getMaintenanceRequests
+      tags:
+        - maintenance-requests
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MaintenanceRequestDto"
+    post:
+      summary: Create a new maintenance request
+      operationId: createMaintenanceRequest
+      tags:
+        - maintenance-requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaintenanceRequestRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceRequestDto"
+  /maintenance-requests/{id}:
+    get:
+      summary: Get maintenance request by ID
+      operationId: getMaintenanceRequestById
+      tags:
+        - maintenance-requests
+      parameters:
+        - $ref: "#/components/parameters/maintenanceRequestId"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceRequestDto"
+    put:
+      summary: Update a maintenance request
+      operationId: updateMaintenanceRequest
+      tags:
+        - maintenance-requests
+      parameters:
+        - $ref: "#/components/parameters/maintenanceRequestId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaintenanceRequestRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceRequestDto"
+    delete:
+      summary: Delete a maintenance request
+      operationId: deleteMaintenanceRequest
+      tags:
+        - maintenance-requests
+      parameters:
+        - $ref: "#/components/parameters/maintenanceRequestId"
       responses:
         200:
           description: OK
 
 components:
+  parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      description: Page number (0-based)
+      schema:
+        type: integer
+        format: int32
+        default: 0
+        minimum: 0
+    size:
+      name: size
+      in: query
+      required: false
+      description: Page size
+      schema:
+        type: integer
+        format: int32
+        default: 20
+        minimum: 1
+        maximum: 100
+    repairmanId:
+      name: id
+      in: path
+      required: true
+      description: Repairman identifier
+      schema:
+        $ref: "#/components/schemas/repairmanId"
+    spaceshipSerial:
+      name: serial
+      in: path
+      required: true
+      description: Spaceship serial number
+      schema:
+        $ref: "#/components/schemas/spaceshipSerial"
+    maintenanceRequestId:
+      name: id
+      in: path
+      required: true
+      description: Maintenance request identifier
+      schema:
+        $ref: "#/components/schemas/maintenanceRequestId"
   schemas:
     RepairmanDto:
       description: Repairman information
@@ -99,4 +327,181 @@ components:
     repairmanPosition:
       description: Repairman position
       type: string
+    SpaceShipDto:
+      description: Spaceship information
+      type: object
+      properties:
+        serial:
+          $ref: "#/components/schemas/spaceshipSerial"
+        manufacturer:
+          type: string
+        manufactureDate:
+          type: string
+          format: date-time
+        name:
+          type: string
+        type:
+          $ref: "#/components/schemas/spaceShipType"
+        dimensions:
+          $ref: "#/components/schemas/DimensionsDto"
+        engine:
+          $ref: "#/components/schemas/EngineDto"
+        crew:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrewMemberDto"
+        maxSpeed:
+          type: integer
+          format: int32
+    SpaceShipRequest:
+      description: Request to create or update a spaceship
+      type: object
+      required:
+        - serial
+      properties:
+        serial:
+          $ref: "#/components/schemas/spaceshipSerial"
+        manufacturer:
+          type: string
+        manufactureDate:
+          type: string
+          format: date-time
+        name:
+          type: string
+        type:
+          $ref: "#/components/schemas/spaceShipType"
+        dimensions:
+          $ref: "#/components/schemas/DimensionsDto"
+        engine:
+          $ref: "#/components/schemas/EngineDto"
+        crew:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrewMemberDto"
+        maxSpeed:
+          type: integer
+          format: int32
+    DimensionsDto:
+      description: Dimensions
+      type: object
+      properties:
+        length:
+          type: integer
+          format: int64
+        width:
+          type: integer
+          format: int64
+        height:
+          type: integer
+          format: int64
+        weight:
+          type: number
+          format: double
+        volume:
+          type: number
+          format: double
+    EngineDto:
+      description: Engine
+      type: object
+      properties:
+        model:
+          type: string
+        thrust:
+          type: integer
+          format: int32
+        fuelType:
+          $ref: "#/components/schemas/fuelType"
+        fuelConsumption:
+          type: number
+          format: double
+    CrewMemberDto:
+      description: Crew member
+      type: object
+      properties:
+        fullName:
+          type: string
+        rank:
+          type: string
+        experienceYears:
+          type: integer
+          format: int32
+        birthDate:
+          type: string
+          format: date
+    spaceshipSerial:
+      description: Spaceship serial number
+      type: integer
+      format: int64
+    spaceShipType:
+      description: Spaceship type
+      type: string
+      enum:
+        - CARGO
+        - EXPLORATION
+        - SCOUT
+        - BATTLE
+        - PASSENGER
+    fuelType:
+      description: Fuel type
+      type: string
+      enum:
+        - LIQUID_HYDROGEN
+        - KEROSENE
+        - METHANE
+        - ELECTRIC
+        - NUCLEAR
+    MaintenanceRequestDto:
+      description: Maintenance request information
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/maintenanceRequestId"
+        spaceshipSerial:
+          $ref: "#/components/schemas/spaceshipSerial"
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        assignee:
+          type: integer
+          format: int64
+          nullable: true
+        status:
+          $ref: "#/components/schemas/maintenanceStatus"
+    MaintenanceRequestRequest:
+      description: Request to create or update a maintenance request
+      type: object
+      properties:
+        spaceshipSerial:
+          $ref: "#/components/schemas/spaceshipSerial"
+        comment:
+          type: string
+        assignee:
+          type: integer
+          format: int64
+          nullable: true
+        status:
+          $ref: "#/components/schemas/maintenanceStatus"
+    maintenanceRequestId:
+      description: Maintenance request identifier
+      type: integer
+      format: int64
+    maintenanceStatus:
+      description: Maintenance request status
+      type: string
+      enum:
+        - NEW
+        - ACCEPTED
+        - DIAGNOSTICS
+        - APPROVAL
+        - WAITING_PARTS
+        - IN_REPAIR
+        - QUALITY_CHECK
+        - READY_FOR_PICKUP
+        - COMPLETED
+        - CANCELLED
 

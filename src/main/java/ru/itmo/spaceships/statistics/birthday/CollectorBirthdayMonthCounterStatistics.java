@@ -19,7 +19,8 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
  * Класс для сбора статистики о количестве членов экипажа, рожденных в разные месяцы.
  * При помощи собственного Collector
  */
-public class CollectorBirthdayMonthCounterStatistics implements StatisticsCalculator<SpaceShipEntity, Map<Month, Long>> {
+public class CollectorBirthdayMonthCounterStatistics
+        implements StatisticsCalculator<SpaceShipEntity, Map<Month, Long>> {
 
     @Override
     public Map<Month, Long> calculate(List<SpaceShipEntity> objects) {

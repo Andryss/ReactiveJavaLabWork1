@@ -28,7 +28,8 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class RxBackpressureManufacturerCounterStatistics implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
+public class RxBackpressureManufacturerCounterStatistics
+        implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
 
     private final int bufferSize;
     private final boolean countDrops;

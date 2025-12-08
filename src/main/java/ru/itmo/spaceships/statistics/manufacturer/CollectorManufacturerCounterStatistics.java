@@ -19,7 +19,8 @@ import ru.itmo.spaceships.statistics.StatisticsCalculator;
  * Класс для сбора статистики о количестве произведенных кораблей различными производителями.
  * При помощи собственного Collector
  */
-public class CollectorManufacturerCounterStatistics implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
+public class CollectorManufacturerCounterStatistics
+        implements StatisticsCalculator<SpaceShipEntity, Map<String, Long>> {
 
     @Override
     public Map<String, Long> calculate(List<SpaceShipEntity> objects) {

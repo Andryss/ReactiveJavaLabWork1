@@ -52,7 +52,7 @@ public class SpaceShip {
     /**
      * Получить производителя с заданной задержкой (имитация работы)
      */
-    public String getManufacturer(long delay) {
+    public String getManufacturerDelayed(long delay) {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {

@@ -20,7 +20,8 @@ public class SpliteratorConcurrentStreamSpaceShipStatistics extends DelayedStati
         OverallStatistics accumulator = new OverallStatistics();
 
         accumulator.setCountByManufacturer(StreamSupport.stream(new SpaceShipSpliterator(objects), true)
-                .collect(Collectors.groupingByConcurrent(s -> s.getManufacturer(getDelay()), Collectors.counting())));
+                .collect(Collectors.groupingByConcurrent(s -> s.getManufacturerDelayed(getDelay()),
+                        Collectors.counting())));
 
         accumulator.setCountByFuelType(StreamSupport.stream(new SpaceShipSpliterator(objects), true)
                 .collect(Collectors.groupingByConcurrent(v -> v.getEngine().getFuelType().name(),

@@ -1,15 +1,12 @@
 package ru.itmo.spaceships;
 
-import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import ru.itmo.spaceships.config.R2dbcConfig;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("functionalTest")
-@AutoConfigureEmbeddedDatabase(
-        refresh = AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_EACH_TEST_METHOD,
-        type = AutoConfigureEmbeddedDatabase.DatabaseType.POSTGRES,
-        provider = AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY
-)
+@Import(R2dbcConfig.class)
 public abstract class BaseDbTest {
 }

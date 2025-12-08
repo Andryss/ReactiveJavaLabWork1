@@ -32,7 +32,7 @@ public class ConcurrentStreamManufacturerCounterStatistics extends DelayedStatis
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(parallelism));
         return objects.stream()
                 .parallel()
-                .map(ship -> ship.getManufacturer(getDelay()))
+                .map(ship -> ship.getManufacturerDelayed(getDelay()))
                 .collect(Collectors.groupingByConcurrent(Function.identity(), Collectors.counting()));
     }
 }

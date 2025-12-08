@@ -10,6 +10,7 @@
 
     <include file="repairmen.sql" relativeToChangelogFile="true"/>
     <include file="spaceship.sql" relativeToChangelogFile="true"/>
+    <include file="maintenance_request.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
 

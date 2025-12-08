@@ -5,7 +5,13 @@ import ru.itmo.spaceships.generated.model.CrewMemberDto;
 import ru.itmo.spaceships.generated.model.DimensionsDto;
 import ru.itmo.spaceships.generated.model.EngineDto;
 import ru.itmo.spaceships.generated.model.SpaceShipDto;
+import ru.itmo.spaceships.generated.model.SpaceShipRequest;
+import ru.itmo.spaceships.model.CrewMember;
+import ru.itmo.spaceships.model.Dimensions;
+import ru.itmo.spaceships.model.Engine;
+import ru.itmo.spaceships.model.FuelType;
 import ru.itmo.spaceships.model.SpaceShipEntity;
+import ru.itmo.spaceships.model.SpaceShipType;
 
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -48,7 +54,7 @@ public class SpaceShipConverter {
      * @param request spaceship request
      * @return spaceship entity
      */
-    public SpaceShipEntity convertToEntity(ru.itmo.spaceships.generated.model.SpaceShipRequest request) {
+    public SpaceShipEntity convertToEntity(SpaceShipRequest request) {
         SpaceShipEntity entity = new SpaceShipEntity();
         // Serial will be set by service layer based on context (create vs update)
         if (request.getSerial() != null) {
@@ -60,7 +66,7 @@ public class SpaceShipConverter {
                 : null);
         entity.setName(request.getName());
         entity.setType(request.getType() != null
-                ? ru.itmo.spaceships.model.SpaceShipType.valueOf(request.getType().name())
+                ? SpaceShipType.valueOf(request.getType().name())
                 : null);
         entity.setDimensions(convertDimensionsToEntity(request.getDimensions()));
         entity.setEngine(convertEngineToEntity(request.getEngine()));
@@ -69,7 +75,7 @@ public class SpaceShipConverter {
         return entity;
     }
 
-    private DimensionsDto convertDimensionsToDto(ru.itmo.spaceships.model.Dimensions model) {
+    private DimensionsDto convertDimensionsToDto(Dimensions model) {
         if (model == null) {
             return null;
         }
@@ -82,11 +88,11 @@ public class SpaceShipConverter {
         return dto;
     }
 
-    private ru.itmo.spaceships.model.Dimensions convertDimensionsToEntity(DimensionsDto dto) {
+    private Dimensions convertDimensionsToEntity(DimensionsDto dto) {
         if (dto == null) {
             return null;
         }
-        return new ru.itmo.spaceships.model.Dimensions(
+        return new Dimensions(
                 dto.getLength() != null ? dto.getLength() : 0L,
                 dto.getWidth() != null ? dto.getWidth() : 0L,
                 dto.getHeight() != null ? dto.getHeight() : 0L,
@@ -95,7 +101,7 @@ public class SpaceShipConverter {
         );
     }
 
-    private EngineDto convertEngineToDto(ru.itmo.spaceships.model.Engine model) {
+    private EngineDto convertEngineToDto(Engine model) {
         if (model == null) {
             return null;
         }
@@ -109,21 +115,21 @@ public class SpaceShipConverter {
         return dto;
     }
 
-    private ru.itmo.spaceships.model.Engine convertEngineToEntity(EngineDto dto) {
+    private Engine convertEngineToEntity(EngineDto dto) {
         if (dto == null) {
             return null;
         }
-        return new ru.itmo.spaceships.model.Engine(
+        return new Engine(
                 dto.getModel(),
                 dto.getThrust() != null ? dto.getThrust() : 0,
                 dto.getFuelType() != null
-                        ? ru.itmo.spaceships.model.FuelType.valueOf(dto.getFuelType().name())
+                        ? FuelType.valueOf(dto.getFuelType().name())
                         : null,
                 dto.getFuelConsumption() != null ? dto.getFuelConsumption() : 0.0
         );
     }
 
-    private List<CrewMemberDto> convertCrewToDto(List<ru.itmo.spaceships.model.CrewMember> model) {
+    private List<CrewMemberDto> convertCrewToDto(List<CrewMember> model) {
         if (model == null) {
             return new ArrayList<>();
         }
@@ -132,7 +138,7 @@ public class SpaceShipConverter {
                 .collect(Collectors.toList());
     }
 
-    private CrewMemberDto convertCrewMemberToDto(ru.itmo.spaceships.model.CrewMember model) {
+    private CrewMemberDto convertCrewMemberToDto(CrewMember model) {
         CrewMemberDto dto = new CrewMemberDto();
         dto.setFullName(model.getFullName());
         dto.setRank(model.getRank());
@@ -141,7 +147,7 @@ public class SpaceShipConverter {
         return dto;
     }
 
-    private List<ru.itmo.spaceships.model.CrewMember> convertCrewToEntity(List<CrewMemberDto> dto) {
+    private List<CrewMember> convertCrewToEntity(List<CrewMemberDto> dto) {
         if (dto == null) {
             return new ArrayList<>();
         }
@@ -150,8 +156,8 @@ public class SpaceShipConverter {
                 .collect(Collectors.toList());
     }
 
-    private ru.itmo.spaceships.model.CrewMember convertCrewMemberToEntity(CrewMemberDto dto) {
-        return new ru.itmo.spaceships.model.CrewMember(
+    private CrewMember convertCrewMemberToEntity(CrewMemberDto dto) {
+        return new CrewMember(
                 dto.getFullName(),
                 dto.getRank(),
                 dto.getExperienceYears() != null ? dto.getExperienceYears() : 0,

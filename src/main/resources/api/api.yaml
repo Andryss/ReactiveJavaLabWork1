@@ -12,6 +12,8 @@ tags:
     description: API for working with repairmen
   - name: spaceships
     description: API for working with spaceships
+  - name: maintenance-requests
+    description: API for working with maintenance requests
 
 paths:
   /repairmen:
@@ -172,6 +174,85 @@ paths:
       responses:
         200:
           description: OK
+  /maintenance-requests:
+    get:
+      summary: Get all maintenance requests
+      operationId: getMaintenanceRequests
+      tags:
+        - maintenance-requests
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MaintenanceRequestDto"
+    post:
+      summary: Create a new maintenance request
+      operationId: createMaintenanceRequest
+      tags:
+        - maintenance-requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaintenanceRequestRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceRequestDto"
+  /maintenance-requests/{id}:
+    get:
+      summary: Get maintenance request by ID
+      operationId: getMaintenanceRequestById
+      tags:
+        - maintenance-requests
+      parameters:
+        - $ref: "#/components/parameters/maintenanceRequestId"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceRequestDto"
+    put:
+      summary: Update a maintenance request
+      operationId: updateMaintenanceRequest
+      tags:
+        - maintenance-requests
+      parameters:
+        - $ref: "#/components/parameters/maintenanceRequestId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaintenanceRequestRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceRequestDto"
+    delete:
+      summary: Delete a maintenance request
+      operationId: deleteMaintenanceRequest
+      tags:
+        - maintenance-requests
+      parameters:
+        - $ref: "#/components/parameters/maintenanceRequestId"
+      responses:
+        200:
+          description: OK
 
 components:
   parameters:
@@ -210,6 +291,13 @@ components:
       description: Spaceship serial number
       schema:
         $ref: "#/components/schemas/spaceshipSerial"
+    maintenanceRequestId:
+      name: id
+      in: path
+      required: true
+      description: Maintenance request identifier
+      schema:
+        $ref: "#/components/schemas/maintenanceRequestId"
   schemas:
     RepairmanDto:
       description: Repairman information
@@ -362,4 +450,58 @@ components:
         - METHANE
         - ELECTRIC
         - NUCLEAR
+    MaintenanceRequestDto:
+      description: Maintenance request information
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/maintenanceRequestId"
+        spaceshipSerial:
+          $ref: "#/components/schemas/spaceshipSerial"
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        assignee:
+          type: integer
+          format: int64
+          nullable: true
+        status:
+          $ref: "#/components/schemas/maintenanceStatus"
+    MaintenanceRequestRequest:
+      description: Request to create or update a maintenance request
+      type: object
+      properties:
+        spaceshipSerial:
+          $ref: "#/components/schemas/spaceshipSerial"
+        comment:
+          type: string
+        assignee:
+          type: integer
+          format: int64
+          nullable: true
+        status:
+          $ref: "#/components/schemas/maintenanceStatus"
+    maintenanceRequestId:
+      description: Maintenance request identifier
+      type: integer
+      format: int64
+    maintenanceStatus:
+      description: Maintenance request status
+      type: string
+      enum:
+        - NEW
+        - ACCEPTED
+        - DIAGNOSTICS
+        - APPROVAL
+        - WAITING_PARTS
+        - IN_REPAIR
+        - QUALITY_CHECK
+        - READY_FOR_PICKUP
+        - COMPLETED
+        - CANCELLED
 

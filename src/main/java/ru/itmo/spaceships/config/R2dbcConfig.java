@@ -13,6 +13,8 @@ import ru.itmo.spaceships.converter.EngineReadingConverter;
 import ru.itmo.spaceships.converter.EngineWritingConverter;
 import ru.itmo.spaceships.converter.SpaceShipTypeReadingConverter;
 import ru.itmo.spaceships.converter.SpaceShipTypeWritingConverter;
+import ru.itmo.spaceships.converter.MaintenanceStatusReadingConverter;
+import ru.itmo.spaceships.converter.MaintenanceStatusWritingConverter;
 import ru.itmo.spaceships.service.ObjectMapperWrapper;
 
 import java.util.List;
@@ -41,7 +43,9 @@ public class R2dbcConfig {
                         new CrewMemberListWritingConverter(objectMapperWrapper),
                         new CrewMemberListReadingConverter(objectMapperWrapper),
                         new SpaceShipTypeWritingConverter(),
-                        new SpaceShipTypeReadingConverter()
+                        new SpaceShipTypeReadingConverter(),
+                        new MaintenanceStatusWritingConverter(),
+                        new MaintenanceStatusReadingConverter()
                 )
         );
     }

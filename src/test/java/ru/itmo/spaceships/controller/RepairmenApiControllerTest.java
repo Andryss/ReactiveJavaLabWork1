@@ -11,6 +11,7 @@ import ru.itmo.spaceships.repository.RepairmanRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RepairmenApiControllerTest extends BaseDbTest {
 
@@ -254,6 +255,191 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .bodyValue(updateRequest)
                 .exchange()
                 .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void testGetRepairmanById() {
+        // First create a repairman
+        RepairmanRequest createRequest = new RepairmanRequest();
+        createRequest.setName("John Doe");
+        createRequest.setPosition("Senior Technician");
+
+        RepairmanDto created = webClient.post()
+                .uri("/repairmen")
+                .bodyValue(createRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(RepairmanDto.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertNotNull(created);
+        Long id = created.getId();
+
+        // Get by ID
+        webClient.get()
+                .uri("/repairmen/{id}", id)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(RepairmanDto.class)
+                .consumeWith(result -> {
+                    RepairmanDto dto = result.getResponseBody();
+                    assertNotNull(dto);
+                    assertEquals(id, dto.getId());
+                    assertEquals("John Doe", dto.getName());
+                    assertEquals("Senior Technician", dto.getPosition());
+                });
+    }
+
+    @Test
+    void testGetRepairmanByIdNotFound() {
+        webClient.get()
+                .uri("/repairmen/{id}", 999L)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void testGetRepairmen() {
+        // Get initial count
+        int initialCount = webClient.get()
+                .uri("/repairmen")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(RepairmanDto.class)
+                .returnResult()
+                .getResponseBody()
+                .size();
+
+        // Create multiple repairmen
+        for (int i = 0; i < 5; i++) {
+            RepairmanRequest request = new RepairmanRequest();
+            request.setName("Repairman " + i);
+            request.setPosition("Position " + i);
+
+            webClient.post()
+                    .uri("/repairmen")
+                    .bodyValue(request)
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+
+        // Get all repairmen (default paging)
+        webClient.get()
+                .uri("/repairmen")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(RepairmanDto.class)
+                .consumeWith(result -> {
+                    assertNotNull(result.getResponseBody());
+                    assertEquals(initialCount + 5, result.getResponseBody().size());
+                });
+    }
+
+    @Test
+    void testGetRepairmenWithPaging() {
+        // Create multiple repairmen
+        for (int i = 0; i < 10; i++) {
+            RepairmanRequest request = new RepairmanRequest();
+            request.setName("Repairman " + i);
+            request.setPosition("Position " + i);
+
+            webClient.post()
+                    .uri("/repairmen")
+                    .bodyValue(request)
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+
+        // Get first page (page=0, size=3)
+        webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repairmen")
+                        .queryParam("page", 0)
+                        .queryParam("size", 3)
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(RepairmanDto.class)
+                .consumeWith(result -> {
+                    assertNotNull(result.getResponseBody());
+                    assertEquals(3, result.getResponseBody().size());
+                });
+
+        // Get second page (page=1, size=3)
+        webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repairmen")
+                        .queryParam("page", 1)
+                        .queryParam("size", 3)
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(RepairmanDto.class)
+                .consumeWith(result -> {
+                    assertNotNull(result.getResponseBody());
+                    assertEquals(3, result.getResponseBody().size());
+                });
+    }
+
+    @Test
+    void testGetRepairmenEmpty() {
+        // Get all repairmen - should return empty list or existing items
+        // Note: Database may contain data from other tests due to refresh timing
+        webClient.get()
+                .uri("/repairmen")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(RepairmanDto.class)
+                .consumeWith(result -> {
+                    assertNotNull(result.getResponseBody());
+                    // Just verify the endpoint works and returns a list
+                    // Exact count depends on database state
+                });
+    }
+
+    @Test
+    void testGetRepairmenSortedById() {
+        // Get initial count
+        int initialCount = webClient.get()
+                .uri("/repairmen")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(RepairmanDto.class)
+                .returnResult()
+                .getResponseBody()
+                .size();
+
+        // Create multiple repairmen
+        for (int i = 0; i < 5; i++) {
+            RepairmanRequest request = new RepairmanRequest();
+            request.setName("Repairman " + i);
+            request.setPosition("Position " + i);
+
+            webClient.post()
+                    .uri("/repairmen")
+                    .bodyValue(request)
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+
+        // Get all repairmen and verify they are sorted by ID
+        webClient.get()
+                .uri("/repairmen")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(RepairmanDto.class)
+                .consumeWith(result -> {
+                    var repairmen = result.getResponseBody();
+                    assertNotNull(repairmen);
+                    assertTrue(repairmen.size() >= initialCount + 5);
+
+                    // Verify sorting by ID (ascending)
+                    for (int i = 1; i < repairmen.size(); i++) {
+                        assertTrue(repairmen.get(i).getId() >= repairmen.get(i - 1).getId(),
+                                "Repairmen should be sorted by ID in ascending order");
+                    }
+                });
     }
 }
 

@@ -10,6 +10,8 @@ servers:
 tags:
   - name: repairmen
     description: API for working with repairmen
+  - name: spaceships
+    description: API for working with spaceships
 
 paths:
   /repairmen:
@@ -19,23 +21,8 @@ paths:
       tags:
         - repairmen
       parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 0
-            minimum: 0
-        - name: size
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 20
-            minimum: 1
-            maximum: 100
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
       responses:
         200:
           description: OK
@@ -69,11 +56,7 @@ paths:
       tags:
         - repairmen
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/repairmanId"
+        - $ref: "#/components/parameters/repairmanId"
       responses:
         200:
           description: OK
@@ -87,11 +70,7 @@ paths:
       tags:
         - repairmen
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/repairmanId"
+        - $ref: "#/components/parameters/repairmanId"
       requestBody:
         content:
           application/json:
@@ -110,16 +89,127 @@ paths:
       tags:
         - repairmen
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/repairmanId"
+        - $ref: "#/components/parameters/repairmanId"
+      responses:
+        200:
+          description: OK
+  /spaceships:
+    get:
+      summary: Get all spaceships
+      operationId: getSpaceships
+      tags:
+        - spaceships
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpaceShipDto"
+    post:
+      summary: Create a new spaceship
+      operationId: createSpaceship
+      tags:
+        - spaceships
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpaceShipRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceShipDto"
+  /spaceships/{serial}:
+    get:
+      summary: Get spaceship by serial number
+      operationId: getSpaceshipBySerial
+      tags:
+        - spaceships
+      parameters:
+        - $ref: "#/components/parameters/spaceshipSerial"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceShipDto"
+    put:
+      summary: Update a spaceship
+      operationId: updateSpaceship
+      tags:
+        - spaceships
+      parameters:
+        - $ref: "#/components/parameters/spaceshipSerial"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpaceShipRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceShipDto"
+    delete:
+      summary: Delete a spaceship
+      operationId: deleteSpaceship
+      tags:
+        - spaceships
+      parameters:
+        - $ref: "#/components/parameters/spaceshipSerial"
       responses:
         200:
           description: OK
 
 components:
+  parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      description: Page number (0-based)
+      schema:
+        type: integer
+        format: int32
+        default: 0
+        minimum: 0
+    size:
+      name: size
+      in: query
+      required: false
+      description: Page size
+      schema:
+        type: integer
+        format: int32
+        default: 20
+        minimum: 1
+        maximum: 100
+    repairmanId:
+      name: id
+      in: path
+      required: true
+      description: Repairman identifier
+      schema:
+        $ref: "#/components/schemas/repairmanId"
+    spaceshipSerial:
+      name: serial
+      in: path
+      required: true
+      description: Spaceship serial number
+      schema:
+        $ref: "#/components/schemas/spaceshipSerial"
   schemas:
     RepairmanDto:
       description: Repairman information
@@ -149,4 +239,127 @@ components:
     repairmanPosition:
       description: Repairman position
       type: string
+    SpaceShipDto:
+      description: Spaceship information
+      type: object
+      properties:
+        serial:
+          $ref: "#/components/schemas/spaceshipSerial"
+        manufacturer:
+          type: string
+        manufactureDate:
+          type: string
+          format: date-time
+        name:
+          type: string
+        type:
+          $ref: "#/components/schemas/spaceShipType"
+        dimensions:
+          $ref: "#/components/schemas/DimensionsDto"
+        engine:
+          $ref: "#/components/schemas/EngineDto"
+        crew:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrewMemberDto"
+        maxSpeed:
+          type: integer
+          format: int32
+    SpaceShipRequest:
+      description: Request to create or update a spaceship
+      type: object
+      required:
+        - serial
+      properties:
+        serial:
+          $ref: "#/components/schemas/spaceshipSerial"
+        manufacturer:
+          type: string
+        manufactureDate:
+          type: string
+          format: date-time
+        name:
+          type: string
+        type:
+          $ref: "#/components/schemas/spaceShipType"
+        dimensions:
+          $ref: "#/components/schemas/DimensionsDto"
+        engine:
+          $ref: "#/components/schemas/EngineDto"
+        crew:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrewMemberDto"
+        maxSpeed:
+          type: integer
+          format: int32
+    DimensionsDto:
+      description: Dimensions
+      type: object
+      properties:
+        length:
+          type: integer
+          format: int64
+        width:
+          type: integer
+          format: int64
+        height:
+          type: integer
+          format: int64
+        weight:
+          type: number
+          format: double
+        volume:
+          type: number
+          format: double
+    EngineDto:
+      description: Engine
+      type: object
+      properties:
+        model:
+          type: string
+        thrust:
+          type: integer
+          format: int32
+        fuelType:
+          $ref: "#/components/schemas/fuelType"
+        fuelConsumption:
+          type: number
+          format: double
+    CrewMemberDto:
+      description: Crew member
+      type: object
+      properties:
+        fullName:
+          type: string
+        rank:
+          type: string
+        experienceYears:
+          type: integer
+          format: int32
+        birthDate:
+          type: string
+          format: date
+    spaceshipSerial:
+      description: Spaceship serial number
+      type: integer
+      format: int64
+    spaceShipType:
+      description: Spaceship type
+      type: string
+      enum:
+        - CARGO
+        - EXPLORATION
+        - SCOUT
+        - BATTLE
+        - PASSENGER
+    fuelType:
+      description: Fuel type
+      type: string
+      enum:
+        - LIQUID_HYDROGEN
+        - KEROSENE
+        - METHANE
+        - ELECTRIC
+        - NUCLEAR
 

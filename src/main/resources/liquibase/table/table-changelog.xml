@@ -9,6 +9,7 @@
     </preConditions>
 
     <include file="repairmen.sql" relativeToChangelogFile="true"/>
+    <include file="spaceship.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
 

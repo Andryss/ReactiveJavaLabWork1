@@ -28,7 +28,7 @@ public class SpliteratorStreamManufacturerCounterStatistics extends DelayedStati
     @Override
     public Map<String, Long> calculate(List<SpaceShip> objects) {
         return StreamSupport.stream(new SpaceShipSpliterator(objects), true)
-                .map(ship -> ship.getManufacturer(getDelay()))
+                .map(ship -> ship.getManufacturerDelayed(getDelay()))
                 .collect(Collectors.groupingByConcurrent(Function.identity(), Collectors.counting()));
     }
 }

@@ -24,7 +24,8 @@ public class ConcurrentStreamSpaceShipStatistics extends DelayedStatistics
         OverallStatistics accumulator = new OverallStatistics();
 
         accumulator.setCountByManufacturer(objects.stream().parallel()
-                .collect(Collectors.groupingByConcurrent(s -> s.getManufacturer(getDelay()), Collectors.counting())));
+                .collect(Collectors.groupingByConcurrent(s -> s.getManufacturerDelayed(getDelay()),
+                        Collectors.counting())));
 
         accumulator.setCountByFuelType(objects.stream().parallel()
                 .collect(Collectors.groupingByConcurrent(v ->

@@ -26,7 +26,7 @@ public class StreamManufacturerCounterStatistics extends DelayedStatistics
     @Override
     public Map<String, Long> calculate(List<SpaceShip> objects) {
         return objects.stream()
-                .map(ship -> ship.getManufacturer(getDelay()))
+                .map(ship -> ship.getManufacturerDelayed(getDelay()))
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 }

@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Spaceships API
+  description: API for spaceships management
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+tags:
+  - name: repairmen
+    description: API for working with repairmen
+
+paths:
+  /repairmen:
+    post:
+      summary: Create a new repairman
+      operationId: createRepairman
+      tags:
+        - repairmen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RepairmanRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RepairmanDto"
+  /repairmen/{id}:
+    put:
+      summary: Update a repairman
+      operationId: updateRepairman
+      tags:
+        - repairmen
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/repairmanId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RepairmanRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RepairmanDto"
+    delete:
+      summary: Delete a repairman
+      operationId: deleteRepairman
+      tags:
+        - repairmen
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/repairmanId"
+      responses:
+        200:
+          description: OK
+
+components:
+  schemas:
+    RepairmanDto:
+      description: Repairman information
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/repairmanId"
+        name:
+          $ref: "#/components/schemas/repairmanName"
+        position:
+          $ref: "#/components/schemas/repairmanPosition"
+    RepairmanRequest:
+      description: Request to create or update a repairman
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/repairmanName"
+        position:
+          $ref: "#/components/schemas/repairmanPosition"
+    repairmanId:
+      description: Repairman identifier
+      type: integer
+      format: int64
+    repairmanName:
+      description: Repairman name
+      type: string
+    repairmanPosition:
+      description: Repairman position
+      type: string
+

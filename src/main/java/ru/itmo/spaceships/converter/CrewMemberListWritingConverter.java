@@ -11,7 +11,7 @@ import ru.itmo.spaceships.service.ObjectMapperWrapper;
 import java.util.List;
 
 /**
- * Converter for writing List of CrewMember to JSONB.
+ * Конвертер для записи списка CrewMember в JSONB.
  */
 @WritingConverter
 @RequiredArgsConstructor

@@ -13,7 +13,7 @@ import ru.itmo.spaceships.generated.model.RepairmanRequest;
 import ru.itmo.spaceships.service.RepairmanService;
 
 /**
- * Controller for repairmen API endpoints.
+ * Контроллер для API эндпоинтов ремонтников.
  */
 @Slf4j
 @RestController

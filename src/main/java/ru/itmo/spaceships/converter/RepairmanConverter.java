@@ -5,16 +5,16 @@ import ru.itmo.spaceships.generated.model.RepairmanDto;
 import ru.itmo.spaceships.model.RepairmanEntity;
 
 /**
- * Converter for RepairmanEntity and RepairmanDto.
+ * Конвертер для RepairmanEntity и RepairmanDto.
  */
 @Component
 public class RepairmanConverter {
 
     /**
-     * Convert RepairmanEntity to RepairmanDto.
+     * Конвертирует RepairmanEntity в RepairmanDto.
      *
-     * @param entity repairman entity
-     * @return repairman DTO
+     * @param entity сущность ремонтника
+     * @return DTO ремонтника
      */
     public RepairmanDto convertToDto(RepairmanEntity entity) {
         RepairmanDto dto = new RepairmanDto();

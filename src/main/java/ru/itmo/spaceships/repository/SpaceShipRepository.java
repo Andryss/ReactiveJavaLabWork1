@@ -5,15 +5,15 @@ import reactor.core.publisher.Mono;
 import ru.itmo.spaceships.model.SpaceShipEntity;
 
 /**
- * Repository for SpaceShipEntity.
+ * Репозиторий для SpaceShipEntity.
  */
 public interface SpaceShipRepository extends R2dbcRepository<SpaceShipEntity, Long> {
 
     /**
-     * Find spaceship by serial number.
+     * Находит корабль по серийному номеру.
      *
-     * @param serial serial number
-     * @return spaceship entity
+     * @param serial серийный номер
+     * @return сущность корабля
      */
     Mono<SpaceShipEntity> findBySerial(Long serial);
 }

@@ -13,7 +13,7 @@ import ru.itmo.spaceships.generated.model.MaintenanceRequestRequest;
 import ru.itmo.spaceships.service.MaintenanceRequestService;
 
 /**
- * Controller for maintenance requests API endpoints.
+ * Контроллер для API эндпоинтов заявок на обслуживание.
  */
 @Slf4j
 @RestController

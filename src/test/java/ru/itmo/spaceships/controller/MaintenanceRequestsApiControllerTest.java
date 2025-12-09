@@ -76,7 +76,7 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
                     assertNotNull(dto);
                     assertEquals(request.getSpaceshipSerial(), dto.getSpaceshipSerial());
                     assertEquals("Test maintenance request", dto.getComment());
-                    // assignee and status should be ignored on create, status should be NEW
+                    // assignee и status должны игнорироваться при создании, status должен быть NEW
                     assertEquals(MaintenanceStatus.NEW, dto.getStatus());
                 });
     }

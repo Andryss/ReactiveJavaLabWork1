@@ -13,20 +13,6 @@ import ru.itmo.spaceships.model.CrewMember;
 public class CrewMemberGenerator implements Generator<CrewMember> {
 
     /**
-     * Все возможные имена
-     */
-    private static final String[] FIRST_NAMES = {
-            "Иван", "Алексей", "Дмитрий", "Сергей", "Павел",
-            "Фёдор", "Александр", "Евгений", "Олег", "Артём"
-    };
-    /**
-     * Все возможные фамилии
-     */
-    private static final String[] LAST_NAMES = {
-            "Иванов", "Петров", "Сидоров", "Кузнецов", "Смирнов",
-            "Соколов", "Попов", "Морозов", "Волков", "Фёдоров"
-    };
-    /**
      * Все возможные ранги на корабле
      */
     private static final String[] RANKS = {
@@ -44,6 +30,7 @@ public class CrewMemberGenerator implements Generator<CrewMember> {
     private static final int MIN_WORK_YEAR_THRESHOLD = 18;
 
     private final Random random;
+    private final NameGenerator nameGenerator;
 
     public CrewMemberGenerator() {
         this(new Random());
@@ -51,13 +38,12 @@ public class CrewMemberGenerator implements Generator<CrewMember> {
 
     public CrewMemberGenerator(Random random) {
         this.random = random;
+        this.nameGenerator = new NameGenerator(random);
     }
 
     @Override
     public CrewMember generateOne() {
-        String firstName = FIRST_NAMES[random.nextInt(FIRST_NAMES.length)];
-        String lastName = LAST_NAMES[random.nextInt(LAST_NAMES.length)];
-        String fullName = String.format("%s %s", firstName, lastName);
+        String fullName = nameGenerator.generateFullName();
 
         String rank = RANKS[random.nextInt(RANKS.length)];
 

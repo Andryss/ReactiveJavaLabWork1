@@ -6,7 +6,7 @@ import org.springframework.lang.NonNull;
 import ru.itmo.spaceships.model.MaintenanceStatus;
 
 /**
- * Converter for reading MaintenanceStatus enum from VARCHAR.
+ * Конвертер для чтения enum MaintenanceStatus из VARCHAR.
  */
 @ReadingConverter
 public class MaintenanceStatusReadingConverter implements Converter<String, MaintenanceStatus> {

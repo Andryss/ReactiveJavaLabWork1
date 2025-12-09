@@ -9,7 +9,7 @@ import ru.itmo.spaceships.model.Engine;
 import ru.itmo.spaceships.service.ObjectMapperWrapper;
 
 /**
- * Converter for reading Engine from JSONB.
+ * Конвертер для чтения Engine из JSONB.
  */
 @ReadingConverter
 @RequiredArgsConstructor

@@ -7,16 +7,16 @@ import ru.itmo.spaceships.model.MaintenanceRequestEntity;
 import java.time.ZoneOffset;
 
 /**
- * Converter for MaintenanceRequestEntity and MaintenanceRequestDto.
+ * Конвертер для MaintenanceRequestEntity и MaintenanceRequestDto.
  */
 @Component
 public class MaintenanceRequestConverter {
 
     /**
-     * Convert MaintenanceRequestEntity to MaintenanceRequestDto.
+     * Конвертирует MaintenanceRequestEntity в MaintenanceRequestDto.
      *
-     * @param entity maintenance request entity
-     * @return maintenance request DTO
+     * @param entity сущность заявки на обслуживание
+     * @return DTO заявки на обслуживание
      */
     public MaintenanceRequestDto convertToDto(MaintenanceRequestEntity entity) {
         MaintenanceRequestDto dto = new MaintenanceRequestDto();

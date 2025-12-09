@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Entity representing a maintenance request.
+ * Сущность, представляющая заявку на обслуживание.
  */
 @Data
 @NoArgsConstructor

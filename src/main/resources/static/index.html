@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spaceships Management System</title>
+    <title>Система управления космическими кораблями</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,7 +16,7 @@
     <!-- Server Status Indicator (Minimized) -->
     <div class="status-indicator">
         <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">Checking...</span>
+        <span id="statusText">Проверка...</span>
     </div>
 
     <div class="main-container">
@@ -24,22 +24,22 @@
         <ul class="nav nav-tabs" id="mainTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button">
-                    <i class="bi bi-house-door"></i> Home
+                    <i class="bi bi-house-door"></i> Главная
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="spaceships-tab" data-bs-toggle="tab" data-bs-target="#spaceships" type="button">
-                    <i class="bi bi-rocket"></i> Spaceships
+                    <i class="bi bi-rocket"></i> Корабли
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff" type="button">
-                    <i class="bi bi-people"></i> Staff
+                    <i class="bi bi-people"></i> Персонал
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button">
-                    <i class="bi bi-clipboard-check"></i> Requests
+                    <i class="bi bi-clipboard-check"></i> Заявки
                 </button>
             </li>
         </ul>
@@ -49,13 +49,13 @@
             <!-- Home Tab -->
             <div class="tab-pane fade show active" id="home" role="tabpanel">
                 <div class="main-screen">
-                    <h1>🚀 Spaceships Management System</h1>
-                    <p class="lead text-muted">Manage your fleet, staff, and maintenance requests all in one place</p>
+                    <h1>🚀 Система управления космическими кораблями</h1>
+                    <p class="lead text-muted">Управляйте флотом, персоналом и заявками на обслуживание в одном месте</p>
                     <div class="gif-container">
-                        <img src="https://media.giphy.com/media/l0MYC0LajdoPo3ATu/giphy.gif" alt="Funny spaceship gif">
+                        <img src="https://media.giphy.com/media/l0MYC0LajdoPo3ATu/giphy.gif" alt="Космический корабль">
                     </div>
 <div class="mt-4">
-                        <p class="text-muted">Navigate through the tabs above to manage different aspects of your spaceship fleet.</p>
+                        <p class="text-muted">Используйте вкладки выше для управления различными аспектами вашего флота космических кораблей.</p>
                     </div>
                 </div>
             </div>
@@ -64,45 +64,45 @@
             <div class="tab-pane fade" id="spaceships" role="tabpanel">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-rocket"></i> Spaceships Database</h5>
+                        <h5 class="mb-0"><i class="bi bi-rocket"></i> База данных кораблей</h5>
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5>Spaceships List</h5>
+                            <h5>Список кораблей</h5>
                             <button class="btn btn-primary" onclick="showSpaceshipModal()">
-                                <i class="bi bi-plus-circle"></i> Add Spaceship
+                                <i class="bi bi-plus-circle"></i> Добавить корабль
                             </button>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Serial</th>
-                                        <th>Name</th>
-                                        <th>Manufacturer</th>
-                                        <th>Type</th>
-                                        <th>Manufacture Date</th>
-                                        <th>Max Speed</th>
-                                        <th>Dimensions</th>
-                                        <th>Engine</th>
-                                        <th>Crew</th>
-                                        <th>Actions</th>
+                                        <th>Серийный номер</th>
+                                        <th>Название</th>
+                                        <th>Производитель</th>
+                                        <th>Тип</th>
+                                        <th>Дата производства</th>
+                                        <th>Макс. скорость</th>
+                                        <th>Размеры</th>
+                                        <th>Двигатель</th>
+                                        <th>Экипаж</th>
+                                        <th>Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody id="spaceshipsTableBody">
                                     <tr>
-                                        <td colspan="10" class="text-center">Loading...</td>
+                                        <td colspan="10" class="text-center">Загрузка...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <button class="btn btn-sm btn-outline-secondary" id="spaceshipsPrevBtn" onclick="navigateSpaceshipsPage(-1)" disabled>
-                                <i class="bi bi-chevron-left"></i> Previous
+                                <i class="bi bi-chevron-left"></i> Назад
                             </button>
-                            <span class="small" id="spaceshipsPageInfo">Page 1</span>
+                            <span class="small" id="spaceshipsPageInfo">Страница 1</span>
                             <button class="btn btn-sm btn-outline-secondary" id="spaceshipsNextBtn" onclick="navigateSpaceshipsPage(1)" disabled>
-                                Next <i class="bi bi-chevron-right"></i>
+                                Вперёд <i class="bi bi-chevron-right"></i>
                             </button>
                         </div>
                     </div>
@@ -113,13 +113,13 @@
             <div class="tab-pane fade" id="staff" role="tabpanel">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-people"></i> Staff Database</h5>
+                        <h5 class="mb-0"><i class="bi bi-people"></i> База данных персонала</h5>
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5>Repairmen List</h5>
+                            <h5>Список ремонтников</h5>
                             <button class="btn btn-primary" onclick="showRepairmanModal()">
-                                <i class="bi bi-plus-circle"></i> Add Repairman
+                                <i class="bi bi-plus-circle"></i> Добавить ремонтника
                             </button>
                         </div>
                         <div class="table-responsive">
@@ -127,25 +127,25 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Position</th>
-                                        <th>Actions</th>
+                                        <th>Имя</th>
+                                        <th>Должность</th>
+                                        <th>Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody id="repairmenTableBody">
                                     <tr>
-                                        <td colspan="4" class="text-center">Loading...</td>
+                                        <td colspan="4" class="text-center">Загрузка...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <button class="btn btn-sm btn-outline-secondary" id="repairmenPrevBtn" onclick="navigateRepairmenPage(-1)" disabled>
-                                <i class="bi bi-chevron-left"></i> Previous
+                                <i class="bi bi-chevron-left"></i> Назад
                             </button>
-                            <span class="small" id="repairmenPageInfo">Page 1</span>
+                            <span class="small" id="repairmenPageInfo">Страница 1</span>
                             <button class="btn btn-sm btn-outline-secondary" id="repairmenNextBtn" onclick="navigateRepairmenPage(1)" disabled>
-                                Next <i class="bi bi-chevron-right"></i>
+                                Вперёд <i class="bi bi-chevron-right"></i>
                             </button>
                         </div>
                     </div>
@@ -156,13 +156,13 @@
             <div class="tab-pane fade" id="requests" role="tabpanel">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> Maintenance Requests Database</h5>
+                        <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> База данных заявок на обслуживание</h5>
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5>Maintenance Requests List</h5>
+                            <h5>Список заявок на обслуживание</h5>
                             <button class="btn btn-primary" onclick="showRequestModal()">
-                                <i class="bi bi-plus-circle"></i> Add Request
+                                <i class="bi bi-plus-circle"></i> Добавить заявку
                             </button>
                         </div>
                         <div class="table-responsive">
@@ -170,28 +170,28 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Spaceship Serial</th>
-                                        <th>Comment</th>
-                                        <th>Status</th>
-                                        <th>Assignee</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
+                                        <th>Серийный номер корабля</th>
+                                        <th>Комментарий</th>
+                                        <th>Статус</th>
+                                        <th>Исполнитель</th>
+                                        <th>Создано</th>
+                                        <th>Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody id="requestsTableBody">
                                     <tr>
-                                        <td colspan="7" class="text-center">Loading...</td>
+                                        <td colspan="7" class="text-center">Загрузка...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <button class="btn btn-sm btn-outline-secondary" id="requestsPrevBtn" onclick="navigateRequestsPage(-1)" disabled>
-                                <i class="bi bi-chevron-left"></i> Previous
+                                <i class="bi bi-chevron-left"></i> Назад
                             </button>
-                            <span class="small" id="requestsPageInfo">Page 1</span>
+                            <span class="small" id="requestsPageInfo">Страница 1</span>
                             <button class="btn btn-sm btn-outline-secondary" id="requestsNextBtn" onclick="navigateRequestsPage(1)" disabled>
-                                Next <i class="bi bi-chevron-right"></i>
+                                Вперёд <i class="bi bi-chevron-right"></i>
                             </button>
                         </div>
                     </div>
@@ -205,114 +205,114 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="spaceshipModalTitle">Add Spaceship</h5>
+                    <h5 class="modal-title" id="spaceshipModalTitle">Добавить корабль</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
                     <form id="spaceshipForm">
                         <input type="hidden" id="spaceshipSerial" name="serial">
                         
-                        <h6 class="mb-3 text-primary">Basic Information</h6>
+                        <h6 class="mb-3 text-primary">Основная информация</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Serial Number *</label>
+                                <label class="form-label">Серийный номер *</label>
                                 <input type="number" class="form-control" id="spaceshipSerialInput" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Name *</label>
+                                <label class="form-label">Название *</label>
                                 <input type="text" class="form-control" id="spaceshipName" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Manufacturer *</label>
+                                <label class="form-label">Производитель *</label>
                                 <input type="text" class="form-control" id="spaceshipManufacturer" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Type *</label>
+                                <label class="form-label">Тип *</label>
                                 <select class="form-select" id="spaceshipType" required>
-                                    <option value="">Select type</option>
-                                    <option value="CARGO">CARGO</option>
-                                    <option value="EXPLORATION">EXPLORATION</option>
-                                    <option value="SCOUT">SCOUT</option>
-                                    <option value="BATTLE">BATTLE</option>
-                                    <option value="PASSENGER">PASSENGER</option>
+                                    <option value="">Выберите тип</option>
+                                    <option value="CARGO">Грузовой</option>
+                                    <option value="EXPLORATION">Исследовательский</option>
+                                    <option value="SCOUT">Разведывательный</option>
+                                    <option value="BATTLE">Боевой</option>
+                                    <option value="PASSENGER">Пассажирский</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Manufacture Date *</label>
+                                <label class="form-label">Дата производства *</label>
                                 <input type="datetime-local" class="form-control" id="spaceshipManufactureDate" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Max Speed</label>
+                                <label class="form-label">Максимальная скорость</label>
                                 <input type="number" class="form-control" id="spaceshipMaxSpeed" value="0">
                             </div>
                         </div>
                         
                         <hr class="my-4">
-                        <h6 class="mb-3 text-primary">Dimensions</h6>
+                        <h6 class="mb-3 text-primary">Размеры</h6>
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Length (meters)</label>
+                                <label class="form-label">Длина (метры)</label>
                                 <input type="number" class="form-control" id="dimensionsLength" value="0">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Width (meters)</label>
+                                <label class="form-label">Ширина (метры)</label>
                                 <input type="number" class="form-control" id="dimensionsWidth" value="0">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Height (meters)</label>
+                                <label class="form-label">Высота (метры)</label>
                                 <input type="number" class="form-control" id="dimensionsHeight" value="0">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Weight (tons)</label>
+                                <label class="form-label">Вес (тонны)</label>
                                 <input type="number" step="0.01" class="form-control" id="dimensionsWeight" value="0">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Volume (cubic meters)</label>
+                                <label class="form-label">Объём (куб. метры)</label>
                                 <input type="number" step="0.01" class="form-control" id="dimensionsVolume" value="0">
                             </div>
 </div>
 
                         <hr class="my-4">
-                        <h6 class="mb-3 text-primary">Engine</h6>
+                        <h6 class="mb-3 text-primary">Двигатель</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Model</label>
+                                <label class="form-label">Модель</label>
                                 <input type="text" class="form-control" id="engineModel">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Thrust (kN)</label>
+                                <label class="form-label">Тяга (кН)</label>
                                 <input type="number" class="form-control" id="engineThrust" value="0">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Fuel Type</label>
+                                <label class="form-label">Тип топлива</label>
                                 <select class="form-select" id="engineFuelType">
-                                    <option value="">Select fuel type</option>
-                                    <option value="LIQUID_HYDROGEN">LIQUID_HYDROGEN</option>
-                                    <option value="KEROSENE">KEROSENE</option>
-                                    <option value="METHANE">METHANE</option>
-                                    <option value="ELECTRIC">ELECTRIC</option>
-                                    <option value="NUCLEAR">NUCLEAR</option>
+                                    <option value="">Выберите тип топлива</option>
+                                    <option value="LIQUID_HYDROGEN">Жидкий водород</option>
+                                    <option value="KEROSENE">Керосин</option>
+                                    <option value="METHANE">Метан</option>
+                                    <option value="ELECTRIC">Ионное/электрическое</option>
+                                    <option value="NUCLEAR">Ядерное топливо</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Fuel Consumption (per hour)</label>
+                                <label class="form-label">Расход топлива (в час)</label>
                                 <input type="number" step="0.01" class="form-control" id="engineFuelConsumption" value="0">
                             </div>
                         </div>
                         
                         <hr class="my-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0 text-primary">Crew Members</h6>
+                            <h6 class="mb-0 text-primary">Члены экипажа</h6>
                             <button type="button" class="btn btn-sm btn-success" onclick="addCrewMember()">
-                                <i class="bi bi-plus-circle"></i> Add Crew Member
+                                <i class="bi bi-plus-circle"></i> Добавить члена экипажа
                             </button>
                         </div>
                         <div id="crewMembersContainer">
@@ -321,8 +321,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="saveSpaceship()">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSpaceship()">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -333,25 +333,25 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="repairmanModalTitle">Add Repairman</h5>
+                    <h5 class="modal-title" id="repairmanModalTitle">Добавить ремонтника</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="repairmanForm">
                         <input type="hidden" id="repairmanId">
                         <div class="mb-3">
-                            <label class="form-label">Name *</label>
+                            <label class="form-label">Имя *</label>
                             <input type="text" class="form-control" id="repairmanName" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Position *</label>
+                            <label class="form-label">Должность *</label>
                             <input type="text" class="form-control" id="repairmanPosition" required>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="saveRepairman()">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRepairman()">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -362,20 +362,20 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Spaceship Details</h5>
+                    <h5 class="modal-title">Детали корабля</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
                     <div id="spaceshipViewContent">
                         <div class="text-center">
                             <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                                <span class="visually-hidden">Загрузка...</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                 </div>
             </div>
         </div>
@@ -386,20 +386,20 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Repairman Details</h5>
+                    <h5 class="modal-title">Детали ремонтника</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div id="repairmanViewContent">
                         <div class="text-center">
                             <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                                <span class="visually-hidden">Загрузка...</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                 </div>
             </div>
         </div>
@@ -410,82 +410,82 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="requestModalTitle">Add Maintenance Request</h5>
+                    <h5 class="modal-title" id="requestModalTitle">Добавить заявку на обслуживание</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="requestForm">
                         <input type="hidden" id="requestId">
                         <div class="mb-3">
-                            <label class="form-label">Spaceship Serial *</label>
+                            <label class="form-label">Серийный номер корабля *</label>
                             <input type="hidden" id="requestSpaceshipSerial" required>
                             <div class="dropdown">
                                 <button class="btn btn-outline-secondary form-control text-start" type="button" id="spaceshipDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span id="spaceshipSelectedText">Select spaceship...</span>
+                                    <span id="spaceshipSelectedText">Выберите корабль...</span>
                                 </button>
                                 <div class="dropdown-menu w-100 p-0" id="spaceshipDropdownContainer">
                                     <ul class="list-unstyled mb-0" id="spaceshipDropdownMenu" style="max-height: 300px; overflow-y: auto;">
-                                        <li><div class="px-3 py-2 text-muted">Loading...</div></li>
+                                        <li><div class="px-3 py-2 text-muted">Загрузка...</div></li>
                                     </ul>
                                     <div class="d-flex justify-content-between align-items-center p-2 border-top" id="spaceshipPagination" style="display: none;">
                                         <button class="btn btn-sm btn-outline-secondary" id="spaceshipPrevBtn" onclick="navigateSpaceshipPage(-1)" disabled>
-                                            <i class="bi bi-chevron-left"></i> Previous
+                                            <i class="bi bi-chevron-left"></i> Назад
                                         </button>
-                                        <span class="small" id="spaceshipPageInfo">Page 1</span>
+                                        <span class="small" id="spaceshipPageInfo">Страница 1</span>
                                         <button class="btn btn-sm btn-outline-secondary" id="spaceshipNextBtn" onclick="navigateSpaceshipPage(1)" disabled>
-                                            Next <i class="bi bi-chevron-right"></i>
+                                            Вперёд <i class="bi bi-chevron-right"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Comment *</label>
+                            <label class="form-label">Комментарий *</label>
                             <textarea class="form-control" id="requestComment" rows="3" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Assignee</label>
+                            <label class="form-label">Исполнитель</label>
                             <input type="hidden" id="requestAssignee">
                             <div class="dropdown">
                                 <button class="btn btn-outline-secondary form-control text-start" type="button" id="assigneeDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span id="assigneeSelectedText">Select repairman...</span>
+                                    <span id="assigneeSelectedText">Выберите ремонтника...</span>
                                 </button>
                                 <div class="dropdown-menu w-100 p-0" id="assigneeDropdownContainer">
                                     <ul class="list-unstyled mb-0" id="assigneeDropdownMenu" style="max-height: 300px; overflow-y: auto;">
-                                        <li><div class="px-3 py-2 text-muted">Loading...</div></li>
+                                        <li><div class="px-3 py-2 text-muted">Загрузка...</div></li>
                                     </ul>
                                     <div class="d-flex justify-content-between align-items-center p-2 border-top" id="assigneePagination" style="display: none;">
                                         <button class="btn btn-sm btn-outline-secondary" id="assigneePrevBtn" onclick="navigateAssigneePage(-1)" disabled>
-                                            <i class="bi bi-chevron-left"></i> Previous
+                                            <i class="bi bi-chevron-left"></i> Назад
                                         </button>
-                                        <span class="small" id="assigneePageInfo">Page 1</span>
+                                        <span class="small" id="assigneePageInfo">Страница 1</span>
                                         <button class="btn btn-sm btn-outline-secondary" id="assigneeNextBtn" onclick="navigateAssigneePage(1)" disabled>
-                                            Next <i class="bi bi-chevron-right"></i>
+                                            Вперёд <i class="bi bi-chevron-right"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3" id="requestStatusContainer" style="display: none;">
-                            <label class="form-label">Status</label>
+                            <label class="form-label">Статус</label>
                             <select class="form-select" id="requestStatus">
-                                <option value="NEW">NEW</option>
-                                <option value="ACCEPTED">ACCEPTED</option>
-                                <option value="DIAGNOSTICS">DIAGNOSTICS</option>
-                                <option value="APPROVAL">APPROVAL</option>
-                                <option value="WAITING_PARTS">WAITING_PARTS</option>
-                                <option value="IN_REPAIR">IN_REPAIR</option>
-                                <option value="QUALITY_CHECK">QUALITY_CHECK</option>
-                                <option value="READY_FOR_PICKUP">READY_FOR_PICKUP</option>
-                                <option value="COMPLETED">COMPLETED</option>
-                                <option value="CANCELLED">CANCELLED</option>
+                                <option value="NEW">Новая</option>
+                                <option value="ACCEPTED">Принята в работу</option>
+                                <option value="DIAGNOSTICS">Диагностика</option>
+                                <option value="APPROVAL">Согласование работ</option>
+                                <option value="WAITING_PARTS">В ожидании запчастей</option>
+                                <option value="IN_REPAIR">В ремонте</option>
+                                <option value="QUALITY_CHECK">Тестирование / контроль качества</option>
+                                <option value="READY_FOR_PICKUP">Готово / ожидает выдачи</option>
+                                <option value="COMPLETED">Завершено / выдано</option>
+                                <option value="CANCELLED">Отменена</option>
                             </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="saveRequest()">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRequest()">Сохранить</button>
                 </div>
             </div>
     </div>
@@ -495,6 +495,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Custom JavaScript -->
+    <script src="js/translations.js"></script>
     <script src="js/common.js"></script>
     <script src="js/pagination.js"></script>
     <script src="js/spaceships.js"></script>

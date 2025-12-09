@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Status of maintenance request.
+ * Статус заявки на обслуживание.
  */
 public enum MaintenanceStatus {
     /**
@@ -80,23 +80,23 @@ public enum MaintenanceStatus {
     }
 
     /**
-     * Check if transition from this status to new status is allowed.
+     * Проверяет, разрешён ли переход из текущего статуса в новый статус.
      *
-     * @param newStatus new status to transition to
-     * @return true if transition is allowed, false otherwise
+     * @param newStatus новый статус для перехода
+     * @return true, если переход разрешён, false в противном случае
      */
     public boolean isTransitionAllowed(MaintenanceStatus newStatus) {
         if (this == newStatus) {
-            return true; // No change is always allowed
+            return true; // Отсутствие изменений всегда разрешено
         }
         return transitions.contains(newStatus);
     }
 
     /**
-     * Validate transition to new status and throw exception if not allowed.
+     * Валидирует переход в новый статус и выбрасывает исключение, если переход не разрешён.
      *
-     * @param newStatus new status to transition to
-     * @throws IllegalArgumentException if transition is not allowed
+     * @param newStatus новый статус для перехода
+     * @throws IllegalArgumentException если переход не разрешён
      */
     public void validateTransition(MaintenanceStatus newStatus) {
         if (!isTransitionAllowed(newStatus)) {

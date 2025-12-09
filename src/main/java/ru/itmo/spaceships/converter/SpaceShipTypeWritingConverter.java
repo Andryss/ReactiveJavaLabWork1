@@ -6,7 +6,7 @@ import org.springframework.lang.NonNull;
 import ru.itmo.spaceships.model.SpaceShipType;
 
 /**
- * Converter for writing SpaceShipType enum to VARCHAR.
+ * Конвертер для записи enum SpaceShipType в VARCHAR.
  */
 @WritingConverter
 public class SpaceShipTypeWritingConverter implements Converter<SpaceShipType, String> {

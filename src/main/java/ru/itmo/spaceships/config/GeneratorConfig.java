@@ -5,64 +5,93 @@ import org.springframework.context.annotation.Configuration;
 import ru.itmo.spaceships.generator.CrewMemberGenerator;
 import ru.itmo.spaceships.generator.DimensionsGenerator;
 import ru.itmo.spaceships.generator.EngineGenerator;
+import ru.itmo.spaceships.generator.RepairmanGenerator;
 import ru.itmo.spaceships.generator.SpaseShipGenerator;
 
+import java.util.Random;
+
 /**
- * Configuration for generator beans.
+ * Конфигурация для бинов генераторов.
  */
 @Configuration
 public class GeneratorConfig {
 
     /**
-     * Creates a bean for DimensionsGenerator.
+     * Создаёт бин для генератора случайных чисел.
      *
-     * @return DimensionsGenerator instance
+     * @return экземпляр Random
      */
     @Bean
-    public DimensionsGenerator dimensionsGenerator() {
-        return new DimensionsGenerator();
+    public Random random() {
+        return new Random();
     }
 
     /**
-     * Creates a bean for EngineGenerator.
+     * Создаёт бин для DimensionsGenerator.
      *
-     * @return EngineGenerator instance
+     * @param random генератор случайных чисел
+     * @return экземпляр DimensionsGenerator
      */
     @Bean
-    public EngineGenerator engineGenerator() {
-        return new EngineGenerator();
+    public DimensionsGenerator dimensionsGenerator(Random random) {
+        return new DimensionsGenerator(random);
     }
 
     /**
-     * Creates a bean for CrewMemberGenerator.
+     * Создаёт бин для EngineGenerator.
      *
-     * @return CrewMemberGenerator instance
+     * @param random генератор случайных чисел
+     * @return экземпляр EngineGenerator
      */
     @Bean
-    public CrewMemberGenerator crewMemberGenerator() {
-        return new CrewMemberGenerator();
+    public EngineGenerator engineGenerator(Random random) {
+        return new EngineGenerator(random);
     }
 
     /**
-     * Creates a bean for SpaseShipGenerator.
-     * Uses the other generator beans for dependencies.
+     * Создаёт бин для CrewMemberGenerator.
      *
-     * @param dimensionsGenerator dimensions generator
-     * @param engineGenerator engine generator
-     * @param crewMemberGenerator crew member generator
-     * @return SpaseShipGenerator instance
+     * @param random генератор случайных чисел
+     * @return экземпляр CrewMemberGenerator
+     */
+    @Bean
+    public CrewMemberGenerator crewMemberGenerator(Random random) {
+        return new CrewMemberGenerator(random);
+    }
+
+    /**
+     * Создаёт бин для SpaseShipGenerator.
+     * Использует другие бины генераторов в качестве зависимостей.
+     *
+     * @param random генератор случайных чисел
+     * @param dimensionsGenerator генератор размеров
+     * @param engineGenerator генератор двигателей
+     * @param crewMemberGenerator генератор членов экипажа
+     * @return экземпляр SpaseShipGenerator
      */
     @Bean
     public SpaseShipGenerator spaseShipGenerator(
+            Random random,
             DimensionsGenerator dimensionsGenerator,
             EngineGenerator engineGenerator,
             CrewMemberGenerator crewMemberGenerator) {
         return new SpaseShipGenerator(
-                new java.util.Random(),
+                random,
                 dimensionsGenerator,
                 engineGenerator,
                 crewMemberGenerator
         );
+    }
+
+    /**
+     * Создаёт бин для RepairmanGenerator.
+     *
+     * @param random генератор случайных чисел
+     * @return экземпляр RepairmanGenerator
+     */
+    @Bean
+    public RepairmanGenerator repairmanGenerator(Random random) {
+        return new RepairmanGenerator(random);
     }
 }
 

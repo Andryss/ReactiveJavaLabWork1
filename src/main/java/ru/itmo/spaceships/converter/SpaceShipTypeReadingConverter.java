@@ -6,7 +6,7 @@ import org.springframework.lang.NonNull;
 import ru.itmo.spaceships.model.SpaceShipType;
 
 /**
- * Converter for reading SpaceShipType enum from VARCHAR.
+ * Конвертер для чтения enum SpaceShipType из VARCHAR.
  */
 @ReadingConverter
 public class SpaceShipTypeReadingConverter implements Converter<String, SpaceShipType> {

@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Entity representing a repairman.
+ * Сущность, представляющая ремонтника.
  */
 @Data
 @NoArgsConstructor

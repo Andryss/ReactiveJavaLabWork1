@@ -16,24 +16,24 @@ async function loadSpaceships() {
         const tbody = document.getElementById('spaceshipsTableBody');
         tbody.innerHTML = data.map(ship => {
             const dimensions = ship.dimensions ? 
-                `${ship.dimensions.length || 0}m × ${ship.dimensions.width || 0}m × ${ship.dimensions.height || 0}m` : '-';
+                `${ship.dimensions.length || 0}м × ${ship.dimensions.width || 0}м × ${ship.dimensions.height || 0}м` : '-';
             const engine = ship.engine ? 
-                `${ship.engine.model || 'N/A'} (${ship.engine.fuelType || 'N/A'})` : '-';
+                `${ship.engine.model || 'Н/Д'} (${translateFuelType(ship.engine.fuelType || '') || 'Н/Д'})` : '-';
             const crewCount = ship.crew && ship.crew.length > 0 ? ship.crew.length : 0;
             const manufactureDate = ship.manufactureDate ? 
-                new Date(ship.manufactureDate).toLocaleDateString() : '-';
+                new Date(ship.manufactureDate).toLocaleDateString('ru-RU') : '-';
             
             return `
             <tr style="cursor: pointer;" onclick="viewSpaceship(${ship.serial})">
                 <td>${ship.serial}</td>
                 <td>${ship.name || '-'}</td>
                 <td>${ship.manufacturer || '-'}</td>
-                <td><span class="badge bg-primary">${ship.type || '-'}</span></td>
+                <td><span class="badge bg-primary">${translateSpaceShipType(ship.type || '') || '-'}</span></td>
                 <td>${manufactureDate}</td>
                 <td>${ship.maxSpeed || 0}</td>
                 <td><small>${dimensions}</small></td>
                 <td><small>${engine}</small></td>
-                <td>${crewCount} member${crewCount !== 1 ? 's' : ''}</td>
+                <td>${crewCount} ${crewCount === 1 ? 'человек' : crewCount < 5 ? 'человека' : 'человек'}</td>
                 <td onclick="event.stopPropagation();">
                     <button class="btn btn-sm btn-primary" onclick="editSpaceship(${ship.serial})">
                         <i class="bi bi-pencil"></i>
@@ -50,7 +50,7 @@ async function loadSpaceships() {
         updateSpaceshipsTablePaginationButtons();
     } catch (error) {
         document.getElementById('spaceshipsTableBody').innerHTML = 
-            '<tr><td colspan="10" class="text-center text-danger">Error loading spaceships</td></tr>';
+            '<tr><td colspan="10" class="text-center text-danger">Ошибка загрузки кораблей</td></tr>';
     }
 }
 
@@ -65,28 +65,28 @@ function addCrewMember() {
     memberDiv.innerHTML = `
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="mb-0">Crew Member</h6>
+                <h6 class="mb-0">Член экипажа</h6>
                 <button type="button" class="btn btn-sm btn-danger" onclick="removeCrewMember(${crewMemberIndex})">
-                    <i class="bi bi-trash"></i> Remove
+                    <i class="bi bi-trash"></i> Удалить
                 </button>
             </div>
             <div class="row">
                 <div class="col-md-6 mb-2">
-                    <label class="form-label">Full Name</label>
+                    <label class="form-label">Полное имя</label>
                     <input type="text" class="form-control" id="crewFullName-${crewMemberIndex}">
                 </div>
                 <div class="col-md-6 mb-2">
-                    <label class="form-label">Rank</label>
+                    <label class="form-label">Звание</label>
                     <input type="text" class="form-control" id="crewRank-${crewMemberIndex}">
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6 mb-2">
-                    <label class="form-label">Experience Years</label>
+                    <label class="form-label">Опыт (лет)</label>
                     <input type="number" class="form-control" id="crewExperience-${crewMemberIndex}" value="0">
                 </div>
                 <div class="col-md-6 mb-2">
-                    <label class="form-label">Birth Date</label>
+                    <label class="form-label">Дата рождения</label>
                     <input type="date" class="form-control" id="crewBirthDate-${crewMemberIndex}">
                 </div>
             </div>
@@ -112,7 +112,7 @@ function removeCrewMember(index) {
  * @param {number|null} serial - Spaceship serial (null for create)
  */
 function showSpaceshipModal(serial = null) {
-    document.getElementById('spaceshipModalTitle').textContent = serial ? 'Edit Spaceship' : 'Add Spaceship';
+    document.getElementById('spaceshipModalTitle').textContent = serial ? 'Редактировать корабль' : 'Добавить корабль';
     document.getElementById('spaceshipSerial').value = serial || '';
     document.getElementById('spaceshipSerialInput').value = serial || '';
     document.getElementById('spaceshipSerialInput').disabled = !!serial;
@@ -263,7 +263,7 @@ async function saveSpaceship() {
         bootstrap.Modal.getInstance(document.getElementById('spaceshipModal')).hide();
         loadSpaceships();
     } catch (error) {
-        alert('Error saving spaceship: ' + error);
+        alert('Ошибка сохранения корабля: ' + error);
     }
 }
 
@@ -272,12 +272,12 @@ async function saveSpaceship() {
  * @param {number} serial - Spaceship serial
  */
 async function deleteSpaceship(serial) {
-    if (!confirm('Are you sure you want to delete this spaceship?')) return;
+    if (!confirm('Вы уверены, что хотите удалить этот корабль?')) return;
     try {
         await fetch(`${API_BASE}/spaceships/${serial}`, { method: 'DELETE' });
         loadSpaceships();
     } catch (error) {
-        alert('Error deleting spaceship: ' + error);
+        alert('Ошибка удаления корабля: ' + error);
     }
 }
 

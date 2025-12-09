@@ -37,7 +37,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
     private static long serialCounter = System.currentTimeMillis();
 
     private SpaceShipRequest createTestRequest() {
-        // Use a unique serial to avoid conflicts
+        // Используем уникальный серийный номер, чтобы избежать конфликтов
         return createTestRequest(++serialCounter);
     }
 
@@ -137,7 +137,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
 
     @Test
     void testUpdateSpaceship() {
-        // Create a spaceship first
+        // Сначала создаём корабль
         SpaceShipRequest createRequest = createTestRequest();
         SpaceShipDto created = webClient.post()
                 .uri("/spaceships")
@@ -151,7 +151,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
         assertNotNull(created);
         Long serial = created.getSerial();
 
-        // Update the spaceship
+        // Обновляем корабль
         SpaceShipRequest updateRequest = createTestRequest();
         updateRequest.setName("Updated Ship Name");
         updateRequest.setMaxSpeed(600);
@@ -173,7 +173,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
 
     @Test
     void testUpdateSpaceshipIgnoresSerialInRequest() {
-        // Create a spaceship first
+        // Сначала создаём корабль
         long originalSerial = 200000L + System.nanoTime() % 100000L; // Unique serial
         SpaceShipRequest createRequest = createTestRequest(originalSerial);
         SpaceShipDto created = webClient.post()
@@ -188,8 +188,8 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
         assertNotNull(created);
         assertEquals(originalSerial, created.getSerial());
 
-        // Update the spaceship with a different serial in request (should be ignored)
-        long differentSerial = 300000L + System.nanoTime() % 100000L; // Different serial - should be ignored
+        // Обновляем корабль с другим серийным номером в запросе (должен быть проигнорирован)
+        long differentSerial = 300000L + System.nanoTime() % 100000L; // Другой серийный номер - должен быть проигнорирован
         SpaceShipRequest updateRequest = createTestRequest(differentSerial);
         updateRequest.setName("Updated Ship Name");
 
@@ -202,7 +202,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                 .consumeWith(result -> {
                     SpaceShipDto dto = result.getResponseBody();
                     assertNotNull(dto);
-                    // Serial should be from path parameter, not from request
+                    // Серийный номер должен быть из параметра пути, а не из запроса
                     assertEquals(originalSerial, dto.getSerial());
                     assertEquals("Updated Ship Name", dto.getName());
                 });
@@ -210,7 +210,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
 
     @Test
     void testDeleteSpaceship() {
-        // Create a spaceship first
+        // Сначала создаём корабль
         SpaceShipRequest request = createTestRequest();
         SpaceShipDto created = webClient.post()
                 .uri("/spaceships")
@@ -224,13 +224,13 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
         assertNotNull(created);
         Long serial = created.getSerial();
 
-        // Delete the spaceship
+        // Удаляем корабль
         webClient.delete()
                 .uri("/spaceships/{serial}", serial)
                 .exchange()
                 .expectStatus().isOk();
 
-        // Verify it's deleted
+        // Проверяем, что он удалён
         webClient.get()
                 .uri("/spaceships/{serial}", serial)
                 .exchange()
@@ -239,7 +239,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
 
     @Test
     void testGetSpaceshipBySerial() {
-        // Create a spaceship
+        // Создаём корабль
         SpaceShipRequest request = createTestRequest();
         SpaceShipDto created = webClient.post()
                 .uri("/spaceships")
@@ -253,7 +253,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
         assertNotNull(created);
         Long serial = created.getSerial();
 
-        // Get the spaceship by serial
+        // Получаем корабль по серийному номеру
         webClient.get()
                 .uri("/spaceships/{serial}", serial)
                 .exchange()
@@ -303,7 +303,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                     .expectStatus().isOk();
         }
 
-        // Get all spaceships (with large page size to get all)
+        // Получаем все корабли (с большим размером страницы, чтобы получить все)
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/spaceships")
@@ -333,7 +333,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                     .expectStatus().isOk();
         }
 
-        // Get first page
+        // Получаем первую страницу
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/spaceships")
@@ -348,7 +348,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                     assertEquals(2, result.getResponseBody().size());
                 });
 
-        // Get second page
+        // Получаем вторую страницу
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/spaceships")

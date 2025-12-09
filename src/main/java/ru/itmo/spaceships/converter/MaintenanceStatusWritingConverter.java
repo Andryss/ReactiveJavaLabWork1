@@ -6,7 +6,7 @@ import org.springframework.lang.NonNull;
 import ru.itmo.spaceships.model.MaintenanceStatus;
 
 /**
- * Converter for writing MaintenanceStatus enum to VARCHAR.
+ * Конвертер для записи enum MaintenanceStatus в VARCHAR.
  */
 @WritingConverter
 public class MaintenanceStatusWritingConverter implements Converter<MaintenanceStatus, String> {

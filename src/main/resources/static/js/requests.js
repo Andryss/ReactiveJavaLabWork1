@@ -45,7 +45,7 @@ function populateStatusDropdown(currentStatus) {
     allowedStatuses.forEach(status => {
         const option = document.createElement('option');
         option.value = status;
-        option.textContent = status;
+        option.textContent = translateMaintenanceStatus(status);
         statusSelect.appendChild(option);
     });
     
@@ -77,25 +77,25 @@ async function loadRequests() {
                               onmouseenter="showSpaceshipTooltip(${req.spaceshipSerial})" 
                               onmouseleave="hideSpaceshipTooltip()"
                               onclick="hideSpaceshipTooltip(); viewSpaceship(${req.spaceshipSerial})" 
-                              title="Hover or click to view details">
+                              title="Наведите курсор или нажмите для просмотра деталей">
                             ${req.spaceshipSerial}
                         </span>
                     ` : '-'}
                 </td>
                 <td>${req.comment || '-'}</td>
-                <td><span class="badge bg-info">${req.status || 'NEW'}</span></td>
+                <td><span class="badge bg-info">${translateMaintenanceStatus(req.status || 'NEW')}</span></td>
                 <td>
                     ${req.assignee ? `
                         <span class="text-primary" style="cursor: pointer; text-decoration: underline;" 
                               onmouseenter="showRepairmanTooltip(${req.assignee})" 
                               onmouseleave="hideRepairmanTooltip()"
                               onclick="hideRepairmanTooltip(); viewRepairman(${req.assignee})" 
-                              title="Hover or click to view details">
+                              title="Наведите курсор или нажмите для просмотра деталей">
                             ${req.assignee}
                         </span>
                     ` : '-'}
                 </td>
-                <td>${req.createdAt ? new Date(req.createdAt).toLocaleString() : '-'}</td>
+                <td>${req.createdAt ? new Date(req.createdAt).toLocaleString('ru-RU') : '-'}</td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="editRequest(${req.id})">
                         <i class="bi bi-pencil"></i>
@@ -111,7 +111,7 @@ async function loadRequests() {
         updateRequestsTablePaginationButtons();
     } catch (error) {
         document.getElementById('requestsTableBody').innerHTML = 
-            '<tr><td colspan="7" class="text-center text-danger">Error loading requests</td></tr>';
+            '<tr><td colspan="7" class="text-center text-danger">Ошибка загрузки заявок</td></tr>';
     }
 }
 
@@ -120,7 +120,7 @@ async function loadRequests() {
  * @param {number|null} id - Request ID (null for create)
  */
 async function showRequestModal(id = null) {
-    document.getElementById('requestModalTitle').textContent = id ? 'Edit Request' : 'Add Request';
+    document.getElementById('requestModalTitle').textContent = id ? 'Редактировать заявку' : 'Добавить заявку';
     document.getElementById('requestId').value = id || '';
     
     // Show/hide status field based on create/edit mode
@@ -133,8 +133,8 @@ async function showRequestModal(id = null) {
     }
     
     // Reset dropdowns
-    document.getElementById('spaceshipSelectedText').textContent = 'Select spaceship...';
-    document.getElementById('assigneeSelectedText').textContent = 'Select repairman...';
+    document.getElementById('spaceshipSelectedText').textContent = 'Выберите корабль...';
+    document.getElementById('assigneeSelectedText').textContent = 'Выберите ремонтника...';
     spaceshipPage = 0;
     assigneePage = 0;
     
@@ -152,7 +152,7 @@ async function showRequestModal(id = null) {
                         .then(r => r.json())
                         .then(ship => {
                             document.getElementById('spaceshipSelectedText').textContent = 
-                                `${ship.serial} - ${ship.name || 'Unnamed'}`;
+                                `${ship.serial} - ${ship.name || 'Без названия'}`;
                         });
                 }
                 document.getElementById('requestComment').value = data.comment || '';
@@ -219,7 +219,7 @@ async function saveRequest() {
         bootstrap.Modal.getInstance(document.getElementById('requestModal')).hide();
         loadRequests();
     } catch (error) {
-        alert('Error saving request: ' + error.message);
+        alert('Ошибка сохранения заявки: ' + error.message);
     }
 }
 
@@ -228,12 +228,12 @@ async function saveRequest() {
  * @param {number} id - Request ID
  */
 async function deleteRequest(id) {
-    if (!confirm('Are you sure you want to delete this request?')) return;
+    if (!confirm('Вы уверены, что хотите удалить эту заявку?')) return;
     try {
         await fetch(`${API_BASE}/maintenance-requests/${id}`, { method: 'DELETE' });
         loadRequests();
     } catch (error) {
-        alert('Error deleting request: ' + error);
+        alert('Ошибка удаления заявки: ' + error);
     }
 }
 

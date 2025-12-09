@@ -25,7 +25,7 @@ function updateSpaceshipsTablePaginationButtons() {
     
     prevBtn.disabled = spaceshipsTablePage === 0;
     nextBtn.disabled = spaceshipsTableTotalItems < spaceshipsTablePageSize;
-    pageInfo.textContent = `Page ${spaceshipsTablePage + 1}`;
+    pageInfo.textContent = `Страница ${spaceshipsTablePage + 1}`;
 }
 
 /**
@@ -50,7 +50,7 @@ function updateRepairmenTablePaginationButtons() {
     
     prevBtn.disabled = repairmenTablePage === 0;
     nextBtn.disabled = repairmenTableTotalItems < repairmenTablePageSize;
-    pageInfo.textContent = `Page ${repairmenTablePage + 1}`;
+    pageInfo.textContent = `Страница ${repairmenTablePage + 1}`;
 }
 
 /**
@@ -75,7 +75,7 @@ function updateRequestsTablePaginationButtons() {
     
     prevBtn.disabled = requestsTablePage === 0;
     nextBtn.disabled = requestsTableTotalItems < requestsTablePageSize;
-    pageInfo.textContent = `Page ${requestsTablePage + 1}`;
+    pageInfo.textContent = `Страница ${requestsTablePage + 1}`;
 }
 
 /**

@@ -16,10 +16,10 @@ const statusText = document.getElementById('statusText');
 function setStatus(online) {
     if (online) {
         statusDot.className = 'status-dot online';
-        statusText.textContent = 'Online';
+        statusText.textContent = 'Онлайн';
     } else {
         statusDot.className = 'status-dot offline';
-        statusText.textContent = 'Offline';
+        statusText.textContent = 'Офлайн';
     }
 }
 

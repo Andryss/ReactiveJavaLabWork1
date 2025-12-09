@@ -17,6 +17,35 @@ function roundTo3Decimals(num) {
     return Math.round(num * 1000) / 1000;
 }
 
+/**
+ * Извлекает сообщение об ошибке из ответа API.
+ * Если ответ содержит ErrorObject, возвращает humanMessage.
+ * Иначе возвращает текст ошибки или стандартное сообщение.
+ * @param {Response} response - Объект ответа fetch
+ * @returns {Promise<string>} Сообщение об ошибке
+ */
+async function extractErrorMessage(response) {
+    try {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            const errorObject = await response.json();
+            if (errorObject.humanMessage) {
+                return errorObject.humanMessage;
+            }
+            if (errorObject.message) {
+                return errorObject.message;
+            }
+        }
+        const text = await response.text();
+        if (text) {
+            return text;
+        }
+    } catch (e) {
+        // Если не удалось распарсить ответ, используем стандартное сообщение
+    }
+    return `HTTP ${response.status}: ${response.statusText}`;
+}
+
 // Server Status Monitor
 const statusDot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');

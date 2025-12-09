@@ -64,6 +64,14 @@ function populateStatusDropdown(currentStatus) {
 async function loadRequests() {
     try {
         const response = await fetch(`${API_BASE}/maintenance-requests?page=${requestsTablePage}&size=${requestsTablePageSize}`);
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            document.getElementById('requestsTableBody').innerHTML = 
+                `<tr><td colspan="7" class="text-center text-danger">Ошибка загрузки заявок: ${errorMessage}</td></tr>`;
+            return;
+        }
+        
         const data = await response.json();
         requestsTableTotalItems = data.length;
         
@@ -143,16 +151,31 @@ async function showRequestModal(id = null) {
     
     if (id) {
         fetch(`${API_BASE}/maintenance-requests/${id}`)
-            .then(r => r.json())
+            .then(async r => {
+                if (!r.ok) {
+                    const errorMessage = await extractErrorMessage(r);
+                    throw new Error(errorMessage);
+                }
+                return r.json();
+            })
             .then(data => {
                 document.getElementById('requestSpaceshipSerial').value = data.spaceshipSerial || '';
                 if (data.spaceshipSerial) {
                     // Find and display the selected spaceship
                     fetch(`${API_BASE}/spaceships/${data.spaceshipSerial}`)
-                        .then(r => r.json())
+                        .then(async r => {
+                            if (!r.ok) {
+                                const errorMessage = await extractErrorMessage(r);
+                                throw new Error(errorMessage);
+                            }
+                            return r.json();
+                        })
                         .then(ship => {
                             document.getElementById('spaceshipSelectedText').textContent = 
                                 `${ship.serial} - ${ship.name || 'Без названия'}`;
+                        })
+                        .catch(error => {
+                            console.error('Ошибка загрузки данных корабля:', error);
                         });
                 }
                 document.getElementById('requestComment').value = data.comment || '';
@@ -160,15 +183,27 @@ async function showRequestModal(id = null) {
                 if (data.assignee) {
                     // Find and display the selected repairman
                     fetch(`${API_BASE}/repairmen/${data.assignee}`)
-                        .then(r => r.json())
+                        .then(async r => {
+                            if (!r.ok) {
+                                const errorMessage = await extractErrorMessage(r);
+                                throw new Error(errorMessage);
+                            }
+                            return r.json();
+                        })
                         .then(repairman => {
                             document.getElementById('assigneeSelectedText').textContent = 
                                 `${repairman.id} - ${repairman.name}`;
+                        })
+                        .catch(error => {
+                            console.error('Ошибка загрузки данных ремонтника:', error);
                         });
                 }
                 const currentStatus = data.status || 'NEW';
                 // Populate status dropdown with only allowed transitions
                 populateStatusDropdown(currentStatus);
+            })
+            .catch(error => {
+                alert('Ошибка загрузки данных заявки: ' + (error.message || error));
             });
     } else {
         document.getElementById('requestForm').reset();
@@ -212,14 +247,15 @@ async function saveRequest() {
         });
         
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || `HTTP ${response.status}: ${response.statusText}`);
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка сохранения заявки: ' + errorMessage);
+            return;
         }
         
         bootstrap.Modal.getInstance(document.getElementById('requestModal')).hide();
         loadRequests();
     } catch (error) {
-        alert('Ошибка сохранения заявки: ' + error.message);
+        alert('Ошибка сохранения заявки: ' + (error.message || error));
     }
 }
 
@@ -230,10 +266,17 @@ async function saveRequest() {
 async function deleteRequest(id) {
     if (!confirm('Вы уверены, что хотите удалить эту заявку?')) return;
     try {
-        await fetch(`${API_BASE}/maintenance-requests/${id}`, { method: 'DELETE' });
+        const response = await fetch(`${API_BASE}/maintenance-requests/${id}`, { method: 'DELETE' });
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка удаления заявки: ' + errorMessage);
+            return;
+        }
+        
         loadRequests();
     } catch (error) {
-        alert('Ошибка удаления заявки: ' + error);
+        alert('Ошибка удаления заявки: ' + (error.message || error));
     }
 }
 

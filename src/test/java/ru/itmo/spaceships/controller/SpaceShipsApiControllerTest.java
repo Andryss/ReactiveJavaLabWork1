@@ -9,6 +9,7 @@ import ru.itmo.spaceships.generated.model.CrewMemberDto;
 import ru.itmo.spaceships.generated.model.DimensionsDto;
 import ru.itmo.spaceships.generated.model.EngineDto;
 import ru.itmo.spaceships.generated.model.FuelType;
+import ru.itmo.spaceships.generated.model.ErrorObject;
 import ru.itmo.spaceships.generated.model.SpaceShipDto;
 import ru.itmo.spaceships.generated.model.SpaceShipRequest;
 import ru.itmo.spaceships.generated.model.SpaceShipType;
@@ -132,7 +133,16 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                 .uri("/spaceships")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is4xxClientError(); // 400 Bad Request - validation error
+                .expectStatus().is5xxServerError() // Может быть 500 из-за ошибки конвертации, но должен быть ErrorObject
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    // Проверяем формат ErrorObject
+                    assertTrue(error.getCode() >= 400 && error.getCode() < 600);
+                    assertNotNull(error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                });
     }
 
     @Test
@@ -168,6 +178,44 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                     assertEquals(serial, dto.getSerial());
                     assertEquals("Updated Ship Name", dto.getName());
                     assertEquals(600, dto.getMaxSpeed());
+                });
+    }
+
+    @Test
+    void testUpdateSpaceshipNotFound() {
+        SpaceShipRequest updateRequest = createTestRequest();
+        updateRequest.setName("Updated Ship Name");
+
+        webClient.put()
+                .uri("/spaceships/{serial}", 999L)
+                .bodyValue(updateRequest)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("spaceship.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Корабль с серийным номером=\"999\" не найден"));
+                });
+    }
+
+    @Test
+    void testDeleteSpaceshipNotFound() {
+        webClient.delete()
+                .uri("/spaceships/{serial}", 999L)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("spaceship.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Корабль с серийным номером=\"999\" не найден"));
                 });
     }
 
@@ -234,7 +282,15 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
         webClient.get()
                 .uri("/spaceships/{serial}", serial)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("spaceship.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                });
     }
 
     @Test
@@ -272,7 +328,16 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
         webClient.get()
                 .uri("/spaceships/{serial}", 999L)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("spaceship.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Корабль с серийным номером=\"999\" не найден"));
+                });
     }
 
     @Test

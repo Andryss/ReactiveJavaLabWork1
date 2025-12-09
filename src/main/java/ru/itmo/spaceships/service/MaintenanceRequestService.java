@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.itmo.spaceships.exception.Errors;
 import ru.itmo.spaceships.generated.model.MaintenanceRequestRequest;
 import ru.itmo.spaceships.model.MaintenanceRequestEntity;
 import ru.itmo.spaceships.model.MaintenanceStatus;
@@ -30,11 +31,10 @@ public class MaintenanceRequestService {
      */
     public Mono<MaintenanceRequestEntity> createMaintenanceRequest(MaintenanceRequestRequest request) {
         if (request.getSpaceshipSerial() == null) {
-            return Mono.error(new IllegalArgumentException(
-                    "Spaceship serial is required for creating a maintenance request"));
+            return Mono.error(Errors.maintenanceRequestSpaceshipSerialRequiredError());
         }
         if (request.getComment() == null) {
-            return Mono.error(new IllegalArgumentException("Comment is required for creating a maintenance request"));
+            return Mono.error(Errors.maintenanceRequestCommentRequiredError());
         }
         MaintenanceRequestEntity entity = new MaintenanceRequestEntity();
         entity.setSpaceshipSerial(request.getSpaceshipSerial());
@@ -56,7 +56,7 @@ public class MaintenanceRequestService {
      */
     public Mono<MaintenanceRequestEntity> updateMaintenanceRequest(Long id, MaintenanceRequestRequest request) {
         return maintenanceRequestRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Maintenance request not found with id: " + id)))
+                .switchIfEmpty(Mono.error(Errors.maintenanceRequestNotFound(id)))
                 .flatMap(entity -> {
                     // Если статус изменяется, валидируем переход
                     if (request.getStatus() != null) {
@@ -68,7 +68,8 @@ public class MaintenanceRequestService {
                             try {
                                 currentStatus.validateTransition(newStatus);
                             } catch (IllegalArgumentException e) {
-                                return Mono.error(e);
+                                return Mono.error(Errors.maintenanceRequestStatusTransitionError(
+                                        currentStatus.name(), newStatus.name()));
                             }
                             entity.setStatus(newStatus);
                         }
@@ -100,7 +101,7 @@ public class MaintenanceRequestService {
      */
     public Mono<Void> deleteMaintenanceRequest(Long id) {
         return maintenanceRequestRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Maintenance request not found with id: " + id)))
+                .switchIfEmpty(Mono.error(Errors.maintenanceRequestNotFound(id)))
                 .flatMap(maintenanceRequestRepository::delete);
     }
 
@@ -129,8 +130,7 @@ public class MaintenanceRequestService {
      */
     public Mono<MaintenanceRequestEntity> getMaintenanceRequestById(Long id) {
         return maintenanceRequestRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException(
-                        "Maintenance request not found with id: " + id)));
+                .switchIfEmpty(Mono.error(Errors.maintenanceRequestNotFound(id)));
     }
 }
 

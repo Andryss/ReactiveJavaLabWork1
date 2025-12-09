@@ -63,6 +63,14 @@ function hideRepairmanTooltip() {
 async function viewSpaceship(serial) {
     try {
         const response = await fetch(`${API_BASE}/spaceships/${serial}`);
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка загрузки деталей корабля: ' + errorMessage);
+            hideSpaceshipTooltip();
+            return;
+        }
+        
         const ship = await response.json();
         
         const dimensions = ship.dimensions ? 
@@ -133,7 +141,7 @@ async function viewSpaceship(serial) {
         // Clear hover timer when modal is shown
         hideSpaceshipTooltip();
     } catch (error) {
-        alert('Ошибка загрузки деталей корабля: ' + error);
+        alert('Ошибка загрузки деталей корабля: ' + (error.message || error));
         hideSpaceshipTooltip();
     }
 }
@@ -145,6 +153,14 @@ async function viewSpaceship(serial) {
 async function viewRepairman(id) {
     try {
         const response = await fetch(`${API_BASE}/repairmen/${id}`);
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка загрузки деталей ремонтника: ' + errorMessage);
+            hideRepairmanTooltip();
+            return;
+        }
+        
         const repairman = await response.json();
         
         document.getElementById('repairmanViewContent').innerHTML = `
@@ -165,7 +181,7 @@ async function viewRepairman(id) {
         // Clear hover timer when modal is shown
         hideRepairmanTooltip();
     } catch (error) {
-        alert('Ошибка загрузки деталей ремонтника: ' + error);
+        alert('Ошибка загрузки деталей ремонтника: ' + (error.message || error));
         hideRepairmanTooltip();
     }
 }

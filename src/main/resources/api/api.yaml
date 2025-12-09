@@ -504,4 +504,18 @@ components:
         - READY_FOR_PICKUP
         - COMPLETED
         - CANCELLED
+    ErrorObject:
+      description: Ответ содержащий информацию об ошибке
+      type: object
+      properties:
+        code:
+          description: Числовой код ошибки
+          type: integer
+          format: int32
+        message:
+          description: Уникальный текстовый идентификатор ошибки
+          type: string
+        humanMessage:
+          description: Человеко-читаемое описание ошибки
+          type: string
 

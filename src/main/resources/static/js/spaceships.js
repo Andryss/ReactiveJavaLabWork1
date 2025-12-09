@@ -10,6 +10,14 @@ let crewMemberIndex = 0;
 async function loadSpaceships() {
     try {
         const response = await fetch(`${API_BASE}/spaceships?page=${spaceshipsTablePage}&size=${spaceshipsTablePageSize}`);
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            document.getElementById('spaceshipsTableBody').innerHTML = 
+                `<tr><td colspan="10" class="text-center text-danger">Ошибка загрузки кораблей: ${errorMessage}</td></tr>`;
+            return;
+        }
+        
         const data = await response.json();
         spaceshipsTableTotalItems = data.length;
         
@@ -123,7 +131,13 @@ function showSpaceshipModal(serial = null) {
     
     if (serial) {
         fetch(`${API_BASE}/spaceships/${serial}`)
-            .then(r => r.json())
+            .then(async r => {
+                if (!r.ok) {
+                    const errorMessage = await extractErrorMessage(r);
+                    throw new Error(errorMessage);
+                }
+                return r.json();
+            })
             .then(data => {
                 document.getElementById('spaceshipName').value = data.name || '';
                 document.getElementById('spaceshipManufacturer').value = data.manufacturer || '';
@@ -167,6 +181,9 @@ function showSpaceshipModal(serial = null) {
                         }
                     });
                 }
+            })
+            .catch(error => {
+                alert('Ошибка загрузки данных корабля: ' + (error.message || error));
             });
     } else {
         document.getElementById('spaceshipForm').reset();
@@ -255,15 +272,22 @@ async function saveSpaceship() {
     const method = serial ? 'PUT' : 'POST';
     
     try {
-        await fetch(url, {
+        const response = await fetch(url, {
             method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка сохранения корабля: ' + errorMessage);
+            return;
+        }
+        
         bootstrap.Modal.getInstance(document.getElementById('spaceshipModal')).hide();
         loadSpaceships();
     } catch (error) {
-        alert('Ошибка сохранения корабля: ' + error);
+        alert('Ошибка сохранения корабля: ' + (error.message || error));
     }
 }
 
@@ -274,10 +298,17 @@ async function saveSpaceship() {
 async function deleteSpaceship(serial) {
     if (!confirm('Вы уверены, что хотите удалить этот корабль?')) return;
     try {
-        await fetch(`${API_BASE}/spaceships/${serial}`, { method: 'DELETE' });
+        const response = await fetch(`${API_BASE}/spaceships/${serial}`, { method: 'DELETE' });
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка удаления корабля: ' + errorMessage);
+            return;
+        }
+        
         loadSpaceships();
     } catch (error) {
-        alert('Ошибка удаления корабля: ' + error);
+        alert('Ошибка удаления корабля: ' + (error.message || error));
     }
 }
 

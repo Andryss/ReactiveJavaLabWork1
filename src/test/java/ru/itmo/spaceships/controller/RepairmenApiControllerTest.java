@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.itmo.spaceships.BaseDbTest;
+import ru.itmo.spaceships.generated.model.ErrorObject;
 import ru.itmo.spaceships.generated.model.RepairmanDto;
 import ru.itmo.spaceships.generated.model.RepairmanRequest;
 import ru.itmo.spaceships.repository.RepairmanRepository;
@@ -54,7 +55,16 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(400, error.getCode());
+                    assertEquals("repairman.validation.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Имя и должность обязательны"));
+                });
     }
 
     @Test
@@ -66,7 +76,16 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(400, error.getCode());
+                    assertEquals("repairman.validation.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Имя и должность обязательны"));
+                });
     }
 
     @Test
@@ -156,7 +175,16 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen/{id}", 999L)
                 .bodyValue(updateRequest)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Ремонтник с id=\"999\" не найден"));
+                });
     }
 
     @Test
@@ -192,7 +220,14 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen/{id}", id)
                 .bodyValue(updateRequest)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                });
     }
 
     @Test
@@ -200,7 +235,16 @@ class RepairmenApiControllerTest extends BaseDbTest {
         webClient.delete()
                 .uri("/repairmen/{id}", 999L)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Ремонтник с id=\"999\" не найден"));
+                });
     }
 
     @Test
@@ -254,7 +298,14 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen/{id}", id)
                 .bodyValue(updateRequest)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                });
     }
 
     @Test
@@ -296,7 +347,16 @@ class RepairmenApiControllerTest extends BaseDbTest {
         webClient.get()
                 .uri("/repairmen/{id}", 999L)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Ремонтник с id=\"999\" не найден"));
+                });
     }
 
     @Test

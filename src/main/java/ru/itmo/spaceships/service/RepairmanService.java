@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.itmo.spaceships.exception.Errors;
 import ru.itmo.spaceships.generated.model.RepairmanRequest;
 import ru.itmo.spaceships.model.RepairmanEntity;
 import ru.itmo.spaceships.repository.RepairmanRepository;
@@ -26,7 +27,7 @@ public class RepairmanService {
      */
     public Mono<RepairmanEntity> createRepairman(RepairmanRequest request) {
         if (request.getName() == null || request.getPosition() == null) {
-            return Mono.error(new IllegalArgumentException("Name and position are required for creating a repairman"));
+            return Mono.error(Errors.repairmanValidationError());
         }
         RepairmanEntity entity = new RepairmanEntity();
         entity.setName(request.getName());
@@ -44,7 +45,7 @@ public class RepairmanService {
      */
     public Mono<RepairmanEntity> updateRepairman(Long id, RepairmanRequest request) {
         return repairmanRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Repairman not found with id: " + id)))
+                .switchIfEmpty(Mono.error(Errors.repairmanNotFound(id)))
                 .flatMap(entity -> {
                     if (request.getName() != null) {
                         entity.setName(request.getName());
@@ -64,7 +65,7 @@ public class RepairmanService {
      */
     public Mono<Void> deleteRepairman(Long id) {
         return repairmanRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Repairman not found with id: " + id)))
+                .switchIfEmpty(Mono.error(Errors.repairmanNotFound(id)))
                 .flatMap(repairmanRepository::delete);
     }
 
@@ -93,7 +94,7 @@ public class RepairmanService {
      */
     public Mono<RepairmanEntity> getRepairmanById(Long id) {
         return repairmanRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Repairman not found with id: " + id)));
+                .switchIfEmpty(Mono.error(Errors.repairmanNotFound(id)));
     }
 }
 

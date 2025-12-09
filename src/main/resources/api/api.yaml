@@ -95,6 +95,21 @@ paths:
       responses:
         200:
           description: OK
+  /repairmen/updates/stream:
+    get:
+      summary: Stream repairman updates
+      operationId: getRepairmenUpdatesStream
+      tags:
+        - repairmen
+      responses:
+        200:
+          description: OK
+          content:
+            text/event-stream:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RepairmanDto"
   /spaceships:
     get:
       summary: Get all spaceships

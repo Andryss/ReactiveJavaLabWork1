@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import ru.itmo.spaceships.exception.Errors;
 import ru.itmo.spaceships.generated.model.RepairmanRequest;
 import ru.itmo.spaceships.model.RepairmanEntity;
@@ -18,6 +19,7 @@ import ru.itmo.spaceships.repository.RepairmanRepository;
 public class RepairmanService {
 
     private final RepairmanRepository repairmanRepository;
+    private final Sinks.Many<RepairmanEntity> repairmanUpdateSink;
 
     /**
      * Создаёт нового ремонтника.
@@ -54,7 +56,8 @@ public class RepairmanService {
                         entity.setPosition(request.getPosition());
                     }
                     return repairmanRepository.save(entity);
-                });
+                })
+                .doOnSuccess(repairmanUpdateSink::tryEmitNext);
     }
 
     /**
@@ -95,6 +98,16 @@ public class RepairmanService {
     public Mono<RepairmanEntity> getRepairmanById(Long id) {
         return repairmanRepository.findById(id)
                 .switchIfEmpty(Mono.error(Errors.repairmanNotFound(id)));
+    }
+
+    /**
+     * Получает поток обновлений ремонтников.
+     * Эмитит событие каждый раз, когда ремонтник успешно обновляется.
+     *
+     * @return поток сущностей ремонтников
+     */
+    public Flux<RepairmanEntity> getRepairmenUpdatesStream() {
+        return repairmanUpdateSink.asFlux();
     }
 }
 

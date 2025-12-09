@@ -3,7 +3,9 @@ package ru.itmo.spaceships.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.test.StepVerifier;
 import ru.itmo.spaceships.BaseDbTest;
 import ru.itmo.spaceships.generated.model.ErrorObject;
 import ru.itmo.spaceships.generated.model.RepairmanDto;
@@ -516,6 +518,103 @@ class RepairmenApiControllerTest extends BaseDbTest {
                                 "Repairmen should be sorted by ID in ascending order");
                     }
                 });
+    }
+
+    @Test
+    void testGetRepairmenUpdatesStreamMultipleUpdates() {
+        // Только один текст, поскольку более одного раза сложно валидировать
+
+        // Создаём первого ремонтника
+        RepairmanRequest createRequest1 = new RepairmanRequest();
+        createRequest1.setName("John Doe");
+        createRequest1.setPosition("Senior Technician");
+
+        RepairmanDto created1 = webClient.post()
+                .uri("/repairmen")
+                .bodyValue(createRequest1)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(RepairmanDto.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertNotNull(created1);
+        Long id1 = created1.getId();
+
+        // Создаём второго ремонтника
+        RepairmanRequest createRequest2 = new RepairmanRequest();
+        createRequest2.setName("Bob Smith");
+        createRequest2.setPosition("Technician");
+
+        RepairmanDto created2 = webClient.post()
+                .uri("/repairmen")
+                .bodyValue(createRequest2)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(RepairmanDto.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertNotNull(created2);
+        Long id2 = created2.getId();
+
+        // Публикуем обновления обоих ремонтников
+        RepairmanRequest updateRequest1 = new RepairmanRequest();
+        updateRequest1.setName("Jane Doe");
+        updateRequest1.setPosition("Lead Technician");
+
+        webClient.put()
+                .uri("/repairmen/{id}", id1)
+                .bodyValue(updateRequest1)
+                .exchange()
+                .expectStatus().isOk();
+
+        RepairmanRequest updateRequest2 = new RepairmanRequest();
+        updateRequest2.setName("Alice Smith");
+        updateRequest2.setPosition("Senior Technician");
+
+        webClient.put()
+                .uri("/repairmen/{id}", id2)
+                .bodyValue(updateRequest2)
+                .exchange()
+                .expectStatus().isOk();
+
+        // Подключаемся к стриму обновлений и фильтруем по ID наших ремонтников
+        webClient.get()
+                .uri("/repairmen/updates/stream")
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
+                .returnResult(RepairmanDto.class)
+                .getResponseBody()
+                .filter(dto -> dto.getId().equals(id1) || dto.getId().equals(id2))
+                .take(2)
+                .collectList()
+                .as(StepVerifier::create)
+                .assertNext(updates -> {
+                    assertEquals(2, updates.size(), "Should receive exactly 2 updates");
+                    
+                    // Проверяем, что получили оба обновления (один для id1, один для id2)
+                    boolean found1 = false;
+                    boolean found2 = false;
+                    
+                    for (RepairmanDto dto : updates) {
+                        if (dto.getId().equals(id1)) {
+                            assertEquals("Jane Doe", dto.getName());
+                            assertEquals("Lead Technician", dto.getPosition());
+                            found1 = true;
+                        } else if (dto.getId().equals(id2)) {
+                            assertEquals("Alice Smith", dto.getName());
+                            assertEquals("Senior Technician", dto.getPosition());
+                            found2 = true;
+                        }
+                    }
+                    
+                    assertTrue(found1, "Should receive update for first repairman (id=" + id1 + ")");
+                    assertTrue(found2, "Should receive update for second repairman (id=" + id2 + ")");
+                })
+                .verifyComplete();
     }
 }
 

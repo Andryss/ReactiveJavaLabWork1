@@ -78,5 +78,16 @@ public class RepairmenApiController implements RepairmenApi {
                 .doOnSuccess(dto -> log.info("Successfully retrieved repairman with id: {}", id))
                 .doOnError(error -> log.error("Error retrieving repairman with id: {}", id, error));
     }
+
+    @Override
+    public Flux<RepairmanDto> getRepairmenUpdatesStream(ServerWebExchange exchange) {
+        log.info("GET /repairmen/updates/stream - Starting repairman updates stream");
+        return repairmanService.getRepairmenUpdatesStream()
+                .map(repairmanConverter::convertToDto)
+                .doOnNext(dto -> log.debug("Streaming repairman update: id={}", dto.getId()))
+                .doOnError(error -> log.error("Error in repairman updates stream", error))
+                .doOnCancel(() -> log.info("Repairman updates stream cancelled"))
+                .doOnComplete(() -> log.info("Repairman updates stream completed"));
+    }
 }
 

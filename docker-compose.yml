@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  antalk-db:
+  spaceships-db:
     restart: unless-stopped
     container_name: spaceships-db
     image: postgres:15-alpine

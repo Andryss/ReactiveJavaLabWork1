@@ -1,6 +1,7 @@
 package ru.itmo.spaceships.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -14,6 +15,7 @@ import ru.itmo.spaceships.service.MaintenanceRequestService;
 /**
  * Controller for maintenance requests API endpoints.
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class MaintenanceRequestsApiController implements MaintenanceRequestsApi {
@@ -25,9 +27,12 @@ public class MaintenanceRequestsApiController implements MaintenanceRequestsApi 
     public Mono<MaintenanceRequestDto> createMaintenanceRequest(
             Mono<MaintenanceRequestRequest> maintenanceRequestRequest,
             ServerWebExchange exchange) {
+        log.info("POST /maintenance-requests - Creating new maintenance request");
         return maintenanceRequestRequest
                 .flatMap(maintenanceRequestService::createMaintenanceRequest)
-                .map(maintenanceRequestConverter::convertToDto);
+                .map(maintenanceRequestConverter::convertToDto)
+                .doOnSuccess(dto -> log.info("Successfully created maintenance request with id: {}", dto.getId()))
+                .doOnError(error -> log.error("Error creating maintenance request", error));
     }
 
     @Override
@@ -35,14 +40,20 @@ public class MaintenanceRequestsApiController implements MaintenanceRequestsApi 
             Long id,
             Mono<MaintenanceRequestRequest> maintenanceRequestRequest,
             ServerWebExchange exchange) {
+        log.info("PUT /maintenance-requests/{} - Updating maintenance request", id);
         return maintenanceRequestRequest
                 .flatMap(request -> maintenanceRequestService.updateMaintenanceRequest(id, request))
-                .map(maintenanceRequestConverter::convertToDto);
+                .map(maintenanceRequestConverter::convertToDto)
+                .doOnSuccess(dto -> log.info("Successfully updated maintenance request with id: {}", id))
+                .doOnError(error -> log.error("Error updating maintenance request with id: {}", id, error));
     }
 
     @Override
     public Mono<Void> deleteMaintenanceRequest(Long id, ServerWebExchange exchange) {
-        return maintenanceRequestService.deleteMaintenanceRequest(id);
+        log.info("DELETE /maintenance-requests/{} - Deleting maintenance request", id);
+        return maintenanceRequestService.deleteMaintenanceRequest(id)
+                .doOnSuccess(v -> log.info("Successfully deleted maintenance request with id: {}", id))
+                .doOnError(error -> log.error("Error deleting maintenance request with id: {}", id, error));
     }
 
     @Override
@@ -50,14 +61,24 @@ public class MaintenanceRequestsApiController implements MaintenanceRequestsApi 
             Integer page,
             Integer size,
             ServerWebExchange exchange) {
+        log.info("GET /maintenance-requests - Listing maintenance requests (page={}, size={})", page, size);
         return maintenanceRequestService.getMaintenanceRequests(page, size)
-                .map(maintenanceRequestConverter::convertToDto);
+                .map(maintenanceRequestConverter::convertToDto)
+                .collectList()
+                .doOnSuccess(list -> log.info("Returned {} maintenance requests (page={}, size={})",
+                        list.size(), page, size))
+                .doOnError(error -> log.error("Error listing maintenance requests (page={}, size={})",
+                        page, size, error))
+                .flatMapMany(Flux::fromIterable);
     }
 
     @Override
     public Mono<MaintenanceRequestDto> getMaintenanceRequestById(Long id, ServerWebExchange exchange) {
+        log.info("GET /maintenance-requests/{} - Getting maintenance request by id", id);
         return maintenanceRequestService.getMaintenanceRequestById(id)
-                .map(maintenanceRequestConverter::convertToDto);
+                .map(maintenanceRequestConverter::convertToDto)
+                .doOnSuccess(dto -> log.info("Successfully retrieved maintenance request with id: {}", id))
+                .doOnError(error -> log.error("Error retrieving maintenance request with id: {}", id, error));
     }
 }
 

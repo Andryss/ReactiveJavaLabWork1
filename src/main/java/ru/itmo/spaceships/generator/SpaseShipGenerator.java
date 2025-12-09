@@ -41,6 +41,9 @@ public class SpaseShipGenerator implements Generator<SpaceShipEntity> {
     private static final int MIN_MAX_SPEED = 1_000;
     private static final int MAX_MAX_SPEED = 10_000;
 
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER
+    public static final long JS_MAX_SAFE_INTEGER = 9007199254740991L;
+
     private final Random random;
     private final Generator<Dimensions> dimensionsGenerator;
     private final Generator<Engine> engineGenerator;
@@ -64,7 +67,7 @@ public class SpaseShipGenerator implements Generator<SpaceShipEntity> {
 
     @Override
     public SpaceShipEntity generateOne() {
-        long serial = random.nextLong();
+        long serial = random.nextLong(0, JS_MAX_SAFE_INTEGER);
 
         String manufacturer = MANUFACTURERS[random.nextInt(MANUFACTURERS.length)];
 

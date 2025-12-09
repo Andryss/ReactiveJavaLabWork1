@@ -301,9 +301,13 @@ class RepairmenApiControllerTest extends BaseDbTest {
 
     @Test
     void testGetRepairmen() {
-        // Get initial count
+        // Get initial count (with large page size to get all)
         int initialCount = webClient.get()
-                .uri("/repairmen")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repairmen")
+                        .queryParam("page", 0)
+                        .queryParam("size", 100)
+                        .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(RepairmanDto.class)
@@ -324,9 +328,13 @@ class RepairmenApiControllerTest extends BaseDbTest {
                     .expectStatus().isOk();
         }
 
-        // Get all repairmen (default paging)
+        // Get all repairmen (with large page size to get all)
         webClient.get()
-                .uri("/repairmen")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repairmen")
+                        .queryParam("page", 0)
+                        .queryParam("size", 100)
+                        .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(RepairmanDto.class)
@@ -400,9 +408,13 @@ class RepairmenApiControllerTest extends BaseDbTest {
 
     @Test
     void testGetRepairmenSortedById() {
-        // Get initial count
+        // Get initial count (with large page size to get all)
         int initialCount = webClient.get()
-                .uri("/repairmen")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repairmen")
+                        .queryParam("page", 0)
+                        .queryParam("size", 100)
+                        .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(RepairmanDto.class)
@@ -423,16 +435,20 @@ class RepairmenApiControllerTest extends BaseDbTest {
                     .expectStatus().isOk();
         }
 
-        // Get all repairmen and verify they are sorted by ID
+        // Get all repairmen and verify they are sorted by ID (with large page size to get all)
         webClient.get()
-                .uri("/repairmen")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repairmen")
+                        .queryParam("page", 0)
+                        .queryParam("size", 100)
+                        .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(RepairmanDto.class)
                 .consumeWith(result -> {
                     var repairmen = result.getResponseBody();
                     assertNotNull(repairmen);
-                    assertTrue(repairmen.size() >= initialCount + 5);
+                    assertEquals(initialCount + 5, repairmen.size());
 
                     // Verify sorting by ID (ascending)
                     for (int i = 1; i < repairmen.size(); i++) {

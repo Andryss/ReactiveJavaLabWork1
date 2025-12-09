@@ -3,6 +3,62 @@
  */
 
 /**
+ * Status transition rules matching the backend MaintenanceStatus enum
+ * Maps each status to its allowed transitions (including staying in the same status)
+ */
+const STATUS_TRANSITIONS = {
+    'NEW': ['NEW', 'ACCEPTED', 'CANCELLED'],
+    'ACCEPTED': ['ACCEPTED', 'DIAGNOSTICS', 'CANCELLED'],
+    'DIAGNOSTICS': ['DIAGNOSTICS', 'APPROVAL', 'CANCELLED'],
+    'APPROVAL': ['APPROVAL', 'WAITING_PARTS', 'IN_REPAIR', 'CANCELLED'],
+    'WAITING_PARTS': ['WAITING_PARTS', 'IN_REPAIR', 'CANCELLED'],
+    'IN_REPAIR': ['IN_REPAIR', 'QUALITY_CHECK', 'CANCELLED'],
+    'QUALITY_CHECK': ['QUALITY_CHECK', 'READY_FOR_PICKUP', 'CANCELLED'],
+    'READY_FOR_PICKUP': ['READY_FOR_PICKUP', 'COMPLETED', 'CANCELLED'],
+    'COMPLETED': ['COMPLETED'],
+    'CANCELLED': ['CANCELLED']
+};
+
+/**
+ * All possible status values
+ */
+const ALL_STATUSES = ['NEW', 'ACCEPTED', 'DIAGNOSTICS', 'APPROVAL', 'WAITING_PARTS', 
+                      'IN_REPAIR', 'QUALITY_CHECK', 'READY_FOR_PICKUP', 'COMPLETED', 'CANCELLED'];
+
+/**
+ * Populate status dropdown with only allowed transitions from current status
+ * @param {string} currentStatus - Current status of the request
+ */
+function populateStatusDropdown(currentStatus) {
+    const statusSelect = document.getElementById('requestStatus');
+    
+    // Normalize status (handle null/undefined and uppercase)
+    const normalizedStatus = (currentStatus || 'NEW').toUpperCase();
+    
+    // Get allowed transitions (fallback to current status only if not found)
+    const allowedStatuses = STATUS_TRANSITIONS[normalizedStatus] || [normalizedStatus];
+    
+    // Clear existing options
+    statusSelect.innerHTML = '';
+    
+    // Add only allowed statuses
+    allowedStatuses.forEach(status => {
+        const option = document.createElement('option');
+        option.value = status;
+        option.textContent = status;
+        statusSelect.appendChild(option);
+    });
+    
+    // Set current status as selected (if it's in the allowed list)
+    if (allowedStatuses.includes(normalizedStatus)) {
+        statusSelect.value = normalizedStatus;
+    } else if (allowedStatuses.length > 0) {
+        // Fallback to first allowed status if current status is not in list
+        statusSelect.value = allowedStatuses[0];
+    }
+}
+
+/**
  * Load maintenance requests list
  */
 async function loadRequests() {
@@ -71,6 +127,7 @@ async function showRequestModal(id = null) {
     const statusContainer = document.getElementById('requestStatusContainer');
     if (id) {
         statusContainer.style.display = 'block';
+        // Status dropdown will be populated when request data is loaded
     } else {
         statusContainer.style.display = 'none';
     }
@@ -109,7 +166,9 @@ async function showRequestModal(id = null) {
                                 `${repairman.id} - ${repairman.name}`;
                         });
                 }
-                document.getElementById('requestStatus').value = data.status || 'NEW';
+                const currentStatus = data.status || 'NEW';
+                // Populate status dropdown with only allowed transitions
+                populateStatusDropdown(currentStatus);
             });
     } else {
         document.getElementById('requestForm').reset();

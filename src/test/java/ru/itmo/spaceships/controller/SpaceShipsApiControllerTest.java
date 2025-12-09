@@ -34,9 +34,11 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    private static long serialCounter = System.currentTimeMillis();
+
     private SpaceShipRequest createTestRequest() {
-        // Use a random serial to avoid conflicts
-        return createTestRequest(System.currentTimeMillis());
+        // Use a unique serial to avoid conflicts
+        return createTestRequest(++serialCounter);
     }
 
     private SpaceShipRequest createTestRequest(Long serial) {
@@ -104,7 +106,8 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
 
     @Test
     void testCreateSpaceshipWithSerial() {
-        SpaceShipRequest request = createTestRequest(12345L);
+        long testSerial = 100000L + System.nanoTime() % 100000L; // Unique serial for this test
+        SpaceShipRequest request = createTestRequest(testSerial);
 
         webClient.post()
                 .uri("/spaceships")
@@ -115,7 +118,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                 .consumeWith(result -> {
                     SpaceShipDto dto = result.getResponseBody();
                     assertNotNull(dto);
-                    assertEquals(12345L, dto.getSerial());
+                    assertEquals(testSerial, dto.getSerial());
                     assertEquals("Test Manufacturer", dto.getManufacturer());
                 });
     }
@@ -171,7 +174,7 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
     @Test
     void testUpdateSpaceshipIgnoresSerialInRequest() {
         // Create a spaceship first
-        Long originalSerial = 3000L;
+        long originalSerial = 200000L + System.nanoTime() % 100000L; // Unique serial
         SpaceShipRequest createRequest = createTestRequest(originalSerial);
         SpaceShipDto created = webClient.post()
                 .uri("/spaceships")
@@ -186,7 +189,8 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
         assertEquals(originalSerial, created.getSerial());
 
         // Update the spaceship with a different serial in request (should be ignored)
-        SpaceShipRequest updateRequest = createTestRequest(99999L); // Different serial - should be ignored
+        long differentSerial = 300000L + System.nanoTime() % 100000L; // Different serial - should be ignored
+        SpaceShipRequest updateRequest = createTestRequest(differentSerial);
         updateRequest.setName("Updated Ship Name");
 
         webClient.put()
@@ -273,9 +277,13 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
 
     @Test
     void testGetSpaceships() {
-        // Get initial count
+        // Get initial count (with large page size to get all)
         int initialCount = webClient.get()
-                .uri("/spaceships")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/spaceships")
+                        .queryParam("page", 0)
+                        .queryParam("size", 100)
+                        .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(SpaceShipDto.class)
@@ -284,8 +292,9 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                 .size();
 
         // Create multiple spaceships
+        long baseSerial = 400000L + System.nanoTime() % 100000L;
         for (int i = 0; i < 3; i++) {
-            SpaceShipRequest request = createTestRequest((long) (1000 + i));
+            SpaceShipRequest request = createTestRequest(baseSerial + i);
             request.setName("Ship " + i);
             webClient.post()
                     .uri("/spaceships")
@@ -294,9 +303,13 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                     .expectStatus().isOk();
         }
 
-        // Get all spaceships
+        // Get all spaceships (with large page size to get all)
         webClient.get()
-                .uri("/spaceships")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/spaceships")
+                        .queryParam("page", 0)
+                        .queryParam("size", 100)
+                        .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(SpaceShipDto.class)
@@ -309,8 +322,9 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
     @Test
     void testGetSpaceshipsWithPaging() {
         // Create multiple spaceships
+        long baseSerial = 500000L + System.nanoTime() % 100000L;
         for (int i = 0; i < 5; i++) {
-            SpaceShipRequest request = createTestRequest((long) (2000 + i));
+            SpaceShipRequest request = createTestRequest(baseSerial + i);
             request.setName("Ship " + i);
             webClient.post()
                     .uri("/spaceships")

@@ -1,6 +1,7 @@
 package ru.itmo.spaceships.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -14,6 +15,7 @@ import ru.itmo.spaceships.service.SpaceShipService;
 /**
  * Controller for spaceships API endpoints.
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class SpaceShipsApiController implements SpaceshipsApi {
@@ -25,9 +27,15 @@ public class SpaceShipsApiController implements SpaceshipsApi {
     public Mono<SpaceShipDto> createSpaceship(
             Mono<SpaceShipRequest> spaceShipRequest,
             ServerWebExchange exchange) {
+        log.info("POST /spaceships - Creating new spaceship");
         return spaceShipRequest
-                .flatMap(spaceShipService::createSpaceship)
-                .map(spaceShipConverter::convertToDto);
+                .flatMap(request -> {
+                    log.debug("Creating spaceship with serial: {}", request.getSerial());
+                    return spaceShipService.createSpaceship(request);
+                })
+                .map(spaceShipConverter::convertToDto)
+                .doOnSuccess(dto -> log.info("Successfully created spaceship with serial: {}", dto.getSerial()))
+                .doOnError(error -> log.error("Error creating spaceship", error));
     }
 
     @Override
@@ -35,14 +43,20 @@ public class SpaceShipsApiController implements SpaceshipsApi {
             Long serial,
             Mono<SpaceShipRequest> spaceShipRequest,
             ServerWebExchange exchange) {
+        log.info("PUT /spaceships/{} - Updating spaceship", serial);
         return spaceShipRequest
                 .flatMap(request -> spaceShipService.updateSpaceship(serial, request))
-                .map(spaceShipConverter::convertToDto);
+                .map(spaceShipConverter::convertToDto)
+                .doOnSuccess(dto -> log.info("Successfully updated spaceship with serial: {}", dto.getSerial()))
+                .doOnError(error -> log.error("Error updating spaceship with serial: {}", serial, error));
     }
 
     @Override
     public Mono<Void> deleteSpaceship(Long serial, ServerWebExchange exchange) {
-        return spaceShipService.deleteSpaceship(serial);
+        log.info("DELETE /spaceships/{} - Deleting spaceship", serial);
+        return spaceShipService.deleteSpaceship(serial)
+                .doOnSuccess(v -> log.info("Successfully deleted spaceship with serial: {}", serial))
+                .doOnError(error -> log.error("Error deleting spaceship with serial: {}", serial, error));
     }
 
     @Override
@@ -50,14 +64,22 @@ public class SpaceShipsApiController implements SpaceshipsApi {
             Integer page,
             Integer size,
             ServerWebExchange exchange) {
+        log.info("GET /spaceships - Listing spaceships (page={}, size={})", page, size);
         return spaceShipService.getSpaceships(page, size)
-                .map(spaceShipConverter::convertToDto);
+                .map(spaceShipConverter::convertToDto)
+                .collectList()
+                .doOnSuccess(list -> log.info("Returned {} spaceships (page={}, size={})", list.size(), page, size))
+                .doOnError(error -> log.error("Error listing spaceships (page={}, size={})", page, size, error))
+                .flatMapMany(Flux::fromIterable);
     }
 
     @Override
     public Mono<SpaceShipDto> getSpaceshipBySerial(Long serial, ServerWebExchange exchange) {
+        log.info("GET /spaceships/{} - Getting spaceship by serial", serial);
         return spaceShipService.getSpaceshipBySerial(serial)
-                .map(spaceShipConverter::convertToDto);
+                .map(spaceShipConverter::convertToDto)
+                .doOnSuccess(dto -> log.info("Successfully retrieved spaceship with serial: {}", serial))
+                .doOnError(error -> log.error("Error retrieving spaceship with serial: {}", serial, error));
     }
 }
 

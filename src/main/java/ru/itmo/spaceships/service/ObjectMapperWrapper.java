@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * Wrapper around ObjectMapper. Isolates exception handling and simplifies serialization.
+ * Обёртка вокруг ObjectMapper. Изолирует обработку исключений и упрощает сериализацию.
  */
 @Service
 @RequiredArgsConstructor
@@ -20,10 +20,10 @@ public class ObjectMapperWrapper {
     private final ObjectMapper mapper;
 
     /**
-     * Serialize object to JSON string.
+     * Сериализует объект в JSON строку.
      *
-     * @param obj object to serialize
-     * @return JSON string
+     * @param obj объект для сериализации
+     * @return JSON строка
      */
     public String writeValueAsString(Object obj) {
         try {
@@ -34,12 +34,12 @@ public class ObjectMapperWrapper {
     }
 
     /**
-     * Deserialize object from JSON string.
+     * Десериализует объект из JSON строки.
      *
-     * @param data JSON string
-     * @param type type reference
-     * @param <T> type
-     * @return deserialized object
+     * @param data JSON строка
+     * @param type ссылка на тип
+     * @param <T> тип
+     * @return десериализованный объект
      */
     @SneakyThrows
     public <T> T readValue(String data, TypeReference<T> type) {
@@ -47,12 +47,12 @@ public class ObjectMapperWrapper {
     }
 
     /**
-     * Deserialize object from JSON string.
+     * Десериализует объект из JSON строки.
      *
-     * @param data JSON string
-     * @param cls class
-     * @param <T> type
-     * @return deserialized object
+     * @param data JSON строка
+     * @param cls класс
+     * @param <T> тип
+     * @return десериализованный объект
      */
     @SneakyThrows
     public <T> T readValue(String data, Class<T> cls) {
@@ -60,10 +60,10 @@ public class ObjectMapperWrapper {
     }
 
     /**
-     * Deserialize object from JSON string to Map.
+     * Десериализует объект из JSON строки в Map.
      *
-     * @param data JSON string
-     * @return map
+     * @param data JSON строка
+     * @return карта
      */
     @SneakyThrows
     public Map<String, Object> readMap(String data) {
@@ -72,10 +72,10 @@ public class ObjectMapperWrapper {
     }
 
     /**
-     * Deserialize JSON tree from string.
+     * Десериализует JSON дерево из строки.
      *
-     * @param data JSON string
-     * @return JSON node
+     * @param data JSON строка
+     * @return JSON узел
      */
     @SneakyThrows
     public JsonNode readTree(String data) {

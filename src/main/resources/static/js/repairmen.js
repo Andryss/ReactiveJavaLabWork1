@@ -8,6 +8,14 @@
 async function loadRepairmen() {
     try {
         const response = await fetch(`${API_BASE}/repairmen?page=${repairmenTablePage}&size=${repairmenTablePageSize}`);
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            document.getElementById('repairmenTableBody').innerHTML = 
+                `<tr><td colspan="4" class="text-center text-danger">Ошибка загрузки ремонтников: ${errorMessage}</td></tr>`;
+            return;
+        }
+        
         const data = await response.json();
         repairmenTableTotalItems = data.length;
         
@@ -32,7 +40,7 @@ async function loadRepairmen() {
         updateRepairmenTablePaginationButtons();
     } catch (error) {
         document.getElementById('repairmenTableBody').innerHTML = 
-            '<tr><td colspan="4" class="text-center text-danger">Error loading repairmen</td></tr>';
+            '<tr><td colspan="4" class="text-center text-danger">Ошибка загрузки ремонтников</td></tr>';
     }
 }
 
@@ -41,14 +49,23 @@ async function loadRepairmen() {
  * @param {number|null} id - Repairman ID (null for create)
  */
 function showRepairmanModal(id = null) {
-    document.getElementById('repairmanModalTitle').textContent = id ? 'Edit Repairman' : 'Add Repairman';
+    document.getElementById('repairmanModalTitle').textContent = id ? 'Редактировать ремонтника' : 'Добавить ремонтника';
     document.getElementById('repairmanId').value = id || '';
     if (id) {
         fetch(`${API_BASE}/repairmen/${id}`)
-            .then(r => r.json())
+            .then(async r => {
+                if (!r.ok) {
+                    const errorMessage = await extractErrorMessage(r);
+                    throw new Error(errorMessage);
+                }
+                return r.json();
+            })
             .then(data => {
                 document.getElementById('repairmanName').value = data.name || '';
                 document.getElementById('repairmanPosition').value = data.position || '';
+            })
+            .catch(error => {
+                alert('Ошибка загрузки данных ремонтника: ' + (error.message || error));
             });
     } else {
         document.getElementById('repairmanForm').reset();
@@ -70,15 +87,22 @@ async function saveRepairman() {
     const method = id ? 'PUT' : 'POST';
     
     try {
-        await fetch(url, {
+        const response = await fetch(url, {
             method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка сохранения ремонтника: ' + errorMessage);
+            return;
+        }
+        
         bootstrap.Modal.getInstance(document.getElementById('repairmanModal')).hide();
         loadRepairmen();
     } catch (error) {
-        alert('Error saving repairman: ' + error);
+        alert('Ошибка сохранения ремонтника: ' + (error.message || error));
     }
 }
 
@@ -87,12 +111,19 @@ async function saveRepairman() {
  * @param {number} id - Repairman ID
  */
 async function deleteRepairman(id) {
-    if (!confirm('Are you sure you want to delete this repairman?')) return;
+    if (!confirm('Вы уверены, что хотите удалить этого ремонтника?')) return;
     try {
-        await fetch(`${API_BASE}/repairmen/${id}`, { method: 'DELETE' });
+        const response = await fetch(`${API_BASE}/repairmen/${id}`, { method: 'DELETE' });
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка удаления ремонтника: ' + errorMessage);
+            return;
+        }
+        
         loadRepairmen();
     } catch (error) {
-        alert('Error deleting repairman: ' + error);
+        alert('Ошибка удаления ремонтника: ' + (error.message || error));
     }
 }
 

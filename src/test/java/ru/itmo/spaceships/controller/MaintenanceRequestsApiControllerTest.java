@@ -1,5 +1,6 @@
 package ru.itmo.spaceships.controller;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.itmo.spaceships.BaseDbTest;
+import ru.itmo.spaceships.generated.model.ErrorObject;
 import ru.itmo.spaceships.generated.model.MaintenanceRequestDto;
 import ru.itmo.spaceships.generated.model.MaintenanceRequestRequest;
 import ru.itmo.spaceships.generated.model.MaintenanceStatus;
@@ -76,7 +78,7 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
                     assertNotNull(dto);
                     assertEquals(request.getSpaceshipSerial(), dto.getSpaceshipSerial());
                     assertEquals("Test maintenance request", dto.getComment());
-                    // assignee and status should be ignored on create, status should be NEW
+                    // assignee и status должны игнорироваться при создании, status должен быть NEW
                     assertEquals(MaintenanceStatus.NEW, dto.getStatus());
                 });
     }
@@ -90,7 +92,16 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
                 .uri("/maintenance-requests")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(400, error.getCode());
+                    assertEquals("maintenance.request.spaceship.serial.required.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Серийный номер корабля обязателен"));
+                });
     }
 
     @Test
@@ -102,7 +113,16 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
                 .uri("/maintenance-requests")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(400, error.getCode());
+                    assertEquals("maintenance.request.comment.required.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Комментарий обязателен"));
+                });
     }
 
     @Test
@@ -140,8 +160,10 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
                     assertEquals("Updated comment", dto.getComment());
                     assertEquals(1L, dto.getAssignee());
                     assertEquals(MaintenanceStatus.ACCEPTED, dto.getStatus());
-                    // createdAt should remain unchanged
-                    assertEquals(created.getCreatedAt(), dto.getCreatedAt());
+                    // createdAt should remain unchanged (truncate to microseconds to handle precision differences)
+                    assertEquals(
+                            created.getCreatedAt().truncatedTo(ChronoUnit.MICROS),
+                            dto.getCreatedAt().truncatedTo(ChronoUnit.MICROS));
                     // updatedAt should be updated
                     assertTrue(dto.getUpdatedAt().isAfter(created.getUpdatedAt()) || 
                                dto.getUpdatedAt().equals(created.getUpdatedAt()));
@@ -187,8 +209,10 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
                 .consumeWith(result -> {
                     MaintenanceRequestDto dto = result.getResponseBody();
                     assertNotNull(dto);
-                    // createdAt should remain unchanged (system field)
-                    assertEquals(originalCreatedAt, dto.getCreatedAt());
+                    // createdAt should remain unchanged (system field) - truncate to microseconds to handle precision differences
+                    assertEquals(
+                            originalCreatedAt.truncatedTo(ChronoUnit.MICROS),
+                            dto.getCreatedAt().truncatedTo(ChronoUnit.MICROS));
                     // updatedAt should be updated by system
                     assertTrue(dto.getUpdatedAt().isAfter(originalUpdatedAt) || 
                                dto.getUpdatedAt().equals(originalUpdatedAt));
@@ -258,7 +282,15 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
         webClient.get()
                 .uri("/maintenance-requests/{id}", id)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("maintenance.request.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                });
     }
 
     @Test
@@ -297,7 +329,93 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
         webClient.get()
                 .uri("/maintenance-requests/{id}", 999L)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("maintenance.request.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Заявка на обслуживание с id=\"999\" не найдена"));
+                });
+    }
+
+    @Test
+    void testUpdateMaintenanceRequestStatusTransitionError() {
+        // Создаём заявку (статус NEW)
+        MaintenanceRequestRequest createRequest = createTestRequest();
+        MaintenanceRequestDto created = webClient.post()
+                .uri("/maintenance-requests")
+                .bodyValue(createRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MaintenanceRequestDto.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertNotNull(created);
+        Long id = created.getId();
+        assertEquals(MaintenanceStatus.NEW, created.getStatus());
+
+        // Пытаемся перейти из NEW напрямую в COMPLETED (недопустимый переход)
+        MaintenanceRequestRequest updateRequest = new MaintenanceRequestRequest();
+        updateRequest.setComment("Updated comment");
+        updateRequest.setStatus(MaintenanceStatus.COMPLETED);
+
+        webClient.put()
+                .uri("/maintenance-requests/{id}", id)
+                .bodyValue(updateRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(400, error.getCode());
+                    assertEquals("maintenance.request.status.transition.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Переход статуса из \"NEW\" в \"COMPLETED\" не разрешён"));
+                });
+    }
+
+    @Test
+    void testUpdateMaintenanceRequestNotFound() {
+        MaintenanceRequestRequest updateRequest = new MaintenanceRequestRequest();
+        updateRequest.setComment("Updated comment");
+        updateRequest.setStatus(MaintenanceStatus.ACCEPTED);
+
+        webClient.put()
+                .uri("/maintenance-requests/{id}", 999L)
+                .bodyValue(updateRequest)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("maintenance.request.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Заявка на обслуживание с id=\"999\" не найдена"));
+                });
+    }
+
+    @Test
+    void testDeleteMaintenanceRequestNotFound() {
+        webClient.delete()
+                .uri("/maintenance-requests/{id}", 999L)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("maintenance.request.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Заявка на обслуживание с id=\"999\" не найдена"));
+                });
     }
 
     @Test

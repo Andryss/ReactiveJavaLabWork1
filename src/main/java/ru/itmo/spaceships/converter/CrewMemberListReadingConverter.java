@@ -12,7 +12,7 @@ import ru.itmo.spaceships.service.ObjectMapperWrapper;
 import java.util.List;
 
 /**
- * Converter for reading List of CrewMember from JSONB.
+ * Конвертер для чтения списка CrewMember из JSONB.
  */
 @ReadingConverter
 @RequiredArgsConstructor

@@ -5,12 +5,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.itmo.spaceships.exception.Errors;
 import ru.itmo.spaceships.generated.model.RepairmanRequest;
 import ru.itmo.spaceships.model.RepairmanEntity;
 import ru.itmo.spaceships.repository.RepairmanRepository;
 
 /**
- * Service for working with repairmen.
+ * Сервис для работы с ремонтниками.
  */
 @Service
 @RequiredArgsConstructor
@@ -19,14 +20,14 @@ public class RepairmanService {
     private final RepairmanRepository repairmanRepository;
 
     /**
-     * Create a new repairman.
+     * Создаёт нового ремонтника.
      *
-     * @param request request to create repairman
-     * @return created repairman entity
+     * @param request запрос на создание ремонтника
+     * @return созданная сущность ремонтника
      */
     public Mono<RepairmanEntity> createRepairman(RepairmanRequest request) {
         if (request.getName() == null || request.getPosition() == null) {
-            return Mono.error(new IllegalArgumentException("Name and position are required for creating a repairman"));
+            return Mono.error(Errors.repairmanValidationError());
         }
         RepairmanEntity entity = new RepairmanEntity();
         entity.setName(request.getName());
@@ -36,15 +37,15 @@ public class RepairmanService {
     }
 
     /**
-     * Update an existing repairman.
+     * Обновляет существующего ремонтника.
      *
-     * @param id repairman id
-     * @param request request to update repairman
-     * @return updated repairman entity
+     * @param id идентификатор ремонтника
+     * @param request запрос на обновление ремонтника
+     * @return обновлённая сущность ремонтника
      */
     public Mono<RepairmanEntity> updateRepairman(Long id, RepairmanRequest request) {
         return repairmanRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Repairman not found with id: " + id)))
+                .switchIfEmpty(Mono.error(Errors.repairmanNotFound(id)))
                 .flatMap(entity -> {
                     if (request.getName() != null) {
                         entity.setName(request.getName());
@@ -57,41 +58,43 @@ public class RepairmanService {
     }
 
     /**
-     * Delete a repairman.
+     * Удаляет ремонтника.
      *
-     * @param id repairman id
-     * @return empty Mono
+     * @param id идентификатор ремонтника
+     * @return пустой Mono
      */
     public Mono<Void> deleteRepairman(Long id) {
         return repairmanRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Repairman not found with id: " + id)))
+                .switchIfEmpty(Mono.error(Errors.repairmanNotFound(id)))
                 .flatMap(repairmanRepository::delete);
     }
 
     /**
-     * Get all repairmen with paging.
+     * Получает всех ремонтников с пагинацией.
      *
-     * @param page page number (0-based)
-     * @param size page size
-     * @return flux of repairman entities sorted by ID
+     * @param page номер страницы (начиная с 0)
+     * @param size размер страницы
+     * @return поток сущностей ремонтников, отсортированных по ID
      */
     public Flux<RepairmanEntity> getRepairmen(Integer page, Integer size) {
-        long offset = (long) page * size;
+        int pageNum = page != null ? page : 0;
+        int pageSize = size != null ? size : 20;
+        long offset = (long) pageNum * pageSize;
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
         return repairmanRepository.findAll(sort)
                 .skip(offset)
-                .take(size);
+                .take(pageSize);
     }
 
     /**
-     * Get repairman by ID.
+     * Получает ремонтника по ID.
      *
-     * @param id repairman id
-     * @return repairman entity
+     * @param id идентификатор ремонтника
+     * @return сущность ремонтника
      */
     public Mono<RepairmanEntity> getRepairmanById(Long id) {
         return repairmanRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Repairman not found with id: " + id)));
+                .switchIfEmpty(Mono.error(Errors.repairmanNotFound(id)));
     }
 }
 

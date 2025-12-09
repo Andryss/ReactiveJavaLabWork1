@@ -19,16 +19,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Converter for SpaceShipEntity and SpaceShipDto.
+ * Конвертер для SpaceShipEntity и SpaceShipDto.
  */
 @Component
 public class SpaceShipConverter {
 
     /**
-     * Convert SpaceShipEntity to SpaceShipDto.
+     * Конвертирует SpaceShipEntity в SpaceShipDto.
      *
-     * @param entity spaceship entity
-     * @return spaceship DTO
+     * @param entity сущность корабля
+     * @return DTO корабля
      */
     public SpaceShipDto convertToDto(SpaceShipEntity entity) {
         SpaceShipDto dto = new SpaceShipDto();
@@ -49,14 +49,14 @@ public class SpaceShipConverter {
     }
 
     /**
-     * Convert SpaceShipRequest to SpaceShipEntity.
+     * Конвертирует SpaceShipRequest в SpaceShipEntity.
      *
-     * @param request spaceship request
-     * @return spaceship entity
+     * @param request запрос на корабль
+     * @return сущность корабля
      */
     public SpaceShipEntity convertToEntity(SpaceShipRequest request) {
         SpaceShipEntity entity = new SpaceShipEntity();
-        // Serial will be set by service layer based on context (create vs update)
+        // Serial будет установлен слоем сервиса в зависимости от контекста (создание vs обновление)
         if (request.getSerial() != null) {
             entity.setSerial(request.getSerial());
         }

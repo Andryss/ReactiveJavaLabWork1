@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.itmo.spaceships.exception.Errors;
 import ru.itmo.spaceships.generated.model.MaintenanceRequestRequest;
 import ru.itmo.spaceships.model.MaintenanceRequestEntity;
 import ru.itmo.spaceships.model.MaintenanceStatus;
@@ -13,7 +14,7 @@ import ru.itmo.spaceships.repository.MaintenanceRequestRepository;
 import java.time.Instant;
 
 /**
- * Service for working with maintenance requests.
+ * Сервис для работы с заявками на обслуживание.
  */
 @Service
 @RequiredArgsConstructor
@@ -22,19 +23,18 @@ public class MaintenanceRequestService {
     private final MaintenanceRequestRepository maintenanceRequestRepository;
 
     /**
-     * Create a new maintenance request.
-     * Only spaceshipSerial and comment are used from the request.
+     * Создаёт новую заявку на обслуживание.
+     * Из запроса используются только spaceshipSerial и comment.
      *
-     * @param request request to create maintenance request
-     * @return created maintenance request entity
+     * @param request запрос на создание заявки на обслуживание
+     * @return созданная сущность заявки на обслуживание
      */
     public Mono<MaintenanceRequestEntity> createMaintenanceRequest(MaintenanceRequestRequest request) {
         if (request.getSpaceshipSerial() == null) {
-            return Mono.error(new IllegalArgumentException(
-                    "Spaceship serial is required for creating a maintenance request"));
+            return Mono.error(Errors.maintenanceRequestSpaceshipSerialRequiredError());
         }
         if (request.getComment() == null) {
-            return Mono.error(new IllegalArgumentException("Comment is required for creating a maintenance request"));
+            return Mono.error(Errors.maintenanceRequestCommentRequiredError());
         }
         MaintenanceRequestEntity entity = new MaintenanceRequestEntity();
         entity.setSpaceshipSerial(request.getSpaceshipSerial());
@@ -46,35 +46,36 @@ public class MaintenanceRequestService {
     }
 
     /**
-     * Update an existing maintenance request.
-     * All fields can be updated except createdAt and updatedAt (system fields).
-     * Status transitions are validated according to business rules.
+     * Обновляет существующую заявку на обслуживание.
+     * Все поля могут быть обновлены, кроме createdAt и updatedAt (системные поля).
+     * Переходы статусов валидируются согласно бизнес-правилам.
      *
-     * @param id maintenance request id
-     * @param request request to update maintenance request
-     * @return updated maintenance request entity
+     * @param id идентификатор заявки на обслуживание
+     * @param request запрос на обновление заявки на обслуживание
+     * @return обновлённая сущность заявки на обслуживание
      */
     public Mono<MaintenanceRequestEntity> updateMaintenanceRequest(Long id, MaintenanceRequestRequest request) {
         return maintenanceRequestRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Maintenance request not found with id: " + id)))
+                .switchIfEmpty(Mono.error(Errors.maintenanceRequestNotFound(id)))
                 .flatMap(entity -> {
-                    // If status is being changed, validate the transition
+                    // Если статус изменяется, валидируем переход
                     if (request.getStatus() != null) {
                         MaintenanceStatus newStatus = MaintenanceStatus.valueOf(request.getStatus().name());
                         MaintenanceStatus currentStatus = entity.getStatus();
                         
                         if (currentStatus != newStatus) {
-                            // Validate status transition
+                            // Валидируем переход статуса
                             try {
                                 currentStatus.validateTransition(newStatus);
                             } catch (IllegalArgumentException e) {
-                                return Mono.error(e);
+                                return Mono.error(Errors.maintenanceRequestStatusTransitionError(
+                                        currentStatus.name(), newStatus.name()));
                             }
                             entity.setStatus(newStatus);
                         }
                     }
                     
-                    // Update other fields
+                    // Обновляем другие поля
                     if (request.getSpaceshipSerial() != null) {
                         entity.setSpaceshipSerial(request.getSpaceshipSerial());
                     }
@@ -85,50 +86,51 @@ public class MaintenanceRequestService {
                         entity.setAssignee(request.getAssignee());
                     }
                     
-                    // Update updatedAt timestamp
+                    // Обновляем временную метку updatedAt
                     entity.setUpdatedAt(Instant.now());
-                    // createdAt and updatedAt are system fields, not updated from request
+                    // createdAt и updatedAt - системные поля, не обновляются из запроса
                     return maintenanceRequestRepository.save(entity);
                 });
     }
 
     /**
-     * Delete a maintenance request.
+     * Удаляет заявку на обслуживание.
      *
-     * @param id maintenance request id
-     * @return empty Mono
+     * @param id идентификатор заявки на обслуживание
+     * @return пустой Mono
      */
     public Mono<Void> deleteMaintenanceRequest(Long id) {
         return maintenanceRequestRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Maintenance request not found with id: " + id)))
+                .switchIfEmpty(Mono.error(Errors.maintenanceRequestNotFound(id)))
                 .flatMap(maintenanceRequestRepository::delete);
     }
 
     /**
-     * Get all maintenance requests with paging.
+     * Получает все заявки на обслуживание с пагинацией.
      *
-     * @param page page number (0-based)
-     * @param size page size
-     * @return flux of maintenance request entities sorted by ID
+     * @param page номер страницы (начиная с 0)
+     * @param size размер страницы
+     * @return поток сущностей заявок на обслуживание, отсортированных по ID
      */
     public Flux<MaintenanceRequestEntity> getMaintenanceRequests(Integer page, Integer size) {
-        long offset = (long) page * size;
+        int pageNum = page != null ? page : 0;
+        int pageSize = size != null ? size : 20;
+        long offset = (long) pageNum * pageSize;
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
         return maintenanceRequestRepository.findAll(sort)
                 .skip(offset)
-                .take(size);
+                .take(pageSize);
     }
 
     /**
-     * Get maintenance request by ID.
+     * Получает заявку на обслуживание по ID.
      *
-     * @param id maintenance request id
-     * @return maintenance request entity
+     * @param id идентификатор заявки на обслуживание
+     * @return сущность заявки на обслуживание
      */
     public Mono<MaintenanceRequestEntity> getMaintenanceRequestById(Long id) {
         return maintenanceRequestRepository.findById(id)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException(
-                        "Maintenance request not found with id: " + id)));
+                .switchIfEmpty(Mono.error(Errors.maintenanceRequestNotFound(id)));
     }
 }
 

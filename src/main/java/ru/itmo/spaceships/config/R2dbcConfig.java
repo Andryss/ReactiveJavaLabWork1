@@ -20,16 +20,16 @@ import ru.itmo.spaceships.service.ObjectMapperWrapper;
 import java.util.List;
 
 /**
- * R2DBC configuration for custom converters.
+ * Конфигурация R2DBC для пользовательских конвертеров.
  */
 @Configuration
 public class R2dbcConfig {
 
     /**
-     * Configure R2DBC custom conversions.
+     * Настраивает пользовательские конвертации R2DBC.
      *
-     * @param objectMapperWrapper object mapper wrapper for JSON serialization
-     * @return R2DBC custom conversions
+     * @param objectMapperWrapper обёртка ObjectMapper для JSON сериализации
+     * @return пользовательские конвертации R2DBC
      */
     @Bean
     public R2dbcCustomConversions r2dbcCustomConversions(ObjectMapperWrapper objectMapperWrapper) {

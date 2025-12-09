@@ -12,8 +12,8 @@ import ru.itmo.spaceships.repository.RepairmanRepository;
 import ru.itmo.spaceships.repository.SpaceShipRepository;
 
 /**
- * Base test class for database tests.
- * Provides automatic cleanup of all repositories after each test.
+ * Базовый класс для тестов базы данных.
+ * Обеспечивает автоматическую очистку всех репозиториев после каждого теста.
  */
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,19 +31,19 @@ public abstract class BaseDbTest {
     private MaintenanceRequestRepository maintenanceRequestRepository;
 
     /**
-     * Clean all repositories after each test to ensure test isolation.
-     * Deletes all entities in the correct order to respect foreign key constraints.
+     * Очищает все репозитории после каждого теста для обеспечения изоляции тестов.
+     * Удаляет все сущности в правильном порядке с учётом ограничений внешних ключей.
      */
     @AfterEach
     void cleanRepositories() {
-        log.debug("Cleaning all repositories after test");
-        // Delete all entities from all repositories
-        // Order matters: delete maintenance requests first (they reference spaceships and repairmen)
+        log.debug("Очистка всех репозиториев после теста");
+        // Удаление всех сущностей из всех репозиториев
+        // Порядок важен: сначала удаляем заявки на обслуживание (они ссылаются на корабли и ремонтников)
         maintenanceRequestRepository.deleteAll()
                 .then(spaceShipRepository.deleteAll())
                 .then(repairmanRepository.deleteAll())
-                .doOnSuccess(v -> log.debug("Successfully cleaned all repositories"))
-                .doOnError(error -> log.error("Error cleaning repositories", error))
-                .block(); // Block to ensure cleanup completes before next test
+                .doOnSuccess(v -> log.debug("Все репозитории успешно очищены"))
+                .doOnError(error -> log.error("Ошибка при очистке репозиториев", error))
+                .block(); // Блокируем выполнение, чтобы очистка завершилась до следующего теста
     }
 }

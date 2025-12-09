@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.itmo.spaceships.BaseDbTest;
+import ru.itmo.spaceships.generated.model.ErrorObject;
 import ru.itmo.spaceships.generated.model.RepairmanDto;
 import ru.itmo.spaceships.generated.model.RepairmanRequest;
 import ru.itmo.spaceships.repository.RepairmanRepository;
@@ -54,7 +55,16 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(400, error.getCode());
+                    assertEquals("repairman.validation.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Имя и должность обязательны"));
+                });
     }
 
     @Test
@@ -66,12 +76,21 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(400, error.getCode());
+                    assertEquals("repairman.validation.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Имя и должность обязательны"));
+                });
     }
 
     @Test
     void testUpdateRepairman() {
-        // First create a repairman
+        // Сначала создаём ремонтника
         RepairmanRequest createRequest = new RepairmanRequest();
         createRequest.setName("John Doe");
         createRequest.setPosition("Senior Technician");
@@ -88,7 +107,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
         assertNotNull(created);
         Long id = created.getId();
 
-        // Now update it
+        // Теперь обновляем его
         RepairmanRequest updateRequest = new RepairmanRequest();
         updateRequest.setName("Jane Doe");
         updateRequest.setPosition("Lead Technician");
@@ -110,7 +129,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
 
     @Test
     void testUpdateRepairmanPartial() {
-        // First create a repairman
+        // Сначала создаём ремонтника
         RepairmanRequest createRequest = new RepairmanRequest();
         createRequest.setName("John Doe");
         createRequest.setPosition("Senior Technician");
@@ -127,7 +146,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
         assertNotNull(created);
         Long id = created.getId();
 
-        // Update only name
+        // Обновляем только имя
         RepairmanRequest updateRequest = new RepairmanRequest();
         updateRequest.setName("Jane Doe");
 
@@ -156,12 +175,21 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen/{id}", 999L)
                 .bodyValue(updateRequest)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Ремонтник с id=\"999\" не найден"));
+                });
     }
 
     @Test
     void testDeleteRepairman() {
-        // First create a repairman
+        // Сначала создаём ремонтника
         RepairmanRequest createRequest = new RepairmanRequest();
         createRequest.setName("John Doe");
         createRequest.setPosition("Senior Technician");
@@ -178,13 +206,13 @@ class RepairmenApiControllerTest extends BaseDbTest {
         assertNotNull(created);
         Long id = created.getId();
 
-        // Delete it
+        // Удаляем его
         webClient.delete()
                 .uri("/repairmen/{id}", id)
                 .exchange()
                 .expectStatus().isOk();
 
-        // Verify it's deleted by trying to update it
+        // Проверяем, что он удалён, пытаясь обновить его
         RepairmanRequest updateRequest = new RepairmanRequest();
         updateRequest.setName("Jane Doe");
 
@@ -192,7 +220,14 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .uri("/repairmen/{id}", id)
                 .bodyValue(updateRequest)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                });
     }
 
     @Test
@@ -200,7 +235,16 @@ class RepairmenApiControllerTest extends BaseDbTest {
         webClient.delete()
                 .uri("/repairmen/{id}", 999L)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Ремонтник с id=\"999\" не найден"));
+                });
     }
 
     @Test
@@ -224,7 +268,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
         assertEquals("John Doe", created.getName());
         assertEquals("Senior Technician", created.getPosition());
 
-        // Update
+        // Обновление
         RepairmanRequest updateRequest = new RepairmanRequest();
         updateRequest.setName("Jane Doe");
         updateRequest.setPosition("Lead Technician");
@@ -243,23 +287,30 @@ class RepairmenApiControllerTest extends BaseDbTest {
         assertEquals("Jane Doe", updated.getName());
         assertEquals("Lead Technician", updated.getPosition());
 
-        // Delete
+        // Удаление
         webClient.delete()
                 .uri("/repairmen/{id}", id)
                 .exchange()
                 .expectStatus().isOk();
 
-        // Verify deletion
+        // Проверка удаления
         webClient.put()
                 .uri("/repairmen/{id}", id)
                 .bodyValue(updateRequest)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                });
     }
 
     @Test
     void testGetRepairmanById() {
-        // First create a repairman
+        // Сначала создаём ремонтника
         RepairmanRequest createRequest = new RepairmanRequest();
         createRequest.setName("John Doe");
         createRequest.setPosition("Senior Technician");
@@ -276,7 +327,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
         assertNotNull(created);
         Long id = created.getId();
 
-        // Get by ID
+        // Получение по ID
         webClient.get()
                 .uri("/repairmen/{id}", id)
                 .exchange()
@@ -296,12 +347,21 @@ class RepairmenApiControllerTest extends BaseDbTest {
         webClient.get()
                 .uri("/repairmen/{id}", 999L)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorObject.class)
+                .consumeWith(result -> {
+                    ErrorObject error = result.getResponseBody();
+                    assertNotNull(error);
+                    assertEquals(404, error.getCode());
+                    assertEquals("repairman.absent.error", error.getMessage());
+                    assertNotNull(error.getHumanMessage());
+                    assertTrue(error.getHumanMessage().contains("Ремонтник с id=\"999\" не найден"));
+                });
     }
 
     @Test
     void testGetRepairmen() {
-        // Get initial count (with large page size to get all)
+        // Получаем начальное количество (с большим размером страницы, чтобы получить все)
         int initialCount = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/repairmen")
@@ -315,7 +375,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .getResponseBody()
                 .size();
 
-        // Create multiple repairmen
+        // Создаём несколько ремонтников
         for (int i = 0; i < 5; i++) {
             RepairmanRequest request = new RepairmanRequest();
             request.setName("Repairman " + i);
@@ -328,7 +388,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
                     .expectStatus().isOk();
         }
 
-        // Get all repairmen (with large page size to get all)
+        // Получаем всех ремонтников (с большим размером страницы, чтобы получить все)
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/repairmen")
@@ -346,7 +406,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
 
     @Test
     void testGetRepairmenWithPaging() {
-        // Create multiple repairmen
+        // Создаём несколько ремонтников
         for (int i = 0; i < 10; i++) {
             RepairmanRequest request = new RepairmanRequest();
             request.setName("Repairman " + i);
@@ -359,7 +419,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
                     .expectStatus().isOk();
         }
 
-        // Get first page (page=0, size=3)
+        // Получаем первую страницу (page=0, size=3)
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/repairmen")
@@ -374,7 +434,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
                     assertEquals(3, result.getResponseBody().size());
                 });
 
-        // Get second page (page=1, size=3)
+        // Получаем вторую страницу (page=1, size=3)
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/repairmen")
@@ -392,8 +452,8 @@ class RepairmenApiControllerTest extends BaseDbTest {
 
     @Test
     void testGetRepairmenEmpty() {
-        // Get all repairmen - should return empty list or existing items
-        // Note: Database may contain data from other tests due to refresh timing
+        // Получаем всех ремонтников - должен вернуть пустой список или существующие элементы
+        // Примечание: База данных может содержать данные из других тестов из-за времени обновления
         webClient.get()
                 .uri("/repairmen")
                 .exchange()
@@ -401,14 +461,14 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .expectBodyList(RepairmanDto.class)
                 .consumeWith(result -> {
                     assertNotNull(result.getResponseBody());
-                    // Just verify the endpoint works and returns a list
-                    // Exact count depends on database state
+                    // Просто проверяем, что эндпоинт работает и возвращает список
+                    // Точное количество зависит от состояния базы данных
                 });
     }
 
     @Test
     void testGetRepairmenSortedById() {
-        // Get initial count (with large page size to get all)
+        // Получаем начальное количество (с большим размером страницы, чтобы получить все)
         int initialCount = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/repairmen")
@@ -422,7 +482,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .getResponseBody()
                 .size();
 
-        // Create multiple repairmen
+        // Создаём несколько ремонтников
         for (int i = 0; i < 5; i++) {
             RepairmanRequest request = new RepairmanRequest();
             request.setName("Repairman " + i);
@@ -435,7 +495,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
                     .expectStatus().isOk();
         }
 
-        // Get all repairmen and verify they are sorted by ID (with large page size to get all)
+        // Получаем всех ремонтников и проверяем, что они отсортированы по ID (с большим размером страницы, чтобы получить все)
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/repairmen")
@@ -450,7 +510,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
                     assertNotNull(repairmen);
                     assertEquals(initialCount + 5, repairmen.size());
 
-                    // Verify sorting by ID (ascending)
+                    // Проверяем сортировку по ID (по возрастанию)
                     for (int i = 1; i < repairmen.size(); i++) {
                         assertTrue(repairmen.get(i).getId() >= repairmen.get(i - 1).getId(),
                                 "Repairmen should be sorted by ID in ascending order");

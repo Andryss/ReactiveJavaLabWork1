@@ -45,7 +45,7 @@ function populateStatusDropdown(currentStatus) {
     allowedStatuses.forEach(status => {
         const option = document.createElement('option');
         option.value = status;
-        option.textContent = status;
+        option.textContent = translateMaintenanceStatus(status);
         statusSelect.appendChild(option);
     });
     
@@ -64,6 +64,14 @@ function populateStatusDropdown(currentStatus) {
 async function loadRequests() {
     try {
         const response = await fetch(`${API_BASE}/maintenance-requests?page=${requestsTablePage}&size=${requestsTablePageSize}`);
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            document.getElementById('requestsTableBody').innerHTML = 
+                `<tr><td colspan="7" class="text-center text-danger">Ошибка загрузки заявок: ${errorMessage}</td></tr>`;
+            return;
+        }
+        
         const data = await response.json();
         requestsTableTotalItems = data.length;
         
@@ -77,25 +85,25 @@ async function loadRequests() {
                               onmouseenter="showSpaceshipTooltip(${req.spaceshipSerial})" 
                               onmouseleave="hideSpaceshipTooltip()"
                               onclick="hideSpaceshipTooltip(); viewSpaceship(${req.spaceshipSerial})" 
-                              title="Hover or click to view details">
+                              title="Наведите курсор или нажмите для просмотра деталей">
                             ${req.spaceshipSerial}
                         </span>
                     ` : '-'}
                 </td>
                 <td>${req.comment || '-'}</td>
-                <td><span class="badge bg-info">${req.status || 'NEW'}</span></td>
+                <td><span class="badge bg-info">${translateMaintenanceStatus(req.status || 'NEW')}</span></td>
                 <td>
                     ${req.assignee ? `
                         <span class="text-primary" style="cursor: pointer; text-decoration: underline;" 
                               onmouseenter="showRepairmanTooltip(${req.assignee})" 
                               onmouseleave="hideRepairmanTooltip()"
                               onclick="hideRepairmanTooltip(); viewRepairman(${req.assignee})" 
-                              title="Hover or click to view details">
+                              title="Наведите курсор или нажмите для просмотра деталей">
                             ${req.assignee}
                         </span>
                     ` : '-'}
                 </td>
-                <td>${req.createdAt ? new Date(req.createdAt).toLocaleString() : '-'}</td>
+                <td>${req.createdAt ? new Date(req.createdAt).toLocaleString('ru-RU') : '-'}</td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="editRequest(${req.id})">
                         <i class="bi bi-pencil"></i>
@@ -111,7 +119,7 @@ async function loadRequests() {
         updateRequestsTablePaginationButtons();
     } catch (error) {
         document.getElementById('requestsTableBody').innerHTML = 
-            '<tr><td colspan="7" class="text-center text-danger">Error loading requests</td></tr>';
+            '<tr><td colspan="7" class="text-center text-danger">Ошибка загрузки заявок</td></tr>';
     }
 }
 
@@ -120,7 +128,7 @@ async function loadRequests() {
  * @param {number|null} id - Request ID (null for create)
  */
 async function showRequestModal(id = null) {
-    document.getElementById('requestModalTitle').textContent = id ? 'Edit Request' : 'Add Request';
+    document.getElementById('requestModalTitle').textContent = id ? 'Редактировать заявку' : 'Добавить заявку';
     document.getElementById('requestId').value = id || '';
     
     // Show/hide status field based on create/edit mode
@@ -133,8 +141,8 @@ async function showRequestModal(id = null) {
     }
     
     // Reset dropdowns
-    document.getElementById('spaceshipSelectedText').textContent = 'Select spaceship...';
-    document.getElementById('assigneeSelectedText').textContent = 'Select repairman...';
+    document.getElementById('spaceshipSelectedText').textContent = 'Выберите корабль...';
+    document.getElementById('assigneeSelectedText').textContent = 'Выберите ремонтника...';
     spaceshipPage = 0;
     assigneePage = 0;
     
@@ -143,16 +151,31 @@ async function showRequestModal(id = null) {
     
     if (id) {
         fetch(`${API_BASE}/maintenance-requests/${id}`)
-            .then(r => r.json())
+            .then(async r => {
+                if (!r.ok) {
+                    const errorMessage = await extractErrorMessage(r);
+                    throw new Error(errorMessage);
+                }
+                return r.json();
+            })
             .then(data => {
                 document.getElementById('requestSpaceshipSerial').value = data.spaceshipSerial || '';
                 if (data.spaceshipSerial) {
                     // Find and display the selected spaceship
                     fetch(`${API_BASE}/spaceships/${data.spaceshipSerial}`)
-                        .then(r => r.json())
+                        .then(async r => {
+                            if (!r.ok) {
+                                const errorMessage = await extractErrorMessage(r);
+                                throw new Error(errorMessage);
+                            }
+                            return r.json();
+                        })
                         .then(ship => {
                             document.getElementById('spaceshipSelectedText').textContent = 
-                                `${ship.serial} - ${ship.name || 'Unnamed'}`;
+                                `${ship.serial} - ${ship.name || 'Без названия'}`;
+                        })
+                        .catch(error => {
+                            console.error('Ошибка загрузки данных корабля:', error);
                         });
                 }
                 document.getElementById('requestComment').value = data.comment || '';
@@ -160,15 +183,27 @@ async function showRequestModal(id = null) {
                 if (data.assignee) {
                     // Find and display the selected repairman
                     fetch(`${API_BASE}/repairmen/${data.assignee}`)
-                        .then(r => r.json())
+                        .then(async r => {
+                            if (!r.ok) {
+                                const errorMessage = await extractErrorMessage(r);
+                                throw new Error(errorMessage);
+                            }
+                            return r.json();
+                        })
                         .then(repairman => {
                             document.getElementById('assigneeSelectedText').textContent = 
                                 `${repairman.id} - ${repairman.name}`;
+                        })
+                        .catch(error => {
+                            console.error('Ошибка загрузки данных ремонтника:', error);
                         });
                 }
                 const currentStatus = data.status || 'NEW';
                 // Populate status dropdown with only allowed transitions
                 populateStatusDropdown(currentStatus);
+            })
+            .catch(error => {
+                alert('Ошибка загрузки данных заявки: ' + (error.message || error));
             });
     } else {
         document.getElementById('requestForm').reset();
@@ -212,14 +247,15 @@ async function saveRequest() {
         });
         
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || `HTTP ${response.status}: ${response.statusText}`);
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка сохранения заявки: ' + errorMessage);
+            return;
         }
         
         bootstrap.Modal.getInstance(document.getElementById('requestModal')).hide();
         loadRequests();
     } catch (error) {
-        alert('Error saving request: ' + error.message);
+        alert('Ошибка сохранения заявки: ' + (error.message || error));
     }
 }
 
@@ -228,12 +264,19 @@ async function saveRequest() {
  * @param {number} id - Request ID
  */
 async function deleteRequest(id) {
-    if (!confirm('Are you sure you want to delete this request?')) return;
+    if (!confirm('Вы уверены, что хотите удалить эту заявку?')) return;
     try {
-        await fetch(`${API_BASE}/maintenance-requests/${id}`, { method: 'DELETE' });
+        const response = await fetch(`${API_BASE}/maintenance-requests/${id}`, { method: 'DELETE' });
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка удаления заявки: ' + errorMessage);
+            return;
+        }
+        
         loadRequests();
     } catch (error) {
-        alert('Error deleting request: ' + error);
+        alert('Ошибка удаления заявки: ' + (error.message || error));
     }
 }
 

@@ -9,7 +9,7 @@ import ru.itmo.spaceships.model.Dimensions;
 import ru.itmo.spaceships.service.ObjectMapperWrapper;
 
 /**
- * Converter for reading Dimensions from JSONB.
+ * Конвертер для чтения Dimensions из JSONB.
  */
 @ReadingConverter
 @RequiredArgsConstructor

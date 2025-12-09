@@ -9,7 +9,7 @@ import ru.itmo.spaceships.model.Engine;
 import ru.itmo.spaceships.service.ObjectMapperWrapper;
 
 /**
- * Converter for writing Engine to JSONB.
+ * Конвертер для записи Engine в JSONB.
  */
 @WritingConverter
 @RequiredArgsConstructor

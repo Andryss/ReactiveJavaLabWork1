@@ -13,7 +13,7 @@ import ru.itmo.spaceships.generated.model.SpaceShipRequest;
 import ru.itmo.spaceships.service.SpaceShipService;
 
 /**
- * Controller for spaceships API endpoints.
+ * Контроллер для API эндпоинтов кораблей.
  */
 @Slf4j
 @RestController

@@ -133,14 +133,15 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                 .uri("/spaceships")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is5xxServerError() // Может быть 500 из-за ошибки конвертации, но должен быть ErrorObject
+                .expectStatus().isBadRequest() // Теперь правильно обрабатывается как 400
                 .expectBody(ErrorObject.class)
                 .consumeWith(result -> {
                     ErrorObject error = result.getResponseBody();
                     assertNotNull(error);
-                    // Проверяем формат ErrorObject
-                    assertTrue(error.getCode() >= 400 && error.getCode() < 600);
-                    assertNotNull(error.getMessage());
+                    assertEquals(400, error.getCode());
+                    // Может быть либо spaceship.serial.required.error (наша ошибка), либо validation.error (Spring)
+                    assertTrue("spaceship.serial.required.error".equals(error.getMessage()) ||
+                               "validation.error".equals(error.getMessage()));
                     assertNotNull(error.getHumanMessage());
                 });
     }

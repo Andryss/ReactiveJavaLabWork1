@@ -82,5 +82,51 @@ public class Errors {
         return new BaseException(400, "maintenance.request.status.transition.error",
                 String.format("Переход статуса из \"%s\" в \"%s\" не разрешён", currentStatus, newStatus));
     }
+
+    /**
+     * Ошибка валидации (общая).
+     */
+    public static BaseException validationError(String message) {
+        return new BaseException(400, "validation.error", message != null ? message : "Ошибка валидации");
+    }
+
+    /**
+     * Ошибка: невалидный JSON в теле запроса.
+     */
+    public static BaseException invalidJsonError() {
+        return new BaseException(400, "invalid.json.error", "Невалидный JSON в теле запроса");
+    }
+
+    /**
+     * Ошибка: невалидное тело запроса.
+     */
+    public static BaseException invalidRequestBodyError(String message) {
+        return new BaseException(400, "invalid.request.body.error",
+                message != null ? message : "Невалидное тело запроса");
+    }
+
+    /**
+     * Ошибка: неверный тип параметра.
+     */
+    public static BaseException invalidParameterTypeError(String parameterName, String expectedType) {
+        return new BaseException(400, "invalid.parameter.type.error",
+                String.format("Неверный тип параметра '%s': ожидается %s", parameterName, expectedType));
+    }
+
+    /**
+     * Ошибка: ошибка обработки входных данных.
+     */
+    public static BaseException invalidInputError(String message) {
+        return new BaseException(400, "invalid.input.error",
+                message != null ? message : "Ошибка обработки входных данных");
+    }
+
+    /**
+     * Ошибка: статусный ответ Spring.
+     */
+    public static BaseException responseStatusError(int code, String message) {
+        return new BaseException(code, "response.status.error",
+                message != null ? message : "Ошибка обработки запроса");
+    }
 }
 

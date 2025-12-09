@@ -267,13 +267,17 @@
                                         <th>Name</th>
                                         <th>Manufacturer</th>
                                         <th>Type</th>
+                                        <th>Manufacture Date</th>
                                         <th>Max Speed</th>
+                                        <th>Dimensions</th>
+                                        <th>Engine</th>
+                                        <th>Crew</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="spaceshipsTableBody">
                                     <tr>
-                                        <td colspan="6" class="text-center">Loading...</td>
+                                        <td colspan="10" class="text-center">Loading...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -455,7 +459,7 @@
                                 <label class="form-label">Volume (cubic meters)</label>
                                 <input type="number" step="0.01" class="form-control" id="dimensionsVolume" value="0">
                             </div>
-                        </div>
+</div>
 
                         <hr class="my-4">
                         <h6 class="mb-3 text-primary">Engine</h6>
@@ -549,17 +553,55 @@
                         <input type="hidden" id="requestId">
                         <div class="mb-3">
                             <label class="form-label">Spaceship Serial *</label>
-                            <input type="number" class="form-control" id="requestSpaceshipSerial" required>
+                            <input type="hidden" id="requestSpaceshipSerial" required>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary form-control text-start" type="button" id="spaceshipDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="spaceshipSelectedText">Select spaceship...</span>
+                                </button>
+                                <div class="dropdown-menu w-100 p-0" id="spaceshipDropdownContainer">
+                                    <ul class="list-unstyled mb-0" id="spaceshipDropdownMenu" style="max-height: 300px; overflow-y: auto;">
+                                        <li><div class="px-3 py-2 text-muted">Loading...</div></li>
+                                    </ul>
+                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="spaceshipPagination" style="display: none;">
+                                        <button class="btn btn-sm btn-outline-secondary" id="spaceshipPrevBtn" onclick="navigateSpaceshipPage(-1)" disabled>
+                                            <i class="bi bi-chevron-left"></i> Previous
+                                        </button>
+                                        <span class="small" id="spaceshipPageInfo">Page 1</span>
+                                        <button class="btn btn-sm btn-outline-secondary" id="spaceshipNextBtn" onclick="navigateSpaceshipPage(1)" disabled>
+                                            Next <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Comment *</label>
                             <textarea class="form-control" id="requestComment" rows="3" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Assignee (Repairman ID)</label>
-                            <input type="number" class="form-control" id="requestAssignee">
+                            <label class="form-label">Assignee</label>
+                            <input type="hidden" id="requestAssignee">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary form-control text-start" type="button" id="assigneeDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="assigneeSelectedText">Select repairman...</span>
+                                </button>
+                                <div class="dropdown-menu w-100 p-0" id="assigneeDropdownContainer">
+                                    <ul class="list-unstyled mb-0" id="assigneeDropdownMenu" style="max-height: 300px; overflow-y: auto;">
+                                        <li><div class="px-3 py-2 text-muted">Loading...</div></li>
+                                    </ul>
+                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="assigneePagination" style="display: none;">
+                                        <button class="btn btn-sm btn-outline-secondary" id="assigneePrevBtn" onclick="navigateAssigneePage(-1)" disabled>
+                                            <i class="bi bi-chevron-left"></i> Previous
+                                        </button>
+                                        <span class="small" id="assigneePageInfo">Page 1</span>
+                                        <button class="btn btn-sm btn-outline-secondary" id="assigneeNextBtn" onclick="navigateAssigneePage(1)" disabled>
+                                            Next <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3" id="requestStatusContainer" style="display: none;">
                             <label class="form-label">Status</label>
                             <select class="form-select" id="requestStatus">
                                 <option value="NEW">NEW</option>
@@ -581,8 +623,8 @@
                     <button type="button" class="btn btn-primary" onclick="saveRequest()">Save</button>
                 </div>
             </div>
-        </div>
     </div>
+</div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -602,9 +644,9 @@
                 statusDot.className = 'status-dot offline';
                 statusText.textContent = 'Offline';
             }
-        }
-        
-        function startPingStream() {
+    }
+
+    function startPingStream() {
             const evtSource = new EventSource(`${API_BASE}/pinger`);
             evtSource.onmessage = () => setStatus(true);
             evtSource.onerror = () => setStatus(false);
@@ -624,13 +666,26 @@
                 const response = await fetch(`${API_BASE}/spaceships?page=${page}&size=${size}`);
                 const data = await response.json();
                 const tbody = document.getElementById('spaceshipsTableBody');
-                tbody.innerHTML = data.map(ship => `
+                tbody.innerHTML = data.map(ship => {
+                    const dimensions = ship.dimensions ? 
+                        `${ship.dimensions.length || 0}m × ${ship.dimensions.width || 0}m × ${ship.dimensions.height || 0}m` : '-';
+                    const engine = ship.engine ? 
+                        `${ship.engine.model || 'N/A'} (${ship.engine.fuelType || 'N/A'})` : '-';
+                    const crewCount = ship.crew && ship.crew.length > 0 ? ship.crew.length : 0;
+                    const manufactureDate = ship.manufactureDate ? 
+                        new Date(ship.manufactureDate).toLocaleDateString() : '-';
+                    
+                    return `
                     <tr>
                         <td>${ship.serial}</td>
                         <td>${ship.name || '-'}</td>
                         <td>${ship.manufacturer || '-'}</td>
                         <td><span class="badge bg-primary">${ship.type || '-'}</span></td>
+                        <td>${manufactureDate}</td>
                         <td>${ship.maxSpeed || 0}</td>
+                        <td><small>${dimensions}</small></td>
+                        <td><small>${engine}</small></td>
+                        <td>${crewCount} member${crewCount !== 1 ? 's' : ''}</td>
                         <td>
                             <button class="btn btn-sm btn-primary" onclick="editSpaceship(${ship.serial})">
                                 <i class="bi bi-pencil"></i>
@@ -640,10 +695,11 @@
                             </button>
                         </td>
                     </tr>
-                `).join('');
+                    `;
+                }).join('');
             } catch (error) {
                 document.getElementById('spaceshipsTableBody').innerHTML = 
-                    '<tr><td colspan="6" class="text-center text-danger">Error loading spaceships</td></tr>';
+                    '<tr><td colspan="10" class="text-center text-danger">Error loading spaceships</td></tr>';
             }
         }
         
@@ -976,16 +1032,213 @@
             }
         }
         
-        function showRequestModal(id = null) {
+        // Pagination state for dropdowns
+        let spaceshipPage = 0;
+        let spaceshipPageSize = 10;
+        let spaceshipTotalItems = 0;
+        let allSpaceships = [];
+        
+        let assigneePage = 0;
+        let assigneePageSize = 10;
+        let assigneeTotalItems = 0;
+        let allRepairmen = [];
+        
+        async function loadSpaceshipsForDropdown(page = 0) {
+            try {
+                const response = await fetch(`${API_BASE}/spaceships?page=${page}&size=${spaceshipPageSize}`);
+                const data = await response.json();
+                spaceshipPage = page;
+                allSpaceships = data;
+                spaceshipTotalItems = data.length;
+                
+                const menu = document.getElementById('spaceshipDropdownMenu');
+                menu.innerHTML = '';
+                
+                if (data.length === 0) {
+                    menu.innerHTML = '<li><div class="px-3 py-2 text-muted">No spaceships found</div></li>';
+                    document.getElementById('spaceshipPagination').style.display = 'none';
+                    return;
+                }
+                
+                data.forEach(ship => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.className = 'dropdown-item';
+                    a.href = '#';
+                    a.textContent = `${ship.serial} - ${ship.name || 'Unnamed'} (${ship.manufacturer || 'Unknown'})`;
+                    a.onclick = (e) => {
+                        e.preventDefault();
+                        document.getElementById('requestSpaceshipSerial').value = ship.serial;
+                        document.getElementById('spaceshipSelectedText').textContent = `${ship.serial} - ${ship.name || 'Unnamed'}`;
+                        bootstrap.Dropdown.getInstance(document.getElementById('spaceshipDropdownBtn'))?.hide();
+                    };
+                    li.appendChild(a);
+                    menu.appendChild(li);
+                });
+                
+                // Show pagination if we have items
+                const pagination = document.getElementById('spaceshipPagination');
+                if (data.length > 0) {
+                    pagination.style.display = 'flex';
+                    updateSpaceshipPaginationButtons();
+                } else {
+                    pagination.style.display = 'none';
+                }
+                
+                // Update dropdown button text if item is already selected
+                const selectedSerial = document.getElementById('requestSpaceshipSerial').value;
+                if (selectedSerial) {
+                    const selectedShip = data.find(s => s.serial == selectedSerial);
+                    if (selectedShip) {
+                        document.getElementById('spaceshipSelectedText').textContent = 
+                            `${selectedShip.serial} - ${selectedShip.name || 'Unnamed'}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading spaceships:', error);
+                document.getElementById('spaceshipDropdownMenu').innerHTML = 
+                    '<li><div class="px-3 py-2 text-danger">Error loading spaceships</div></li>';
+            }
+        }
+        
+        function updateSpaceshipPaginationButtons() {
+            const prevBtn = document.getElementById('spaceshipPrevBtn');
+            const nextBtn = document.getElementById('spaceshipNextBtn');
+            const pageInfo = document.getElementById('spaceshipPageInfo');
+            
+            prevBtn.disabled = spaceshipPage === 0;
+            nextBtn.disabled = spaceshipTotalItems < spaceshipPageSize;
+            pageInfo.textContent = `Page ${spaceshipPage + 1}`;
+        }
+        
+        function navigateSpaceshipPage(direction) {
+            const newPage = spaceshipPage + direction;
+            if (newPage >= 0) {
+                loadSpaceshipsForDropdown(newPage);
+            }
+        }
+        
+        async function loadRepairmenForDropdown(page = 0) {
+            try {
+                const response = await fetch(`${API_BASE}/repairmen?page=${page}&size=${assigneePageSize}`);
+                const data = await response.json();
+                assigneePage = page;
+                allRepairmen = data;
+                assigneeTotalItems = data.length;
+                
+                const menu = document.getElementById('assigneeDropdownMenu');
+                menu.innerHTML = '';
+                
+                if (data.length === 0) {
+                    menu.innerHTML = '<li><div class="px-3 py-2 text-muted">No repairmen found</div></li>';
+                    document.getElementById('assigneePagination').style.display = 'none';
+                    return;
+                }
+                
+                data.forEach(repairman => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.className = 'dropdown-item';
+                    a.href = '#';
+                    a.textContent = `${repairman.id} - ${repairman.name} (${repairman.position})`;
+                    a.onclick = (e) => {
+                        e.preventDefault();
+                        document.getElementById('requestAssignee').value = repairman.id;
+                        document.getElementById('assigneeSelectedText').textContent = `${repairman.id} - ${repairman.name}`;
+                        bootstrap.Dropdown.getInstance(document.getElementById('assigneeDropdownBtn'))?.hide();
+                    };
+                    li.appendChild(a);
+                    menu.appendChild(li);
+                });
+                
+                // Show pagination if we have items
+                const pagination = document.getElementById('assigneePagination');
+                if (data.length > 0) {
+                    pagination.style.display = 'flex';
+                    updateAssigneePaginationButtons();
+                } else {
+                    pagination.style.display = 'none';
+                }
+                
+                // Update dropdown button text if item is already selected
+                const selectedAssignee = document.getElementById('requestAssignee').value;
+                if (selectedAssignee) {
+                    const selectedRepairman = data.find(r => r.id == selectedAssignee);
+                    if (selectedRepairman) {
+                        document.getElementById('assigneeSelectedText').textContent = 
+                            `${selectedRepairman.id} - ${selectedRepairman.name}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading repairmen:', error);
+                document.getElementById('assigneeDropdownMenu').innerHTML = 
+                    '<li><div class="px-3 py-2 text-danger">Error loading repairmen</div></li>';
+            }
+        }
+        
+        function updateAssigneePaginationButtons() {
+            const prevBtn = document.getElementById('assigneePrevBtn');
+            const nextBtn = document.getElementById('assigneeNextBtn');
+            const pageInfo = document.getElementById('assigneePageInfo');
+            
+            prevBtn.disabled = assigneePage === 0;
+            nextBtn.disabled = assigneeTotalItems < assigneePageSize;
+            pageInfo.textContent = `Page ${assigneePage + 1}`;
+        }
+        
+        function navigateAssigneePage(direction) {
+            const newPage = assigneePage + direction;
+            if (newPage >= 0) {
+                loadRepairmenForDropdown(newPage);
+            }
+        }
+        
+        async function showRequestModal(id = null) {
             document.getElementById('requestModalTitle').textContent = id ? 'Edit Request' : 'Add Request';
             document.getElementById('requestId').value = id || '';
+            
+            // Show/hide status field based on create/edit mode
+            const statusContainer = document.getElementById('requestStatusContainer');
+            if (id) {
+                statusContainer.style.display = 'block';
+            } else {
+                statusContainer.style.display = 'none';
+            }
+            
+            // Reset dropdowns
+            document.getElementById('spaceshipSelectedText').textContent = 'Select spaceship...';
+            document.getElementById('assigneeSelectedText').textContent = 'Select repairman...';
+            spaceshipPage = 0;
+            assigneePage = 0;
+            
+            // Load first page of dropdowns
+            await Promise.all([loadSpaceshipsForDropdown(0), loadRepairmenForDropdown(0)]);
+            
             if (id) {
                 fetch(`${API_BASE}/maintenance-requests/${id}`)
                     .then(r => r.json())
                     .then(data => {
                         document.getElementById('requestSpaceshipSerial').value = data.spaceshipSerial || '';
+                        if (data.spaceshipSerial) {
+                            // Find and display the selected spaceship
+                            fetch(`${API_BASE}/spaceships/${data.spaceshipSerial}`)
+                                .then(r => r.json())
+                                .then(ship => {
+                                    document.getElementById('spaceshipSelectedText').textContent = 
+                                        `${ship.serial} - ${ship.name || 'Unnamed'}`;
+                                });
+                        }
                         document.getElementById('requestComment').value = data.comment || '';
                         document.getElementById('requestAssignee').value = data.assignee || '';
+                        if (data.assignee) {
+                            // Find and display the selected repairman
+                            fetch(`${API_BASE}/repairmen/${data.assignee}`)
+                                .then(r => r.json())
+                                .then(repairman => {
+                                    document.getElementById('assigneeSelectedText').textContent = 
+                                        `${repairman.id} - ${repairman.name}`;
+                                });
+                        }
                         document.getElementById('requestStatus').value = data.status || 'NEW';
                     });
             } else {
@@ -997,8 +1250,9 @@
         
         async function saveRequest() {
             const id = document.getElementById('requestId').value;
+            const spaceshipSerial = document.getElementById('requestSpaceshipSerial').value;
             const data = {
-                spaceshipSerial: parseInt(document.getElementById('requestSpaceshipSerial').value),
+                spaceshipSerial: parseInt(spaceshipSerial),
                 comment: document.getElementById('requestComment').value
             };
             
@@ -1006,22 +1260,34 @@
                 // On update, include all fields except createdAt/updatedAt
                 const assignee = document.getElementById('requestAssignee').value;
                 if (assignee) data.assignee = parseInt(assignee);
+                // Status is only included when updating
                 data.status = document.getElementById('requestStatus').value;
+            } else {
+                // On create, status is ignored (always set to NEW by backend)
+                // Also allow assignee to be set
+                const assignee = document.getElementById('requestAssignee').value;
+                if (assignee) data.assignee = parseInt(assignee);
             }
             
             const url = id ? `${API_BASE}/maintenance-requests/${id}` : `${API_BASE}/maintenance-requests`;
             const method = id ? 'PUT' : 'POST';
             
             try {
-                await fetch(url, {
+                const response = await fetch(url, {
                     method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || `HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 bootstrap.Modal.getInstance(document.getElementById('requestModal')).hide();
                 loadRequests();
             } catch (error) {
-                alert('Error saving request: ' + error);
+                alert('Error saving request: ' + error.message);
             }
         }
         

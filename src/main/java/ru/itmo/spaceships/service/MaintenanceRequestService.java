@@ -48,6 +48,7 @@ public class MaintenanceRequestService {
     /**
      * Update an existing maintenance request.
      * All fields can be updated except createdAt and updatedAt (system fields).
+     * Status transitions are validated according to business rules.
      *
      * @param id maintenance request id
      * @param request request to update maintenance request
@@ -57,6 +58,23 @@ public class MaintenanceRequestService {
         return maintenanceRequestRepository.findById(id)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Maintenance request not found with id: " + id)))
                 .flatMap(entity -> {
+                    // If status is being changed, validate the transition
+                    if (request.getStatus() != null) {
+                        MaintenanceStatus newStatus = MaintenanceStatus.valueOf(request.getStatus().name());
+                        MaintenanceStatus currentStatus = entity.getStatus();
+                        
+                        if (currentStatus != newStatus) {
+                            // Validate status transition
+                            try {
+                                currentStatus.validateTransition(newStatus);
+                            } catch (IllegalArgumentException e) {
+                                return Mono.error(e);
+                            }
+                            entity.setStatus(newStatus);
+                        }
+                    }
+                    
+                    // Update other fields
                     if (request.getSpaceshipSerial() != null) {
                         entity.setSpaceshipSerial(request.getSpaceshipSerial());
                     }
@@ -66,9 +84,7 @@ public class MaintenanceRequestService {
                     if (request.getAssignee() != null) {
                         entity.setAssignee(request.getAssignee());
                     }
-                    if (request.getStatus() != null) {
-                        entity.setStatus(MaintenanceStatus.valueOf(request.getStatus().name()));
-                    }
+                    
                     // Update updatedAt timestamp
                     entity.setUpdatedAt(Instant.now());
                     // createdAt and updatedAt are system fields, not updated from request

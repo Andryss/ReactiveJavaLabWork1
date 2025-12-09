@@ -165,10 +165,10 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
         var originalCreatedAt = created.getCreatedAt();
         var originalUpdatedAt = created.getUpdatedAt();
 
-        // Update with all fields
+        // Update with all fields (use valid status transition: NEW -> ACCEPTED)
         MaintenanceRequestRequest updateRequest = new MaintenanceRequestRequest();
         updateRequest.setComment("Updated comment");
-        updateRequest.setStatus(MaintenanceStatus.IN_REPAIR);
+        updateRequest.setStatus(MaintenanceStatus.ACCEPTED);
 
         // Wait a bit to ensure updatedAt changes
         try {

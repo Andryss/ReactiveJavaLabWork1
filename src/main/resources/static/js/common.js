@@ -5,6 +5,18 @@
 // API base URL
 const API_BASE = 'http://localhost:8080';
 
+/**
+ * Округляет число до 3 знаков после запятой
+ * @param {number} num - Число для округления
+ * @returns {number} Округлённое число
+ */
+function roundTo3Decimals(num) {
+    if (num === null || num === undefined || isNaN(num)) {
+        return 0;
+    }
+    return Math.round(num * 1000) / 1000;
+}
+
 // Server Status Monitor
 const statusDot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');

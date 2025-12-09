@@ -67,10 +67,10 @@ async function viewSpaceship(serial) {
         
         const dimensions = ship.dimensions ? 
             `${ship.dimensions.length || 0}м × ${ship.dimensions.width || 0}м × ${ship.dimensions.height || 0}м, ` +
-            `Вес: ${ship.dimensions.weight || 0} тонн, Объём: ${ship.dimensions.volume || 0} м³` : 'Не указано';
+            `Вес: ${roundTo3Decimals(ship.dimensions.weight || 0)} тонн, Объём: ${roundTo3Decimals(ship.dimensions.volume || 0)} м³` : 'Не указано';
         const engine = ship.engine ? 
             `Модель: ${ship.engine.model || 'Н/Д'}, Тяга: ${ship.engine.thrust || 0} кН, ` +
-            `Тип топлива: ${translateFuelType(ship.engine.fuelType || '') || 'Н/Д'}, Расход: ${ship.engine.fuelConsumption || 0} в час` : 'Не указано';
+            `Тип топлива: ${translateFuelType(ship.engine.fuelType || '') || 'Н/Д'}, Расход: ${roundTo3Decimals(ship.engine.fuelConsumption || 0)} в час` : 'Не указано';
         const manufactureDate = ship.manufactureDate ? 
             new Date(ship.manufactureDate).toLocaleString('ru-RU') : 'Не указано';
         

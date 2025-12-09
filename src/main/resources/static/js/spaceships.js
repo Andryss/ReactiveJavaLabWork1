@@ -140,8 +140,8 @@ function showSpaceshipModal(serial = null) {
                     document.getElementById('dimensionsLength').value = data.dimensions.length || 0;
                     document.getElementById('dimensionsWidth').value = data.dimensions.width || 0;
                     document.getElementById('dimensionsHeight').value = data.dimensions.height || 0;
-                    document.getElementById('dimensionsWeight').value = data.dimensions.weight || 0;
-                    document.getElementById('dimensionsVolume').value = data.dimensions.volume || 0;
+                    document.getElementById('dimensionsWeight').value = roundTo3Decimals(data.dimensions.weight || 0);
+                    document.getElementById('dimensionsVolume').value = roundTo3Decimals(data.dimensions.volume || 0);
                 }
                 
                 // Populate engine
@@ -149,7 +149,7 @@ function showSpaceshipModal(serial = null) {
                     document.getElementById('engineModel').value = data.engine.model || '';
                     document.getElementById('engineThrust').value = data.engine.thrust || 0;
                     document.getElementById('engineFuelType').value = data.engine.fuelType || '';
-                    document.getElementById('engineFuelConsumption').value = data.engine.fuelConsumption || 0;
+                    document.getElementById('engineFuelConsumption').value = roundTo3Decimals(data.engine.fuelConsumption || 0);
                 }
                 
                 // Populate crew

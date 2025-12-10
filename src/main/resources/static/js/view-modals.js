@@ -6,6 +6,9 @@
 let spaceshipHoverTimer = null;
 let repairmanHoverTimer = null;
 
+// Track currently viewed repairman ID
+let viewedRepairmanId = null;
+
 /**
  * Show spaceship tooltip on hover (with delay)
  * @param {number} serial - Spaceship serial
@@ -163,6 +166,8 @@ async function viewRepairman(id) {
         
         const repairman = await response.json();
         
+        viewedRepairmanId = repairman.id; // Track currently viewed repairman
+        
         document.getElementById('repairmanViewContent').innerHTML = `
             <div class="mb-3">
                 <strong>ID:</strong> ${repairman.id}
@@ -177,6 +182,12 @@ async function viewRepairman(id) {
         
         const modal = new bootstrap.Modal(document.getElementById('repairmanViewModal'));
         modal.show();
+        
+        // Clear tracked ID when modal is hidden
+        const viewModalElement = document.getElementById('repairmanViewModal');
+        viewModalElement.addEventListener('hidden.bs.modal', () => {
+            viewedRepairmanId = null;
+        }, { once: true });
         
         // Clear hover timer when modal is shown
         hideRepairmanTooltip();

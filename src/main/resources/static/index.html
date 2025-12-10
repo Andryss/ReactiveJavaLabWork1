@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress HtmlFormInputWithoutLabel -->
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -337,6 +338,20 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Warning about external update -->
+                    <div id="repairmanUpdateWarning" class="alert alert-warning" style="display: none;">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Внимание!</strong> Этот ремонтник был изменён другим пользователем. 
+                        Ваши несохранённые изменения могут быть перезаписаны.
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="ignoreRepairmanUpdate()">
+                                Игнорировать
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="updateRepairmanModalFromBackend()">
+                                Обновить данные
+                            </button>
+                        </div>
+                    </div>
                     <form id="repairmanForm">
                         <input type="hidden" id="repairmanId">
                         <div class="mb-3">

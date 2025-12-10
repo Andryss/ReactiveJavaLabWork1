@@ -64,17 +64,82 @@ function setStatus(online) {
     }
 }
 
+// Global EventSource instance for server status monitoring
+let pingEventSource = null;
+
 /**
- * Start server status monitoring via SSE
+ * Start server status monitoring via SSE (opens once and remains open during session)
  */
 function startPingStream() {
-    const evtSource = new EventSource(`${API_BASE}/pinger`);
-    evtSource.onmessage = () => setStatus(true);
-    evtSource.onerror = () => setStatus(false);
+    // Don't create a new connection if one already exists and is open
+    if (pingEventSource && pingEventSource.readyState !== EventSource.CLOSED) {
+        return;
+    }
+    
+    // Close existing connection if any (shouldn't happen, but just in case)
+    if (pingEventSource) {
+        pingEventSource.close();
+    }
+    
+    // Create new EventSource connection
+    pingEventSource = new EventSource(`${API_BASE}/pinger`);
+    pingEventSource.onmessage = () => setStatus(true);
+    pingEventSource.onerror = () => setStatus(false);
+    pingEventSource.onopen = () => {
+        console.log('Server status monitor connected');
+    };
+}
+
+// Global EventSource instance for repairman updates stream
+let repairmanUpdatesEventSource = null;
+
+/**
+ * Start repairman updates stream via SSE (opens once and remains open during session)
+ */
+function startRepairmanUpdatesStream() {
+    // Don't create a new connection if one already exists and is open
+    if (repairmanUpdatesEventSource && repairmanUpdatesEventSource.readyState !== EventSource.CLOSED) {
+        return;
+    }
+    
+    // Close existing connection if any (shouldn't happen, but just in case)
+    if (repairmanUpdatesEventSource) {
+        repairmanUpdatesEventSource.close();
+    }
+    
+    // Create new EventSource connection
+    repairmanUpdatesEventSource = new EventSource(`${API_BASE}/repairmen/updates/stream`);
+    
+    repairmanUpdatesEventSource.onmessage = (event) => {
+        try {
+            // Parse the repairman update from SSE
+            // Spring WebFlux sends JSON objects directly in the data field
+            const data = event.data;
+            if (data && data.trim() !== '') {
+                const repairman = JSON.parse(data);
+                if (repairman && repairman.id) {
+                    handleRepairmanUpdate(repairman);
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing repairman update from stream:', error, event.data);
+        }
+    };
+    
+    repairmanUpdatesEventSource.onerror = () => {
+        // No reconnection - similar to ping stream
+    };
+    
+    repairmanUpdatesEventSource.onopen = () => {
+        console.log('Repairman updates stream connected');
+    };
 }
 
 // Initialize status monitor
 startPingStream();
+
+// Initialize repairman updates stream
+startRepairmanUpdatesStream();
 
 // Load data when tabs are shown
 document.getElementById('spaceships-tab').addEventListener('shown.bs.tab', () => {

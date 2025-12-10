@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import ru.itmo.spaceships.converter.SpaceShipConverter;
 import ru.itmo.spaceships.exception.Errors;
 import ru.itmo.spaceships.generated.model.SpaceShipRequest;
@@ -20,6 +21,7 @@ public class SpaceShipService {
 
     private final SpaceShipRepository spaceShipRepository;
     private final SpaceShipConverter spaceShipConverter;
+    private final Sinks.Many<SpaceShipEntity> spaceShipUpdateSink;
 
     /**
      * Создаёт новый корабль.
@@ -56,7 +58,8 @@ public class SpaceShipService {
                     updated.setId(entity.getId());
                     updated.setSerial(serial);
                     return spaceShipRepository.save(updated);
-                });
+                })
+                .doOnSuccess(spaceShipUpdateSink::tryEmitNext);
     }
 
     /**
@@ -97,6 +100,16 @@ public class SpaceShipService {
     public Mono<SpaceShipEntity> getSpaceshipBySerial(Long serial) {
         return spaceShipRepository.findBySerial(serial)
                 .switchIfEmpty(Mono.error(Errors.spaceshipNotFound(serial)));
+    }
+
+    /**
+     * Получает поток обновлений кораблей.
+     * Эмитит событие каждый раз, когда корабль успешно обновляется.
+     *
+     * @return поток сущностей кораблей
+     */
+    public Flux<SpaceShipEntity> getSpaceshipsUpdatesStream() {
+        return spaceShipUpdateSink.asFlux();
     }
 }
 

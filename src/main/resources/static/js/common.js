@@ -183,6 +183,54 @@ function startMaintenanceRequestUpdatesStream() {
     };
 }
 
+// Global EventSource instance for spaceship updates stream
+let spaceshipUpdatesEventSource = null;
+
+/**
+ * Start spaceship updates stream via SSE (opens once and remains open during session)
+ */
+function startSpaceshipUpdatesStream() {
+    // Don't create a new connection if one already exists and is open
+    if (spaceshipUpdatesEventSource && spaceshipUpdatesEventSource.readyState !== EventSource.CLOSED) {
+        return;
+    }
+    
+    // Close existing connection if any (shouldn't happen, but just in case)
+    if (spaceshipUpdatesEventSource) {
+        spaceshipUpdatesEventSource.close();
+    }
+    
+    // Create new EventSource connection
+    spaceshipUpdatesEventSource = new EventSource(`${API_BASE}/spaceships/updates/stream`);
+    
+    spaceshipUpdatesEventSource.onmessage = (event) => {
+        try {
+            // Parse the spaceship update from SSE
+            // Spring WebFlux sends JSON objects directly in the data field
+            const data = event.data;
+            if (data && data.trim() !== '') {
+                const spaceship = JSON.parse(data);
+                if (spaceship && spaceship.serial) {
+                    // Handle the update
+                    if (typeof handleSpaceshipUpdate === 'function') {
+                        handleSpaceshipUpdate(spaceship);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing spaceship update from stream:', error, event.data);
+        }
+    };
+    
+    spaceshipUpdatesEventSource.onerror = () => {
+        // No reconnection - similar to ping stream
+    };
+    
+    spaceshipUpdatesEventSource.onopen = () => {
+        console.log('Spaceship updates stream connected');
+    };
+}
+
 // Initialize status monitor
 startPingStream();
 
@@ -191,6 +239,9 @@ startRepairmanUpdatesStream();
 
 // Initialize maintenance request updates stream
 startMaintenanceRequestUpdatesStream();
+
+// Initialize spaceship updates stream
+startSpaceshipUpdatesStream();
 
 // Load data when tabs are shown
 document.getElementById('spaceships-tab').addEventListener('shown.bs.tab', () => {

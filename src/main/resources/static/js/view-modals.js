@@ -6,6 +6,9 @@
 let spaceshipHoverTimer = null;
 let repairmanHoverTimer = null;
 
+// Track currently viewed spaceship serial
+let viewedSpaceshipSerial = null;
+
 // Track currently viewed repairman ID
 let viewedRepairmanId = null;
 
@@ -67,6 +70,7 @@ function hideRepairmanTooltip() {
  * @param {number} serial - Spaceship serial
  */
 async function viewSpaceship(serial) {
+    viewedSpaceshipSerial = serial; // Track currently viewed spaceship
     try {
         const response = await fetch(`${API_BASE}/spaceships/${serial}`);
         
@@ -105,6 +109,14 @@ async function viewSpaceship(serial) {
             crewHtml = '<p class="text-muted">Члены экипажа не назначены</p>';
         }
         
+        const viewModal = new bootstrap.Modal(document.getElementById('spaceshipViewModal'));
+        
+        // Clear tracked serial when modal is hidden
+        const spaceshipViewModalElement = document.getElementById('spaceshipViewModal');
+        spaceshipViewModalElement.addEventListener('hidden.bs.modal', () => {
+            viewedSpaceshipSerial = null;
+        }, { once: true });
+        
         document.getElementById('spaceshipViewContent').innerHTML = `
             <h6 class="mb-3 text-primary">Основная информация</h6>
             <div class="row mb-3">
@@ -141,8 +153,7 @@ async function viewSpaceship(serial) {
             ${crewHtml}
         `;
         
-        const modal = new bootstrap.Modal(document.getElementById('spaceshipViewModal'));
-        modal.show();
+        viewModal.show();
         
         // Clear hover timer when modal is shown
         hideSpaceshipTooltip();

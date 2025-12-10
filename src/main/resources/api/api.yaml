@@ -189,6 +189,21 @@ paths:
       responses:
         200:
           description: OK
+  /spaceships/updates/stream:
+    get:
+      summary: Stream spaceship updates
+      operationId: getSpaceshipsUpdatesStream
+      tags:
+        - spaceships
+      responses:
+        200:
+          description: OK
+          content:
+            text/event-stream:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpaceShipDto"
   /maintenance-requests:
     get:
       summary: Get all maintenance requests

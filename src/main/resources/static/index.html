@@ -210,6 +210,19 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                    <div id="spaceshipUpdateWarning" class="alert alert-warning" style="display: none;">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Внимание!</strong> Этот корабль был изменён другим пользователем. 
+                        Ваши несохранённые изменения могут быть перезаписаны.
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="ignoreSpaceshipUpdate()">
+                                Игнорировать
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="updateSpaceshipModalFromBackend()">
+                                Обновить данные
+                            </button>
+                        </div>
+                    </div>
                     <form id="spaceshipForm">
                         <input type="hidden" id="spaceshipSerial" name="serial">
                         

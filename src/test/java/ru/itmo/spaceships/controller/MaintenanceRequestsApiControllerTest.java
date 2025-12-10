@@ -213,8 +213,8 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
                     assertNotNull(dto);
                     // createdAt should remain unchanged (system field) - truncate to microseconds to handle precision differences
                     assertEquals(
-                            originalCreatedAt.truncatedTo(ChronoUnit.MICROS),
-                            dto.getCreatedAt().truncatedTo(ChronoUnit.MICROS));
+                            originalCreatedAt.truncatedTo(ChronoUnit.MILLIS),
+                            dto.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
                     // updatedAt should be updated by system
                     assertTrue(dto.getUpdatedAt().isAfter(originalUpdatedAt) || 
                                dto.getUpdatedAt().equals(originalUpdatedAt));

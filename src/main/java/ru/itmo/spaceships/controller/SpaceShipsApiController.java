@@ -82,12 +82,6 @@ public class SpaceShipsApiController implements SpaceshipsApi {
                 .doOnError(error -> log.error("Error retrieving spaceship with serial: {}", serial, error));
     }
 
-    /**
-     * Получает поток обновлений кораблей через SSE.
-     *
-     * @param exchange обмен веб-запроса
-     * @return поток DTO кораблей
-     */
     @Override
     public Flux<SpaceShipDto> getSpaceshipsUpdatesStream(ServerWebExchange exchange) {
         log.info("GET /spaceships/updates/stream - Starting spaceship updates stream");

@@ -37,8 +37,7 @@ async function loadSpaceships() {
             const engine = ship.engine ? 
                 `${ship.engine.model || 'Н/Д'} (${translateFuelType(ship.engine.fuelType || '') || 'Н/Д'})` : '-';
             const crewCount = ship.crew && ship.crew.length > 0 ? ship.crew.length : 0;
-            const manufactureDate = ship.manufactureDate ? 
-                new Date(ship.manufactureDate).toLocaleDateString('ru-RU') : '-';
+            const manufactureDate = formatTimestamp(ship.manufactureDate, 'date');
             
             return `
             <tr style="cursor: pointer;" onclick="viewSpaceship(${ship.serial})">
@@ -157,11 +156,9 @@ function showSpaceshipModal(serial = null) {
                 document.getElementById('spaceshipManufacturer').value = data.manufacturer || '';
                 document.getElementById('spaceshipType').value = data.type || '';
                 document.getElementById('spaceshipMaxSpeed').value = data.maxSpeed || 0;
-                if (data.manufactureDate) {
-                    const date = new Date(data.manufactureDate);
-                    document.getElementById('spaceshipManufactureDate').value = 
-                        date.toISOString().slice(0, 16);
-                }
+                // Конвертируем timestamp (с timezone или UTC) в локальное время для datetime-local input
+                document.getElementById('spaceshipManufactureDate').value = 
+                    timestampToLocalDateTime(data.manufactureDate);
                 
                 // Populate dimensions
                 if (data.dimensions) {
@@ -299,7 +296,8 @@ async function saveSpaceship() {
     
     const manufactureDate = document.getElementById('spaceshipManufactureDate').value;
     if (manufactureDate) {
-        data.manufactureDate = new Date(manufactureDate).toISOString();
+        // Конвертируем локальное время в timestamp с timezone offset устройства
+        data.manufactureDate = localDateTimeToTimestamp(manufactureDate);
     }
     
     // Add dimensions
@@ -440,8 +438,7 @@ function updateSpaceshipInTable(spaceship) {
             const engine = spaceship.engine ? 
                 `${spaceship.engine.model || 'Н/Д'} (${translateFuelType(spaceship.engine.fuelType || '') || 'Н/Д'})` : '-';
             const crewCount = spaceship.crew && spaceship.crew.length > 0 ? spaceship.crew.length : 0;
-            const manufactureDate = spaceship.manufactureDate ? 
-                new Date(spaceship.manufactureDate).toLocaleDateString('ru-RU') : '-';
+            const manufactureDate = formatTimestamp(spaceship.manufactureDate, 'date');
             
             row.cells[1].textContent = spaceship.name || '-';
             row.cells[2].textContent = spaceship.manufacturer || '-';
@@ -510,11 +507,9 @@ async function updateSpaceshipModalFromBackend() {
         document.getElementById('spaceshipManufacturer').value = ship.manufacturer || '';
         document.getElementById('spaceshipType').value = ship.type || '';
         document.getElementById('spaceshipMaxSpeed').value = ship.maxSpeed || 0;
-        if (ship.manufactureDate) {
-            const date = new Date(ship.manufactureDate);
-            document.getElementById('spaceshipManufactureDate').value = 
-                date.toISOString().slice(0, 16);
-        }
+        // Конвертируем timestamp (с timezone или UTC) в локальное время для datetime-local input
+        document.getElementById('spaceshipManufactureDate').value = 
+            timestampToLocalDateTime(ship.manufactureDate);
         
         // Populate dimensions (handle null/undefined by clearing fields)
         if (ship.dimensions) {
@@ -590,11 +585,9 @@ function updateSpaceshipInModal(spaceship) {
             document.getElementById('spaceshipManufacturer').value = spaceship.manufacturer || '';
             document.getElementById('spaceshipType').value = spaceship.type || '';
             document.getElementById('spaceshipMaxSpeed').value = spaceship.maxSpeed || 0;
-            if (spaceship.manufactureDate) {
-                const date = new Date(spaceship.manufactureDate);
-                document.getElementById('spaceshipManufactureDate').value = 
-                    date.toISOString().slice(0, 16);
-            }
+            // Конвертируем timestamp (с timezone или UTC) в локальное время для datetime-local input
+            document.getElementById('spaceshipManufactureDate').value = 
+                timestampToLocalDateTime(spaceship.manufactureDate);
             
             // Update dimensions (handle null/undefined by clearing fields)
             if (spaceship.dimensions) {

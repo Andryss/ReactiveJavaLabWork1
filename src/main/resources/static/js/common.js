@@ -18,6 +18,125 @@ function roundTo3Decimals(num) {
 }
 
 /**
+ * Парсит timestamp с возможным timezone offset.
+ * Если timezone присутствует в строке - использует его, иначе считает UTC.
+ * @param {string} timestamp - Timestamp в формате ISO 8601 (может содержать timezone offset)
+ * @returns {Date|null} Date объект или null если не удалось распарсить
+ */
+function parseTimestamp(timestamp) {
+    if (!timestamp) {
+        return null;
+    }
+    
+    // Пытаемся распарсить timestamp
+    // Date конструктор автоматически обрабатывает timezone offset если он присутствует
+    // Если offset отсутствует, считаем что это UTC (добавляем 'Z' в конец)
+    let dateString = timestamp.trim();
+    
+    // Если строка не заканчивается на 'Z' и не содержит timezone offset (+/-HH:MM)
+    // то считаем что это UTC и добавляем 'Z'
+    if (!dateString.endsWith('Z') && !/[\+\-]\d{2}:\d{2}$/.test(dateString)) {
+        // Если нет timezone, добавляем 'Z' чтобы указать UTC
+        if (!dateString.includes('T')) {
+            // Если нет времени, добавляем время
+            dateString += 'T00:00:00Z';
+        } else {
+            dateString += 'Z';
+        }
+    }
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return null;
+    }
+    return date;
+}
+
+/**
+ * Конвертирует timestamp с timezone offset в локальное время для datetime-local input.
+ * Backend может отправлять timestamp с timezone offset или без него (UTC).
+ * datetime-local input ожидает локальное время без timezone.
+ * @param {string} timestamp - Timestamp в формате ISO 8601 (может содержать timezone offset)
+ * @returns {string} Локальное время в формате YYYY-MM-DDTHH:mm для datetime-local input
+ */
+function timestampToLocalDateTime(timestamp) {
+    const date = parseTimestamp(timestamp);
+    if (!date) {
+        return '';
+    }
+    
+    // Получаем локальное время и форматируем для datetime-local input
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+/**
+ * Конвертирует локальное время из datetime-local input в timestamp с timezone offset устройства.
+ * datetime-local input возвращает локальное время без timezone.
+ * Нужно добавить timezone offset устройства к отправляемому timestamp.
+ * @param {string} localDateTime - Локальное время в формате YYYY-MM-DDTHH:mm
+ * @returns {string} Timestamp в формате ISO 8601 с timezone offset устройства
+ */
+function localDateTimeToTimestamp(localDateTime) {
+    if (!localDateTime) {
+        return null;
+    }
+    
+    // Создаём Date объект из локального времени (браузер интерпретирует как локальное)
+    const date = new Date(localDateTime);
+    if (isNaN(date.getTime())) {
+        return null;
+    }
+    
+    // Получаем timezone offset устройства в минутах
+    const timezoneOffset = date.getTimezoneOffset();
+    
+    // Преобразуем offset в формат +/-HH:MM
+    const offsetHours = Math.floor(Math.abs(timezoneOffset) / 60);
+    const offsetMinutes = Math.abs(timezoneOffset) % 60;
+    const offsetSign = timezoneOffset <= 0 ? '+' : '-'; // Инвертируем знак, т.к. getTimezoneOffset возвращает обратный знак
+    const offsetString = `${offsetSign}${String(offsetHours).padStart(2, '0')}:${String(offsetMinutes).padStart(2, '0')}`;
+    
+    // Форматируем дату в ISO формат с timezone offset
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${offsetString}`;
+}
+
+/**
+ * Форматирует timestamp для отображения в локальном времени устройства.
+ * Парсит timestamp с возможным timezone offset и отображает в локальном времени.
+ * @param {string} timestamp - Timestamp в формате ISO 8601 (может содержать timezone offset)
+ * @param {string} format - Формат: 'date' для даты, 'datetime' для даты и времени, 'time' для времени
+ * @returns {string} Отформатированная строка в локальном времени устройства
+ */
+function formatTimestamp(timestamp, format = 'datetime') {
+    const date = parseTimestamp(timestamp);
+    if (!date) {
+        return '-';
+    }
+    
+    if (format === 'date') {
+        return date.toLocaleDateString('ru-RU');
+    } else if (format === 'datetime') {
+        return date.toLocaleString('ru-RU');
+    } else if (format === 'time') {
+        return date.toLocaleTimeString('ru-RU');
+    }
+    return date.toLocaleString('ru-RU');
+}
+
+/**
  * Извлекает сообщение об ошибке из ответа API.
  * Если ответ содержит ErrorObject, возвращает humanMessage.
  * Иначе возвращает текст ошибки или стандартное сообщение.

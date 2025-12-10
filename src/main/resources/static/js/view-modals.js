@@ -89,8 +89,7 @@ async function viewSpaceship(serial) {
         const engine = ship.engine ? 
             `Модель: ${ship.engine.model || 'Н/Д'}, Тяга: ${ship.engine.thrust || 0} кН, ` +
             `Тип топлива: ${translateFuelType(ship.engine.fuelType || '') || 'Н/Д'}, Расход: ${roundTo3Decimals(ship.engine.fuelConsumption || 0)} в час` : 'Не указано';
-        const manufactureDate = ship.manufactureDate ? 
-            new Date(ship.manufactureDate).toLocaleString('ru-RU') : 'Не указано';
+        const manufactureDate = formatTimestamp(ship.manufactureDate, 'datetime');
         
         let crewHtml = '';
         if (ship.crew && ship.crew.length > 0) {
@@ -229,10 +228,8 @@ async function viewRequest(id) {
         
         viewedRequestId = request.id; // Track currently viewed request
         
-        const createdAt = request.createdAt ? 
-            new Date(request.createdAt).toLocaleString('ru-RU') : 'Не указано';
-        const updatedAt = request.updatedAt ? 
-            new Date(request.updatedAt).toLocaleString('ru-RU') : 'Не указано';
+        const createdAt = formatTimestamp(request.createdAt, 'datetime');
+        const updatedAt = formatTimestamp(request.updatedAt, 'datetime');
         
         // Load spaceship details if available
         let spaceshipInfo = 'Не указано';

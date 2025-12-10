@@ -112,7 +112,7 @@ async function loadRequests() {
                         </span>
                     ` : '-'}
                 </td>
-                <td>${req.createdAt ? new Date(req.createdAt).toLocaleString('ru-RU') : '-'}</td>
+                <td>${formatTimestamp(req.createdAt, 'datetime')}</td>
                 <td onclick="event.stopPropagation();">
                     <button class="btn btn-sm btn-primary" onclick="editRequest(${req.id})">
                         <i class="bi bi-pencil"></i>
@@ -375,7 +375,7 @@ function updateRequestInTable(request) {
                     ${request.assignee}
                 </span>
             ` : '-';
-            row.cells[5].textContent = request.createdAt ? new Date(request.createdAt).toLocaleString('ru-RU') : '-';
+            row.cells[5].textContent = formatTimestamp(request.createdAt, 'datetime');
             break;
         }
     }

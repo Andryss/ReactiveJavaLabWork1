@@ -135,11 +135,62 @@ function startRepairmanUpdatesStream() {
     };
 }
 
+// Global EventSource instance for maintenance request updates stream
+let maintenanceRequestUpdatesEventSource = null;
+
+/**
+ * Start maintenance request updates stream via SSE (opens once and remains open during session)
+ */
+function startMaintenanceRequestUpdatesStream() {
+    // Don't create a new connection if one already exists and is open
+    if (maintenanceRequestUpdatesEventSource && maintenanceRequestUpdatesEventSource.readyState !== EventSource.CLOSED) {
+        return;
+    }
+    
+    // Close existing connection if any (shouldn't happen, but just in case)
+    if (maintenanceRequestUpdatesEventSource) {
+        maintenanceRequestUpdatesEventSource.close();
+    }
+    
+    // Create new EventSource connection
+    maintenanceRequestUpdatesEventSource = new EventSource(`${API_BASE}/maintenance-requests/updates/stream`);
+    
+    maintenanceRequestUpdatesEventSource.onmessage = (event) => {
+        try {
+            // Parse the maintenance request update from SSE
+            // Spring WebFlux sends JSON objects directly in the data field
+            const data = event.data;
+            if (data && data.trim() !== '') {
+                const request = JSON.parse(data);
+                if (request && request.id) {
+                    // Handle the update
+                    if (typeof handleRequestUpdate === 'function') {
+                        handleRequestUpdate(request);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing maintenance request update from stream:', error, event.data);
+        }
+    };
+    
+    maintenanceRequestUpdatesEventSource.onerror = () => {
+        // No reconnection - similar to ping stream
+    };
+    
+    maintenanceRequestUpdatesEventSource.onopen = () => {
+        console.log('Maintenance request updates stream connected');
+    };
+}
+
 // Initialize status monitor
 startPingStream();
 
 // Initialize repairman updates stream
 startRepairmanUpdatesStream();
+
+// Initialize maintenance request updates stream
+startMaintenanceRequestUpdatesStream();
 
 // Load data when tabs are shown
 document.getElementById('spaceships-tab').addEventListener('shown.bs.tab', () => {

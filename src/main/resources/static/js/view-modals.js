@@ -9,6 +9,9 @@ let repairmanHoverTimer = null;
 // Track currently viewed repairman ID
 let viewedRepairmanId = null;
 
+// Track currently viewed maintenance request ID
+let viewedRequestId = null;
+
 /**
  * Show spaceship tooltip on hover (with delay)
  * @param {number} serial - Spaceship serial
@@ -194,6 +197,94 @@ async function viewRepairman(id) {
     } catch (error) {
         alert('Ошибка загрузки деталей ремонтника: ' + (error.message || error));
         hideRepairmanTooltip();
+    }
+}
+
+/**
+ * View maintenance request details in read-only modal
+ * @param {number} id - Maintenance request ID
+ */
+async function viewRequest(id) {
+    try {
+        const response = await fetch(`${API_BASE}/maintenance-requests/${id}`);
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка загрузки деталей заявки: ' + errorMessage);
+            return;
+        }
+        
+        const request = await response.json();
+        
+        viewedRequestId = request.id; // Track currently viewed request
+        
+        const createdAt = request.createdAt ? 
+            new Date(request.createdAt).toLocaleString('ru-RU') : 'Не указано';
+        const updatedAt = request.updatedAt ? 
+            new Date(request.updatedAt).toLocaleString('ru-RU') : 'Не указано';
+        
+        // Load spaceship details if available
+        let spaceshipInfo = 'Не указано';
+        if (request.spaceshipSerial) {
+            try {
+                const spaceshipResponse = await fetch(`${API_BASE}/spaceships/${request.spaceshipSerial}`);
+                if (spaceshipResponse.ok) {
+                    const spaceship = await spaceshipResponse.json();
+                    spaceshipInfo = `${spaceship.serial} - ${spaceship.name || 'Без названия'}`;
+                }
+            } catch (error) {
+                spaceshipInfo = `Серийный номер: ${request.spaceshipSerial}`;
+            }
+        }
+        
+        // Load repairman details if available
+        let assigneeInfo = 'Не назначен';
+        if (request.assignee) {
+            try {
+                const repairmanResponse = await fetch(`${API_BASE}/repairmen/${request.assignee}`);
+                if (repairmanResponse.ok) {
+                    const repairman = await repairmanResponse.json();
+                    assigneeInfo = `${repairman.id} - ${repairman.name}`;
+                }
+            } catch (error) {
+                assigneeInfo = `ID: ${request.assignee}`;
+            }
+        }
+        
+        document.getElementById('requestViewContent').innerHTML = `
+            <div class="mb-3">
+                <strong>ID:</strong> ${request.id}
+            </div>
+            <div class="mb-3">
+                <strong>Корабль:</strong> ${spaceshipInfo}
+            </div>
+            <div class="mb-3">
+                <strong>Комментарий:</strong> ${request.comment || 'Н/Д'}
+            </div>
+            <div class="mb-3">
+                <strong>Статус:</strong> <span class="badge bg-info">${translateMaintenanceStatus(request.status || 'NEW')}</span>
+            </div>
+            <div class="mb-3">
+                <strong>Исполнитель:</strong> ${assigneeInfo}
+            </div>
+            <div class="mb-3">
+                <strong>Дата создания:</strong> ${createdAt}
+            </div>
+            <div class="mb-3">
+                <strong>Дата обновления:</strong> ${updatedAt}
+            </div>
+        `;
+        
+        const modal = new bootstrap.Modal(document.getElementById('requestViewModal'));
+        modal.show();
+        
+        // Clear tracked ID when modal is hidden
+        const viewModalElement = document.getElementById('requestViewModal');
+        viewModalElement.addEventListener('hidden.bs.modal', () => {
+            viewedRequestId = null;
+        }, { once: true });
+    } catch (error) {
+        alert('Ошибка загрузки деталей заявки: ' + (error.message || error));
     }
 }
 

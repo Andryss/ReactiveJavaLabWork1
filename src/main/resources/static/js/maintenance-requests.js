@@ -2,6 +2,15 @@
  * Maintenance requests management functions
  */
 
+// Track currently displayed/edited maintenance request ID
+let currentRequestId = null;
+
+// Track if modal has unsaved changes
+let requestModalHasChanges = false;
+
+// Store the last received update for the current request
+let pendingRequestUpdate = null;
+
 /**
  * Status transition rules matching the backend MaintenanceStatus enum
  * Maps each status to its allowed transitions (including staying in the same status)
@@ -77,7 +86,7 @@ async function loadRequests() {
         
         const tbody = document.getElementById('requestsTableBody');
         tbody.innerHTML = data.map(req => `
-            <tr>
+            <tr style="cursor: pointer;" onclick="viewRequest(${req.id})">
                 <td>${req.id}</td>
                 <td>
                     ${req.spaceshipSerial ? `
@@ -104,7 +113,7 @@ async function loadRequests() {
                     ` : '-'}
                 </td>
                 <td>${req.createdAt ? new Date(req.createdAt).toLocaleString('ru-RU') : '-'}</td>
-                <td>
+                <td onclick="event.stopPropagation();">
                     <button class="btn btn-sm btn-primary" onclick="editRequest(${req.id})">
                         <i class="bi bi-pencil"></i>
                     </button>
@@ -128,6 +137,11 @@ async function loadRequests() {
  * @param {number|null} id - Request ID (null for create)
  */
 async function showRequestModal(id = null) {
+    currentRequestId = id; // Track currently edited request
+    requestModalHasChanges = false; // Reset changes tracking
+    pendingRequestUpdate = null; // Clear any pending updates
+    hideRequestUpdateWarning(); // Hide warning if visible
+    
     document.getElementById('requestModalTitle').textContent = id ? 'Редактировать заявку' : 'Добавить заявку';
     document.getElementById('requestId').value = id || '';
     
@@ -209,7 +223,38 @@ async function showRequestModal(id = null) {
         document.getElementById('requestForm').reset();
         document.getElementById('requestStatus').value = 'NEW';
     }
-    new bootstrap.Modal(document.getElementById('requestModal')).show();
+    
+    // Track form changes
+    const commentInput = document.getElementById('requestComment');
+    const statusSelect = document.getElementById('requestStatus');
+    const assigneeInput = document.getElementById('requestAssignee');
+    const spaceshipInput = document.getElementById('requestSpaceshipSerial');
+    
+    const trackChanges = () => {
+        requestModalHasChanges = true;
+    };
+    
+    commentInput.addEventListener('input', trackChanges);
+    statusSelect.addEventListener('change', trackChanges);
+    assigneeInput.addEventListener('change', trackChanges);
+    spaceshipInput.addEventListener('change', trackChanges);
+    
+    const modal = new bootstrap.Modal(document.getElementById('requestModal'));
+    
+    // Clear tracked ID and reset state when modal is hidden
+    const requestModalElement = document.getElementById('requestModal');
+    requestModalElement.addEventListener('hidden.bs.modal', () => {
+        currentRequestId = null;
+        requestModalHasChanges = false;
+        pendingRequestUpdate = null;
+        hideRequestUpdateWarning();
+        commentInput.removeEventListener('input', trackChanges);
+        statusSelect.removeEventListener('change', trackChanges);
+        assigneeInput.removeEventListener('change', trackChanges);
+        spaceshipInput.removeEventListener('change', trackChanges);
+    }, { once: true });
+    
+    modal.show();
 }
 
 /**
@@ -253,6 +298,10 @@ async function saveRequest() {
         }
         
         bootstrap.Modal.getInstance(document.getElementById('requestModal')).hide();
+        currentRequestId = null; // Clear tracked ID after save
+        requestModalHasChanges = false; // Reset changes tracking
+        pendingRequestUpdate = null; // Clear pending updates
+        hideRequestUpdateWarning(); // Hide warning
         loadRequests();
     } catch (error) {
         alert('Ошибка сохранения заявки: ' + (error.message || error));
@@ -286,5 +335,225 @@ async function deleteRequest(id) {
  */
 function editRequest(id) {
     showRequestModal(id);
+}
+
+/**
+ * Update request in table row
+ * @param {Object} request - Updated request data
+ */
+function updateRequestInTable(request) {
+    const tbody = document.getElementById('requestsTableBody');
+    const rows = tbody.getElementsByTagName('tr');
+    
+    for (let row of rows) {
+        const firstCell = row.cells[0];
+        if (firstCell && firstCell.textContent.trim() === String(request.id)) {
+            // Preserve onclick handler for the row
+            if (!row.onclick) {
+                row.style.cursor = 'pointer';
+                row.onclick = () => viewRequest(request.id);
+            }
+            
+            // Update the row with new data
+            row.cells[1].innerHTML = request.spaceshipSerial ? `
+                <span class="text-primary" style="cursor: pointer; text-decoration: underline;" 
+                      onmouseenter="showSpaceshipTooltip(${request.spaceshipSerial})" 
+                      onmouseleave="hideSpaceshipTooltip()"
+                      onclick="event.stopPropagation(); hideSpaceshipTooltip(); viewSpaceship(${request.spaceshipSerial})" 
+                      title="Наведите курсор или нажмите для просмотра деталей">
+                    ${request.spaceshipSerial}
+                </span>
+            ` : '-';
+            row.cells[2].textContent = request.comment || '-';
+            row.cells[3].innerHTML = `<span class="badge bg-info">${translateMaintenanceStatus(request.status || 'NEW')}</span>`;
+            row.cells[4].innerHTML = request.assignee ? `
+                <span class="text-primary" style="cursor: pointer; text-decoration: underline;" 
+                      onmouseenter="showRepairmanTooltip(${request.assignee})" 
+                      onmouseleave="hideRepairmanTooltip()"
+                      onclick="event.stopPropagation(); hideRepairmanTooltip(); viewRepairman(${request.assignee})" 
+                      title="Наведите курсор или нажмите для просмотра деталей">
+                    ${request.assignee}
+                </span>
+            ` : '-';
+            row.cells[5].textContent = request.createdAt ? new Date(request.createdAt).toLocaleString('ru-RU') : '-';
+            break;
+        }
+    }
+}
+
+/**
+ * Show warning about request update when editing
+ * @param {Object} request - Updated request data
+ */
+function showRequestUpdateWarning(request) {
+    const warningDiv = document.getElementById('requestUpdateWarning');
+    if (warningDiv) {
+        warningDiv.style.display = 'block';
+        pendingRequestUpdate = request;
+    }
+}
+
+/**
+ * Hide warning about request update
+ */
+function hideRequestUpdateWarning() {
+    const warningDiv = document.getElementById('requestUpdateWarning');
+    if (warningDiv) {
+        warningDiv.style.display = 'none';
+        pendingRequestUpdate = null;
+    }
+}
+
+/**
+ * Ignore request update warning
+ */
+function ignoreRequestUpdate() {
+    hideRequestUpdateWarning();
+}
+
+/**
+ * Update request modal with fresh data from backend
+ */
+async function updateRequestModalFromBackend() {
+    if (!currentRequestId || !pendingRequestUpdate) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/maintenance-requests/${currentRequestId}`);
+        
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            alert('Ошибка загрузки обновлённых данных заявки: ' + errorMessage);
+            return;
+        }
+        
+        const request = await response.json();
+        
+        // Update form fields with fresh data
+        document.getElementById('requestSpaceshipSerial').value = request.spaceshipSerial || '';
+        if (request.spaceshipSerial) {
+            // Find and display the selected spaceship
+            fetch(`${API_BASE}/spaceships/${request.spaceshipSerial}`)
+                .then(async r => {
+                    if (!r.ok) {
+                        const errorMessage = await extractErrorMessage(r);
+                        throw new Error(errorMessage);
+                    }
+                    return r.json();
+                })
+                .then(ship => {
+                    document.getElementById('spaceshipSelectedText').textContent = 
+                        `${ship.serial} - ${ship.name || 'Без названия'}`;
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки данных корабля:', error);
+                });
+        }
+        document.getElementById('requestComment').value = request.comment || '';
+        document.getElementById('requestAssignee').value = request.assignee || '';
+        if (request.assignee) {
+            // Find and display the selected repairman
+            fetch(`${API_BASE}/repairmen/${request.assignee}`)
+                .then(async r => {
+                    if (!r.ok) {
+                        const errorMessage = await extractErrorMessage(r);
+                        throw new Error(errorMessage);
+                    }
+                    return r.json();
+                })
+                .then(repairman => {
+                    document.getElementById('assigneeSelectedText').textContent = 
+                        `${repairman.id} - ${repairman.name}`;
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки данных ремонтника:', error);
+                });
+        }
+        const currentStatus = request.status || 'NEW';
+        // Populate status dropdown with only allowed transitions
+        populateStatusDropdown(currentStatus);
+        
+        // Reset changes tracking since we're updating with fresh data
+        requestModalHasChanges = false;
+        
+        // Hide warning
+        hideRequestUpdateWarning();
+    } catch (error) {
+        alert('Ошибка загрузки обновлённых данных заявки: ' + (error.message || error));
+    }
+}
+
+/**
+ * Update request in edit modal if it's currently open
+ * @param {Object} request - Updated request data
+ */
+function updateRequestInModal(request) {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('requestModal'));
+    if (modal && modal._isShown && currentRequestId === request.id) {
+        // If modal has unsaved changes, show warning instead of auto-updating
+        if (requestModalHasChanges) {
+            showRequestUpdateWarning(request);
+        } else {
+            // No unsaved changes, update directly
+            document.getElementById('requestSpaceshipSerial').value = request.spaceshipSerial || '';
+            document.getElementById('requestComment').value = request.comment || '';
+            document.getElementById('requestAssignee').value = request.assignee || '';
+            const currentStatus = request.status || 'NEW';
+            populateStatusDropdown(currentStatus);
+            
+            // Update dropdowns if needed
+            if (request.spaceshipSerial) {
+                fetch(`${API_BASE}/spaceships/${request.spaceshipSerial}`)
+                    .then(async r => {
+                        if (!r.ok) return;
+                        const ship = await r.json();
+                        document.getElementById('spaceshipSelectedText').textContent = 
+                            `${ship.serial} - ${ship.name || 'Без названия'}`;
+                    })
+                    .catch(() => {});
+            }
+            if (request.assignee) {
+                fetch(`${API_BASE}/repairmen/${request.assignee}`)
+                    .then(async r => {
+                        if (!r.ok) return;
+                        const repairman = await r.json();
+                        document.getElementById('assigneeSelectedText').textContent = 
+                            `${repairman.id} - ${repairman.name}`;
+                    })
+                    .catch(() => {});
+            }
+        }
+    }
+}
+
+/**
+ * Update request in view modal if it's currently open
+ * @param {Object} request - Updated request data
+ */
+function updateRequestInViewModal(request) {
+    // Check if view modal is showing this request using tracked ID
+    if (typeof viewedRequestId !== 'undefined' && viewedRequestId === request.id) {
+        const viewModal = bootstrap.Modal.getInstance(document.getElementById('requestViewModal'));
+        if (viewModal && viewModal._isShown) {
+            // Reload the view modal content
+            viewRequest(request.id);
+        }
+    }
+}
+
+/**
+ * Handle request update from event stream
+ * @param {Object} request - Updated request data
+ */
+function handleRequestUpdate(request) {
+    // Update table if request is displayed there
+    updateRequestInTable(request);
+    
+    // Update edit modal if this request is being edited
+    updateRequestInModal(request);
+    
+    // Update view modal if this request is being viewed
+    updateRequestInViewModal(request);
 }
 

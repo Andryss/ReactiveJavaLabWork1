@@ -80,5 +80,16 @@ public class MaintenanceRequestsApiController implements MaintenanceRequestsApi 
                 .doOnSuccess(dto -> log.info("Successfully retrieved maintenance request with id: {}", id))
                 .doOnError(error -> log.error("Error retrieving maintenance request with id: {}", id, error));
     }
+
+    @Override
+    public Flux<MaintenanceRequestDto> getMaintenanceRequestsUpdatesStream(ServerWebExchange exchange) {
+        log.info("GET /maintenance-requests/updates/stream - Starting maintenance request updates stream");
+        return maintenanceRequestService.getMaintenanceRequestsUpdatesStream()
+                .map(maintenanceRequestConverter::convertToDto)
+                .doOnNext(dto -> log.info("Streaming maintenance request update: id={}", dto.getId()))
+                .doOnError(error -> log.error("Error in maintenance request updates stream", error))
+                .doOnCancel(() -> log.info("Maintenance request updates stream cancelled"))
+                .doOnComplete(() -> log.info("Maintenance request updates stream completed"));
+    }
 }
 

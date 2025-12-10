@@ -420,6 +420,30 @@
         </div>
     </div>
 
+    <!-- Maintenance Request View Modal (Read-only) -->
+    <div class="modal fade" id="requestViewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Детали заявки на обслуживание</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="requestViewContent">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Request Modal -->
     <div class="modal fade" id="requestModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -429,6 +453,20 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Warning about external update -->
+                    <div id="requestUpdateWarning" class="alert alert-warning" style="display: none;">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Внимание!</strong> Эта заявка была изменена другим пользователем. 
+                        Ваши несохранённые изменения могут быть перезаписаны.
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="ignoreRequestUpdate()">
+                                Игнорировать
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="updateRequestModalFromBackend()">
+                                Обновить данные
+                            </button>
+                        </div>
+                    </div>
                     <form id="requestForm">
                         <input type="hidden" id="requestId">
                         <div class="mb-3">
@@ -515,7 +553,7 @@
     <script src="js/pagination.js"></script>
     <script src="js/spaceships.js"></script>
     <script src="js/repairmen.js"></script>
-    <script src="js/requests.js"></script>
+    <script src="js/maintenance-requests.js"></script>
     <script src="js/dropdowns.js"></script>
     <script src="js/view-modals.js"></script>
 </body>

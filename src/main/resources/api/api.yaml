@@ -95,6 +95,21 @@ paths:
       responses:
         200:
           description: OK
+  /repairmen/updates/stream:
+    get:
+      summary: Stream repairman updates
+      operationId: getRepairmenUpdatesStream
+      tags:
+        - repairmen
+      responses:
+        200:
+          description: OK
+          content:
+            text/event-stream:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RepairmanDto"
   /spaceships:
     get:
       summary: Get all spaceships
@@ -174,6 +189,21 @@ paths:
       responses:
         200:
           description: OK
+  /spaceships/updates/stream:
+    get:
+      summary: Stream spaceship updates
+      operationId: getSpaceshipsUpdatesStream
+      tags:
+        - spaceships
+      responses:
+        200:
+          description: OK
+          content:
+            text/event-stream:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpaceShipDto"
   /maintenance-requests:
     get:
       summary: Get all maintenance requests
@@ -253,6 +283,21 @@ paths:
       responses:
         200:
           description: OK
+  /maintenance-requests/updates/stream:
+    get:
+      summary: Stream maintenance request updates
+      operationId: getMaintenanceRequestsUpdatesStream
+      tags:
+        - maintenance-requests
+      responses:
+        200:
+          description: OK
+          content:
+            text/event-stream:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MaintenanceRequestDto"
 
 components:
   parameters:

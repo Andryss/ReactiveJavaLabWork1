@@ -4,7 +4,7 @@
 
 // Pagination state for main tables
 let spaceshipsTablePage = 0;
-let spaceshipsTablePageSize = 20;
+let spaceshipsTablePageSize = 5;
 let spaceshipsTableTotalItems = 0;
 
 let repairmenTablePage = 0;
@@ -12,7 +12,7 @@ let repairmenTablePageSize = 20;
 let repairmenTableTotalItems = 0;
 
 let requestsTablePage = 0;
-let requestsTablePageSize = 20;
+let requestsTablePageSize = 10;
 let requestsTableTotalItems = 0;
 
 /**
@@ -86,6 +86,60 @@ function navigateRequestsPage(direction) {
     const newPage = requestsTablePage + direction;
     if (newPage >= 0) {
         requestsTablePage = newPage;
+        loadRequests();
+    }
+}
+
+/**
+ * Change page size for spaceships table
+ * @param {string} newPageSize - New page size as string
+ */
+function changeSpaceshipsPageSize(newPageSize) {
+    const pageSize = parseInt(newPageSize, 10);
+    if (pageSize !== spaceshipsTablePageSize) {
+        spaceshipsTablePageSize = pageSize;
+        spaceshipsTablePage = 0; // Reset to first page
+        // Update select to reflect current value
+        const select = document.getElementById('spaceshipsPageSizeSelect');
+        if (select) {
+            select.value = pageSize.toString();
+        }
+        loadSpaceships();
+    }
+}
+
+/**
+ * Change page size for repairmen table
+ * @param {string} newPageSize - New page size as string
+ */
+function changeRepairmenPageSize(newPageSize) {
+    const pageSize = parseInt(newPageSize, 10);
+    if (pageSize !== repairmenTablePageSize) {
+        repairmenTablePageSize = pageSize;
+        repairmenTablePage = 0; // Reset to first page
+        // Update select to reflect current value
+        const select = document.getElementById('repairmenPageSizeSelect');
+        if (select) {
+            select.value = pageSize.toString();
+        }
+        loadRepairmen();
+    }
+}
+
+/**
+ * Change page size for requests table
+ * @param {string} newPageSize - New page size as string
+ */
+function changeRequestsPageSize(newPageSize) {
+    const pageSize = parseInt(newPageSize, 10);
+    if (pageSize !== requestsTablePageSize) {
+        requestsTablePageSize = pageSize;
+        requestsTablePage = 0; // Reset to first page
+        // Update select to reflect current value
+        const select = document.getElementById('requestsPageSizeSelect');
+        if (select) {
+            select.value = pageSize.toString();
+        }
         loadRequests();
     }
 }

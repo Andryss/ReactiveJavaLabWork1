@@ -3,7 +3,9 @@ package ru.itmo.spaceships.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.test.StepVerifier;
 import ru.itmo.spaceships.BaseDbTest;
 import ru.itmo.spaceships.generated.model.CrewMemberDto;
 import ru.itmo.spaceships.generated.model.DimensionsDto;
@@ -428,6 +430,56 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                     assertNotNull(result.getResponseBody());
                     assertTrue(result.getResponseBody().size() <= 2);
                 });
+    }
+
+    @Test
+    void testGetSpaceshipsUpdatesStream() {
+        // Создаём корабль
+        SpaceShipRequest createRequest = createTestRequest();
+        SpaceShipDto created = webClient.post()
+                .uri("/spaceships")
+                .bodyValue(createRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SpaceShipDto.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertNotNull(created);
+        Long serial = created.getSerial();
+
+        // Обновляем корабль
+        SpaceShipRequest updateRequest = createTestRequest(serial);
+        updateRequest.setName("Updated Ship Name");
+        updateRequest.setManufacturer("Updated Manufacturer");
+
+        webClient.put()
+                .uri("/spaceships/{serial}", serial)
+                .bodyValue(updateRequest)
+                .exchange()
+                .expectStatus().isOk();
+
+        // Подключаемся к стриму обновлений и фильтруем по серийному номеру нашего корабля
+        webClient.get()
+                .uri("/spaceships/updates/stream")
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
+                .returnResult(SpaceShipDto.class)
+                .getResponseBody()
+                .filter(dto -> dto.getSerial().equals(serial))
+                .take(1)
+                .collectList()
+                .as(StepVerifier::create)
+                .assertNext(updates -> {
+                    assertEquals(1, updates.size(), "Should receive exactly 1 update");
+                    SpaceShipDto dto = updates.get(0);
+                    assertEquals(serial, dto.getSerial());
+                    assertEquals("Updated Ship Name", dto.getName());
+                    assertEquals("Updated Manufacturer", dto.getManufacturer());
+                })
+                .verifyComplete();
     }
 }
 

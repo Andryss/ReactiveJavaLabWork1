@@ -81,5 +81,16 @@ public class SpaceShipsApiController implements SpaceshipsApi {
                 .doOnSuccess(dto -> log.info("Successfully retrieved spaceship with serial: {}", serial))
                 .doOnError(error -> log.error("Error retrieving spaceship with serial: {}", serial, error));
     }
+
+    @Override
+    public Flux<SpaceShipDto> getSpaceshipsUpdatesStream(ServerWebExchange exchange) {
+        log.info("GET /spaceships/updates/stream - Starting spaceship updates stream");
+        return spaceShipService.getSpaceshipsUpdatesStream()
+                .map(spaceShipConverter::convertToDto)
+                .doOnNext(dto -> log.info("Streaming spaceship update: serial={}", dto.getSerial()))
+                .doOnError(error -> log.error("Error in spaceship updates stream", error))
+                .doOnCancel(() -> log.info("Spaceship updates stream cancelled"))
+                .doOnComplete(() -> log.info("Spaceship updates stream completed"));
+    }
 }
 

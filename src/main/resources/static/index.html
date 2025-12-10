@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress HtmlFormInputWithoutLabel -->
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -51,8 +52,10 @@
                 <div class="main-screen">
                     <h1>🚀 Система управления космическими кораблями</h1>
                     <p class="lead text-muted">Управляйте флотом, персоналом и заявками на обслуживание в одном месте</p>
-                    <div class="gif-container">
-                        <img src="https://media.giphy.com/media/l0MYC0LajdoPo3ATu/giphy.gif" alt="Космический корабль">
+                    <div class="d-flex justify-content-center">
+                        <div class="gif-container">
+                            <img src="https://media.giphy.com/media/l0MYC0LajdoPo3ATu/giphy.gif" alt="Космический корабль">
+                        </div>
                     </div>
 <div class="mt-4">
                         <p class="text-muted">Используйте вкладки выше для управления различными аспектами вашего флота космических кораблей.</p>
@@ -96,6 +99,17 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="small mb-0">Записей на странице:</label>
+                                <select class="form-select form-select-sm" id="spaceshipsPageSizeSelect" style="width: auto;" onchange="changeSpaceshipsPageSize(this.value)">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <button class="btn btn-sm btn-outline-secondary" id="spaceshipsPrevBtn" onclick="navigateSpaceshipsPage(-1)" disabled>
                                 <i class="bi bi-chevron-left"></i> Назад
@@ -138,6 +152,17 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="small mb-0">Записей на странице:</label>
+                                <select class="form-select form-select-sm" id="repairmenPageSizeSelect" style="width: auto;" onchange="changeRepairmenPageSize(this.value)">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20" selected>20</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <button class="btn btn-sm btn-outline-secondary" id="repairmenPrevBtn" onclick="navigateRepairmenPage(-1)" disabled>
@@ -185,6 +210,17 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="small mb-0">Записей на странице:</label>
+                                <select class="form-select form-select-sm" id="requestsPageSizeSelect" style="width: auto;" onchange="changeRequestsPageSize(this.value)">
+                                    <option value="5">5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <button class="btn btn-sm btn-outline-secondary" id="requestsPrevBtn" onclick="navigateRequestsPage(-1)" disabled>
                                 <i class="bi bi-chevron-left"></i> Назад
@@ -209,6 +245,19 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                    <div id="spaceshipUpdateWarning" class="alert alert-warning" style="display: none;">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Внимание!</strong> Этот корабль был изменён другим пользователем. 
+                        Ваши несохранённые изменения могут быть перезаписаны.
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="ignoreSpaceshipUpdate()">
+                                Игнорировать
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="updateSpaceshipModalFromBackend()">
+                                Обновить данные
+                            </button>
+                        </div>
+                    </div>
                     <form id="spaceshipForm">
                         <input type="hidden" id="spaceshipSerial" name="serial">
                         
@@ -337,6 +386,20 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Warning about external update -->
+                    <div id="repairmanUpdateWarning" class="alert alert-warning" style="display: none;">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Внимание!</strong> Этот ремонтник был изменён другим пользователем. 
+                        Ваши несохранённые изменения могут быть перезаписаны.
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="ignoreRepairmanUpdate()">
+                                Игнорировать
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="updateRepairmanModalFromBackend()">
+                                Обновить данные
+                            </button>
+                        </div>
+                    </div>
                     <form id="repairmanForm">
                         <input type="hidden" id="repairmanId">
                         <div class="mb-3">
@@ -405,6 +468,30 @@
         </div>
     </div>
 
+    <!-- Maintenance Request View Modal (Read-only) -->
+    <div class="modal fade" id="requestViewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Детали заявки на обслуживание</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="requestViewContent">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Request Modal -->
     <div class="modal fade" id="requestModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -414,6 +501,20 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Warning about external update -->
+                    <div id="requestUpdateWarning" class="alert alert-warning" style="display: none;">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Внимание!</strong> Эта заявка была изменена другим пользователем. 
+                        Ваши несохранённые изменения могут быть перезаписаны.
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="ignoreRequestUpdate()">
+                                Игнорировать
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="updateRequestModalFromBackend()">
+                                Обновить данные
+                            </button>
+                        </div>
+                    </div>
                     <form id="requestForm">
                         <input type="hidden" id="requestId">
                         <div class="mb-3">
@@ -427,12 +528,12 @@
                                     <ul class="list-unstyled mb-0" id="spaceshipDropdownMenu" style="max-height: 300px; overflow-y: auto;">
                                         <li><div class="px-3 py-2 text-muted">Загрузка...</div></li>
                                     </ul>
-                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="spaceshipPagination" style="display: none;">
-                                        <button class="btn btn-sm btn-outline-secondary" id="spaceshipPrevBtn" onclick="navigateSpaceshipPage(-1)" disabled>
+                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="spaceshipPagination" style="display: none;" onclick="event.stopPropagation()">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="spaceshipPrevBtn" onclick="navigateSpaceshipPage(-1, event)" disabled>
                                             <i class="bi bi-chevron-left"></i> Назад
                                         </button>
                                         <span class="small" id="spaceshipPageInfo">Страница 1</span>
-                                        <button class="btn btn-sm btn-outline-secondary" id="spaceshipNextBtn" onclick="navigateSpaceshipPage(1)" disabled>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="spaceshipNextBtn" onclick="navigateSpaceshipPage(1, event)" disabled>
                                             Вперёд <i class="bi bi-chevron-right"></i>
                                         </button>
                                     </div>
@@ -454,12 +555,12 @@
                                     <ul class="list-unstyled mb-0" id="assigneeDropdownMenu" style="max-height: 300px; overflow-y: auto;">
                                         <li><div class="px-3 py-2 text-muted">Загрузка...</div></li>
                                     </ul>
-                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="assigneePagination" style="display: none;">
-                                        <button class="btn btn-sm btn-outline-secondary" id="assigneePrevBtn" onclick="navigateAssigneePage(-1)" disabled>
+                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="assigneePagination" style="display: none;" onclick="event.stopPropagation()">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="assigneePrevBtn" onclick="navigateAssigneePage(-1, event)" disabled>
                                             <i class="bi bi-chevron-left"></i> Назад
                                         </button>
                                         <span class="small" id="assigneePageInfo">Страница 1</span>
-                                        <button class="btn btn-sm btn-outline-secondary" id="assigneeNextBtn" onclick="navigateAssigneePage(1)" disabled>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="assigneeNextBtn" onclick="navigateAssigneePage(1, event)" disabled>
                                             Вперёд <i class="bi bi-chevron-right"></i>
                                         </button>
                                     </div>
@@ -500,7 +601,7 @@
     <script src="js/pagination.js"></script>
     <script src="js/spaceships.js"></script>
     <script src="js/repairmen.js"></script>
-    <script src="js/requests.js"></script>
+    <script src="js/maintenance-requests.js"></script>
     <script src="js/dropdowns.js"></script>
     <script src="js/view-modals.js"></script>
 </body>

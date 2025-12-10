@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import ru.itmo.spaceships.exception.Errors;
 import ru.itmo.spaceships.generated.model.MaintenanceRequestRequest;
 import ru.itmo.spaceships.model.MaintenanceRequestEntity;
@@ -21,6 +22,7 @@ import java.time.Instant;
 public class MaintenanceRequestService {
 
     private final MaintenanceRequestRepository maintenanceRequestRepository;
+    private final Sinks.Many<MaintenanceRequestEntity> maintenanceRequestUpdateSink;
 
     /**
      * Создаёт новую заявку на обслуживание.
@@ -90,7 +92,8 @@ public class MaintenanceRequestService {
                     entity.setUpdatedAt(Instant.now());
                     // createdAt и updatedAt - системные поля, не обновляются из запроса
                     return maintenanceRequestRepository.save(entity);
-                });
+                })
+                .doOnSuccess(maintenanceRequestUpdateSink::tryEmitNext);
     }
 
     /**
@@ -131,6 +134,16 @@ public class MaintenanceRequestService {
     public Mono<MaintenanceRequestEntity> getMaintenanceRequestById(Long id) {
         return maintenanceRequestRepository.findById(id)
                 .switchIfEmpty(Mono.error(Errors.maintenanceRequestNotFound(id)));
+    }
+
+    /**
+     * Получает поток обновлений заявок на обслуживание.
+     * Эмитит событие каждый раз, когда заявка на обслуживание успешно обновляется.
+     *
+     * @return поток сущностей заявок на обслуживание
+     */
+    public Flux<MaintenanceRequestEntity> getMaintenanceRequestsUpdatesStream() {
+        return maintenanceRequestUpdateSink.asFlux();
     }
 }
 

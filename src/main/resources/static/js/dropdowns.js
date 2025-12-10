@@ -21,18 +21,24 @@ async function loadSpaceshipsForDropdown(page = 0) {
     try {
         const response = await fetch(`${API_BASE}/spaceships?page=${page}&size=${spaceshipPageSize}`);
         const data = await response.json();
+        
+        const menu = document.getElementById('spaceshipDropdownMenu');
+        
+        if (data.length === 0) {
+            // Don't update page number, just disable next button
+            const prevBtn = document.getElementById('spaceshipPrevBtn');
+            const nextBtn = document.getElementById('spaceshipNextBtn');
+            prevBtn.disabled = spaceshipPage === 0;
+            nextBtn.disabled = true; // Disable next button when no items
+            return;
+        }
+
+        menu.innerHTML = '';
+        
+        // Only update page number if we have items
         spaceshipPage = page;
         allSpaceships = data;
         spaceshipTotalItems = data.length;
-        
-        const menu = document.getElementById('spaceshipDropdownMenu');
-        menu.innerHTML = '';
-        
-        if (data.length === 0) {
-            menu.innerHTML = '<li><div class="px-3 py-2 text-muted">Корабли не найдены</div></li>';
-            document.getElementById('spaceshipPagination').style.display = 'none';
-            return;
-        }
         
         data.forEach(ship => {
             const li = document.createElement('li');
@@ -91,8 +97,13 @@ function updateSpaceshipPaginationButtons() {
 /**
  * Navigate spaceship dropdown page
  * @param {number} direction - -1 for previous, 1 for next
+ * @param {Event} event - Click event (optional)
  */
-function navigateSpaceshipPage(direction) {
+function navigateSpaceshipPage(direction, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
     const newPage = spaceshipPage + direction;
     if (newPage >= 0) {
         loadSpaceshipsForDropdown(newPage);
@@ -107,18 +118,24 @@ async function loadRepairmenForDropdown(page = 0) {
     try {
         const response = await fetch(`${API_BASE}/repairmen?page=${page}&size=${assigneePageSize}`);
         const data = await response.json();
+        
+        const menu = document.getElementById('assigneeDropdownMenu');
+        
+        if (data.length === 0) {
+            // Don't update page number, just disable next button
+            const prevBtn = document.getElementById('assigneePrevBtn');
+            const nextBtn = document.getElementById('assigneeNextBtn');
+            prevBtn.disabled = assigneePage === 0;
+            nextBtn.disabled = true; // Disable next button when no items
+            return;
+        }
+
+        menu.innerHTML = '';
+        
+        // Only update page number if we have items
         assigneePage = page;
         allRepairmen = data;
         assigneeTotalItems = data.length;
-        
-        const menu = document.getElementById('assigneeDropdownMenu');
-        menu.innerHTML = '';
-        
-        if (data.length === 0) {
-            menu.innerHTML = '<li><div class="px-3 py-2 text-muted">Ремонтники не найдены</div></li>';
-            document.getElementById('assigneePagination').style.display = 'none';
-            return;
-        }
         
         data.forEach(repairman => {
             const li = document.createElement('li');
@@ -177,8 +194,13 @@ function updateAssigneePaginationButtons() {
 /**
  * Navigate assignee dropdown page
  * @param {number} direction - -1 for previous, 1 for next
+ * @param {Event} event - Click event (optional)
  */
-function navigateAssigneePage(direction) {
+function navigateAssigneePage(direction, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
     const newPage = assigneePage + direction;
     if (newPage >= 0) {
         loadRepairmenForDropdown(newPage);

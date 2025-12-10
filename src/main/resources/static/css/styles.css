@@ -144,12 +144,13 @@ body {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: inline-block;
 }
 
 .main-screen .gif-container img {
-    width: 100%;
     max-width: 500px;
     height: auto;
+    display: block;
 }
 
 .form-control:focus {

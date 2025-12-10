@@ -52,8 +52,10 @@
                 <div class="main-screen">
                     <h1>🚀 Система управления космическими кораблями</h1>
                     <p class="lead text-muted">Управляйте флотом, персоналом и заявками на обслуживание в одном месте</p>
-                    <div class="gif-container">
-                        <img src="https://media.giphy.com/media/l0MYC0LajdoPo3ATu/giphy.gif" alt="Космический корабль">
+                    <div class="d-flex justify-content-center">
+                        <div class="gif-container">
+                            <img src="https://media.giphy.com/media/l0MYC0LajdoPo3ATu/giphy.gif" alt="Космический корабль">
+                        </div>
                     </div>
 <div class="mt-4">
                         <p class="text-muted">Используйте вкладки выше для управления различными аспектами вашего флота космических кораблей.</p>
@@ -493,12 +495,12 @@
                                     <ul class="list-unstyled mb-0" id="spaceshipDropdownMenu" style="max-height: 300px; overflow-y: auto;">
                                         <li><div class="px-3 py-2 text-muted">Загрузка...</div></li>
                                     </ul>
-                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="spaceshipPagination" style="display: none;">
-                                        <button class="btn btn-sm btn-outline-secondary" id="spaceshipPrevBtn" onclick="navigateSpaceshipPage(-1)" disabled>
+                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="spaceshipPagination" style="display: none;" onclick="event.stopPropagation()">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="spaceshipPrevBtn" onclick="navigateSpaceshipPage(-1, event)" disabled>
                                             <i class="bi bi-chevron-left"></i> Назад
                                         </button>
                                         <span class="small" id="spaceshipPageInfo">Страница 1</span>
-                                        <button class="btn btn-sm btn-outline-secondary" id="spaceshipNextBtn" onclick="navigateSpaceshipPage(1)" disabled>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="spaceshipNextBtn" onclick="navigateSpaceshipPage(1, event)" disabled>
                                             Вперёд <i class="bi bi-chevron-right"></i>
                                         </button>
                                     </div>
@@ -520,12 +522,12 @@
                                     <ul class="list-unstyled mb-0" id="assigneeDropdownMenu" style="max-height: 300px; overflow-y: auto;">
                                         <li><div class="px-3 py-2 text-muted">Загрузка...</div></li>
                                     </ul>
-                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="assigneePagination" style="display: none;">
-                                        <button class="btn btn-sm btn-outline-secondary" id="assigneePrevBtn" onclick="navigateAssigneePage(-1)" disabled>
+                                    <div class="d-flex justify-content-between align-items-center p-2 border-top" id="assigneePagination" style="display: none;" onclick="event.stopPropagation()">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="assigneePrevBtn" onclick="navigateAssigneePage(-1, event)" disabled>
                                             <i class="bi bi-chevron-left"></i> Назад
                                         </button>
                                         <span class="small" id="assigneePageInfo">Страница 1</span>
-                                        <button class="btn btn-sm btn-outline-secondary" id="assigneeNextBtn" onclick="navigateAssigneePage(1)" disabled>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="assigneeNextBtn" onclick="navigateAssigneePage(1, event)" disabled>
                                             Вперёд <i class="bi bi-chevron-right"></i>
                                         </button>
                                     </div>

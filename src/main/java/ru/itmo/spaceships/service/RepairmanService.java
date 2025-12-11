@@ -1,5 +1,7 @@
 package ru.itmo.spaceships.service;
 
+import java.time.Duration;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import ru.itmo.spaceships.generated.model.RepairmanRequest;
 import ru.itmo.spaceships.model.RepairmanEntity;
 import ru.itmo.spaceships.repository.RepairmanRepository;
 
+import static reactor.core.publisher.Sinks.EmitFailureHandler.busyLooping;
+
 /**
  * Сервис для работы с ремонтниками.
  */
@@ -20,6 +24,8 @@ public class RepairmanService {
 
     private final RepairmanRepository repairmanRepository;
     private final Sinks.Many<RepairmanEntity> repairmanUpdateSink;
+
+    private final Duration emitDuration = Duration.ofSeconds(3);
 
     /**
      * Создаёт нового ремонтника.
@@ -57,7 +63,7 @@ public class RepairmanService {
                     }
                     return repairmanRepository.save(entity);
                 })
-                .doOnSuccess(repairmanUpdateSink::tryEmitNext);
+                .doOnSuccess(entity -> repairmanUpdateSink.emitNext(entity, busyLooping(emitDuration)));
     }
 
     /**

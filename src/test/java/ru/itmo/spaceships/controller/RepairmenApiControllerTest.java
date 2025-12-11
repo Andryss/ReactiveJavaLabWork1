@@ -1,5 +1,7 @@
 package ru.itmo.spaceships.controller;
 
+import java.util.concurrent.CountDownLatch;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -522,7 +524,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
 
     @Test
     void testGetRepairmenUpdatesStreamMultipleUpdates() {
-        // Только один текст, поскольку более одного раза сложно валидировать
+        CountDownLatch consumerSubscribedLatch = new CountDownLatch(1);
 
         // Создаём первого ремонтника
         RepairmanRequest createRequest1 = new RepairmanRequest();
@@ -559,25 +561,47 @@ class RepairmenApiControllerTest extends BaseDbTest {
         Long id2 = created2.getId();
 
         // Публикуем обновления обоих ремонтников
-        RepairmanRequest updateRequest1 = new RepairmanRequest();
-        updateRequest1.setName("Jane Doe");
-        updateRequest1.setPosition("Lead Technician");
+        new Thread(() -> {
+            RepairmanRequest updateRequest1 = new RepairmanRequest();
+            updateRequest1.setName("Jane Doe");
+            updateRequest1.setPosition("Lead Technician");
 
-        webClient.put()
-                .uri("/repairmen/{id}", id1)
-                .bodyValue(updateRequest1)
-                .exchange()
-                .expectStatus().isOk();
+            WebTestClient.RequestHeadersSpec<?> requestSpec = webClient.put()
+                    .uri("/repairmen/{id}", id1)
+                    .bodyValue(updateRequest1);
 
-        RepairmanRequest updateRequest2 = new RepairmanRequest();
-        updateRequest2.setName("Alice Smith");
-        updateRequest2.setPosition("Senior Technician");
+            try {
+                consumerSubscribedLatch.await();
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
-        webClient.put()
-                .uri("/repairmen/{id}", id2)
-                .bodyValue(updateRequest2)
-                .exchange()
-                .expectStatus().isOk();
+            requestSpec.exchange()
+                    .expectStatus().isOk();
+        }).start();
+
+        new Thread(() -> {
+            RepairmanRequest updateRequest2 = new RepairmanRequest();
+            updateRequest2.setName("Alice Smith");
+            updateRequest2.setPosition("Senior Technician");
+
+            WebTestClient.RequestHeadersSpec<?> requestSpec = webClient.put()
+                    .uri("/repairmen/{id}", id2)
+                    .bodyValue(updateRequest2);
+
+            try {
+                consumerSubscribedLatch.await();
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            requestSpec.exchange()
+                    .expectStatus().isOk();
+        }).start();
+
+        consumerSubscribedLatch.countDown();
 
         // Подключаемся к стриму обновлений и фильтруем по ID наших ремонтников
         webClient.get()
@@ -594,11 +618,11 @@ class RepairmenApiControllerTest extends BaseDbTest {
                 .as(StepVerifier::create)
                 .assertNext(updates -> {
                     assertEquals(2, updates.size(), "Should receive exactly 2 updates");
-                    
+
                     // Проверяем, что получили оба обновления (один для id1, один для id2)
                     boolean found1 = false;
                     boolean found2 = false;
-                    
+
                     for (RepairmanDto dto : updates) {
                         if (dto.getId().equals(id1)) {
                             assertEquals("Jane Doe", dto.getName());
@@ -610,7 +634,7 @@ class RepairmenApiControllerTest extends BaseDbTest {
                             found2 = true;
                         }
                     }
-                    
+
                     assertTrue(found1, "Should receive update for first repairman (id=" + id1 + ")");
                     assertTrue(found2, "Should receive update for second repairman (id=" + id2 + ")");
                 })

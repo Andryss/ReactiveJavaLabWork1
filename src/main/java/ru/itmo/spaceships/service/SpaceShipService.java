@@ -1,5 +1,7 @@
 package ru.itmo.spaceships.service;
 
+import java.time.Duration;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,8 @@ import ru.itmo.spaceships.generated.model.SpaceShipRequest;
 import ru.itmo.spaceships.model.SpaceShipEntity;
 import ru.itmo.spaceships.repository.SpaceShipRepository;
 
+import static reactor.core.publisher.Sinks.EmitFailureHandler.busyLooping;
+
 /**
  * Сервис для работы с кораблями.
  */
@@ -22,6 +26,8 @@ public class SpaceShipService {
     private final SpaceShipRepository spaceShipRepository;
     private final SpaceShipConverter spaceShipConverter;
     private final Sinks.Many<SpaceShipEntity> spaceShipUpdateSink;
+
+    private final Duration emitDuration = Duration.ofSeconds(3);
 
     /**
      * Создаёт новый корабль.
@@ -59,7 +65,7 @@ public class SpaceShipService {
                     updated.setSerial(serial);
                     return spaceShipRepository.save(updated);
                 })
-                .doOnSuccess(spaceShipUpdateSink::tryEmitNext);
+                .doOnSuccess(entity -> spaceShipUpdateSink.emitNext(entity, busyLooping(emitDuration)));
     }
 
     /**

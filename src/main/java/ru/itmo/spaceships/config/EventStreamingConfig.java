@@ -3,6 +3,7 @@ package ru.itmo.spaceships.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Sinks;
+import reactor.util.concurrent.Queues;
 import ru.itmo.spaceships.model.MaintenanceRequestEntity;
 import ru.itmo.spaceships.model.RepairmanEntity;
 import ru.itmo.spaceships.model.SpaceShipEntity;
@@ -22,7 +23,7 @@ public class EventStreamingConfig {
      */
     @Bean
     public Sinks.Many<RepairmanEntity> repairmanUpdateSink() {
-        return Sinks.many().multicast().onBackpressureBuffer();
+        return Sinks.many().multicast().onBackpressureBuffer(Queues.SMALL_BUFFER_SIZE, false);
     }
 
     /**
@@ -33,7 +34,7 @@ public class EventStreamingConfig {
      */
     @Bean
     public Sinks.Many<MaintenanceRequestEntity> maintenanceRequestUpdateSink() {
-        return Sinks.many().multicast().onBackpressureBuffer();
+        return Sinks.many().multicast().onBackpressureBuffer(Queues.SMALL_BUFFER_SIZE, false);
     }
 
     /**
@@ -44,7 +45,7 @@ public class EventStreamingConfig {
      */
     @Bean
     public Sinks.Many<SpaceShipEntity> spaceShipUpdateSink() {
-        return Sinks.many().multicast().onBackpressureBuffer();
+        return Sinks.many().multicast().onBackpressureBuffer(Queues.SMALL_BUFFER_SIZE, false);
     }
 }
 

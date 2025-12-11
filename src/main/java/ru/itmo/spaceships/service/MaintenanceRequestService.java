@@ -12,7 +12,10 @@ import ru.itmo.spaceships.model.MaintenanceRequestEntity;
 import ru.itmo.spaceships.model.MaintenanceStatus;
 import ru.itmo.spaceships.repository.MaintenanceRequestRepository;
 
+import java.time.Duration;
 import java.time.Instant;
+
+import static reactor.core.publisher.Sinks.EmitFailureHandler.busyLooping;
 
 /**
  * Сервис для работы с заявками на обслуживание.
@@ -23,6 +26,8 @@ public class MaintenanceRequestService {
 
     private final MaintenanceRequestRepository maintenanceRequestRepository;
     private final Sinks.Many<MaintenanceRequestEntity> maintenanceRequestUpdateSink;
+
+    private final Duration emitDuration = Duration.ofSeconds(3);
 
     /**
      * Создаёт новую заявку на обслуживание.
@@ -64,7 +69,7 @@ public class MaintenanceRequestService {
                     if (request.getStatus() != null) {
                         MaintenanceStatus newStatus = MaintenanceStatus.valueOf(request.getStatus().name());
                         MaintenanceStatus currentStatus = entity.getStatus();
-                        
+
                         if (currentStatus != newStatus) {
                             // Валидируем переход статуса
                             try {
@@ -76,7 +81,7 @@ public class MaintenanceRequestService {
                             entity.setStatus(newStatus);
                         }
                     }
-                    
+
                     // Обновляем другие поля
                     if (request.getSpaceshipSerial() != null) {
                         entity.setSpaceshipSerial(request.getSpaceshipSerial());
@@ -87,13 +92,13 @@ public class MaintenanceRequestService {
                     if (request.getAssignee() != null) {
                         entity.setAssignee(request.getAssignee());
                     }
-                    
+
                     // Обновляем временную метку updatedAt
                     entity.setUpdatedAt(Instant.now());
                     // createdAt и updatedAt - системные поля, не обновляются из запроса
                     return maintenanceRequestRepository.save(entity);
                 })
-                .doOnSuccess(maintenanceRequestUpdateSink::tryEmitNext);
+                .doOnSuccess(entity -> maintenanceRequestUpdateSink.emitNext(entity, busyLooping(emitDuration)));
     }
 
     /**

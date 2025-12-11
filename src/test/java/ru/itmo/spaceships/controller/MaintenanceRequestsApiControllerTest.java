@@ -4,6 +4,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -570,6 +571,8 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
 
     @Test
     void testGetMaintenanceRequestsUpdatesStreamMultipleUpdates() {
+        CountDownLatch consumerSubscribedLatch = new CountDownLatch(1);
+
         // Создаём первую заявку на обслуживание
         MaintenanceRequestRequest createRequest1 = createTestRequest();
         createRequest1.setSpaceshipSerial(100L);
@@ -605,39 +608,49 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
         Long id2 = created2.getId();
 
         // Публикуем обновления обеих заявок
-        MaintenanceRequestRequest updateRequest1 = createTestRequest();
-        updateRequest1.setSpaceshipSerial(100L);
-        updateRequest1.setComment("Updated first request");
-        updateRequest1.setStatus(MaintenanceStatus.ACCEPTED);
+        new Thread(() -> {
+            MaintenanceRequestRequest updateRequest1 = createTestRequest();
+            updateRequest1.setSpaceshipSerial(100L);
+            updateRequest1.setComment("Updated first request");
+            updateRequest1.setStatus(MaintenanceStatus.ACCEPTED);
 
-        webClient.put()
-                .uri("/maintenance-requests/{id}", id1)
-                .bodyValue(updateRequest1)
-                .exchange()
-                .expectStatus().isOk();
+            WebTestClient.RequestHeadersSpec<?> requestSpec = webClient.put()
+                    .uri("/maintenance-requests/{id}", id1)
+                    .bodyValue(updateRequest1);
 
-        // Для второй заявки сначала переходим в ACCEPTED, потом в DIAGNOSTICS
-        MaintenanceRequestRequest updateRequest2a = createTestRequest();
-        updateRequest2a.setSpaceshipSerial(200L);
-        updateRequest2a.setComment("Second request - accepted");
-        updateRequest2a.setStatus(MaintenanceStatus.ACCEPTED);
+            try {
+                consumerSubscribedLatch.await();
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
-        webClient.put()
-                .uri("/maintenance-requests/{id}", id2)
-                .bodyValue(updateRequest2a)
-                .exchange()
-                .expectStatus().isOk();
+            requestSpec.exchange()
+                    .expectStatus().isOk();
+        }).start();
 
-        MaintenanceRequestRequest updateRequest2 = createTestRequest();
-        updateRequest2.setSpaceshipSerial(200L);
-        updateRequest2.setComment("Updated second request");
-        updateRequest2.setStatus(MaintenanceStatus.DIAGNOSTICS);
+        new Thread(() -> {
+            MaintenanceRequestRequest updateRequest2 = createTestRequest();
+            updateRequest2.setSpaceshipSerial(200L);
+            updateRequest2.setComment("Updated second request");
+            updateRequest2.setStatus(MaintenanceStatus.ACCEPTED);
 
-        webClient.put()
-                .uri("/maintenance-requests/{id}", id2)
-                .bodyValue(updateRequest2)
-                .exchange()
-                .expectStatus().isOk();
+            WebTestClient.RequestHeadersSpec<?> requestSpec = webClient.put()
+                    .uri("/maintenance-requests/{id}", id2)
+                    .bodyValue(updateRequest2);
+
+            try {
+                consumerSubscribedLatch.await();
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            requestSpec.exchange()
+                    .expectStatus().isOk();
+        }).start();
+
+        consumerSubscribedLatch.countDown();
 
         // Подключаемся к стриму обновлений и фильтруем по ID наших заявок
         webClient.get()
@@ -654,25 +667,23 @@ class MaintenanceRequestsApiControllerTest extends BaseDbTest {
                 .as(StepVerifier::create)
                 .assertNext(updates -> {
                     assertEquals(2, updates.size(), "Should receive exactly 2 updates");
-                    
+
                     // Проверяем, что получили обе обновления (одна для id1, одна для id2)
                     boolean found1 = false;
                     boolean found2 = false;
-                    
+
                     for (MaintenanceRequestDto dto : updates) {
                         if (dto.getId().equals(id1)) {
                             assertEquals("Updated first request", dto.getComment());
                             assertEquals(MaintenanceStatus.ACCEPTED, dto.getStatus());
                             found1 = true;
                         } else if (dto.getId().equals(id2)) {
-                            // Может быть либо ACCEPTED (первое обновление), либо DIAGNOSTICS (второе обновление)
-                            assertTrue(dto.getStatus() == MaintenanceStatus.ACCEPTED || 
-                                      dto.getStatus() == MaintenanceStatus.DIAGNOSTICS,
-                                      "Status should be ACCEPTED or DIAGNOSTICS");
+                            assertEquals("Updated second request", dto.getComment());
+                            assertEquals(MaintenanceStatus.ACCEPTED, dto.getStatus());
                             found2 = true;
                         }
                     }
-                    
+
                     assertTrue(found1, "Should receive update for first maintenance request (id=" + id1 + ")");
                     assertTrue(found2, "Should receive update for second maintenance request (id=" + id2 + ")");
                 })

@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -433,33 +434,81 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
     }
 
     @Test
-    void testGetSpaceshipsUpdatesStream() {
-        // Создаём корабль
-        SpaceShipRequest createRequest = createTestRequest();
-        SpaceShipDto created = webClient.post()
+    void testGetSpaceshipsUpdatesStreamMultipleUpdates() {
+        CountDownLatch consumerSubscribedLatch = new CountDownLatch(1);
+
+        // Создаём первый корабль
+        SpaceShipRequest createRequest1 = createTestRequest();
+        SpaceShipDto created1 = webClient.post()
                 .uri("/spaceships")
-                .bodyValue(createRequest)
+                .bodyValue(createRequest1)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SpaceShipDto.class)
                 .returnResult()
                 .getResponseBody();
 
-        assertNotNull(created);
-        Long serial = created.getSerial();
+        assertNotNull(created1);
+        Long serial1 = created1.getSerial();
 
-        // Обновляем корабль
-        SpaceShipRequest updateRequest = createTestRequest(serial);
-        updateRequest.setName("Updated Ship Name");
-        updateRequest.setManufacturer("Updated Manufacturer");
-
-        webClient.put()
-                .uri("/spaceships/{serial}", serial)
-                .bodyValue(updateRequest)
+        // Создаём второй корабль
+        SpaceShipRequest createRequest2 = createTestRequest();
+        SpaceShipDto created2 = webClient.post()
+                .uri("/spaceships")
+                .bodyValue(createRequest2)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .expectBody(SpaceShipDto.class)
+                .returnResult()
+                .getResponseBody();
 
-        // Подключаемся к стриму обновлений и фильтруем по серийному номеру нашего корабля
+        assertNotNull(created2);
+        Long serial2 = created2.getSerial();
+
+        // Публикуем обновления обоих кораблей
+        new Thread(() -> {
+            SpaceShipRequest updateRequest1 = createTestRequest(serial1);
+            updateRequest1.setName("Updated Ship Name 1");
+            updateRequest1.setManufacturer("Updated Manufacturer 1");
+
+            WebTestClient.RequestHeadersSpec<?> requestSpec = webClient.put()
+                    .uri("/spaceships/{serial}", serial1)
+                    .bodyValue(updateRequest1);
+
+            try {
+                consumerSubscribedLatch.await();
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            requestSpec.exchange()
+                    .expectStatus().isOk();
+        }).start();
+
+        new Thread(() -> {
+            SpaceShipRequest updateRequest2 = createTestRequest(serial2);
+            updateRequest2.setName("Updated Ship Name 2");
+            updateRequest2.setManufacturer("Updated Manufacturer 2");
+
+            WebTestClient.RequestHeadersSpec<?> requestSpec = webClient.put()
+                    .uri("/spaceships/{serial}", serial2)
+                    .bodyValue(updateRequest2);
+
+            try {
+                consumerSubscribedLatch.await();
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            requestSpec.exchange()
+                    .expectStatus().isOk();
+        }).start();
+
+        consumerSubscribedLatch.countDown();
+
+        // Подключаемся к стриму обновлений и фильтруем по серийным номерам наших кораблей
         webClient.get()
                 .uri("/spaceships/updates/stream")
                 .accept(MediaType.TEXT_EVENT_STREAM)
@@ -468,16 +517,31 @@ class SpaceShipsApiControllerTest extends BaseDbTest {
                 .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
                 .returnResult(SpaceShipDto.class)
                 .getResponseBody()
-                .filter(dto -> dto.getSerial().equals(serial))
-                .take(1)
+                .filter(dto -> dto.getSerial().equals(serial1) || dto.getSerial().equals(serial2))
+                .take(2)
                 .collectList()
                 .as(StepVerifier::create)
                 .assertNext(updates -> {
-                    assertEquals(1, updates.size(), "Should receive exactly 1 update");
-                    SpaceShipDto dto = updates.get(0);
-                    assertEquals(serial, dto.getSerial());
-                    assertEquals("Updated Ship Name", dto.getName());
-                    assertEquals("Updated Manufacturer", dto.getManufacturer());
+                    assertEquals(2, updates.size(), "Should receive exactly 2 updates");
+
+                    // Проверяем, что получили оба обновления (одно для serial1, одно для serial2)
+                    boolean found1 = false;
+                    boolean found2 = false;
+
+                    for (SpaceShipDto dto : updates) {
+                        if (dto.getSerial().equals(serial1)) {
+                            assertEquals("Updated Ship Name 1", dto.getName());
+                            assertEquals("Updated Manufacturer 1", dto.getManufacturer());
+                            found1 = true;
+                        } else if (dto.getSerial().equals(serial2)) {
+                            assertEquals("Updated Ship Name 2", dto.getName());
+                            assertEquals("Updated Manufacturer 2", dto.getManufacturer());
+                            found2 = true;
+                        }
+                    }
+
+                    assertTrue(found1, "Should receive update for first spaceship (serial=" + serial1 + ")");
+                    assertTrue(found2, "Should receive update for second spaceship (serial=" + serial2 + ")");
                 })
                 .verifyComplete();
     }

@@ -35,7 +35,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        log.info("Запуск инициализации данных...");
+        log.info("Initializing data...");
 
         // Инициализация кораблей
         spaceShipRepository.count()
